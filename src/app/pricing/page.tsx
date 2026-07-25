@@ -12,27 +12,30 @@ import { useLanguage } from '@/lib/i18n';
 export default function PricingPage() {
   const { t } = useLanguage();
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleSelectPlan = async (tierKey: 'basic' | 'loyalty' | 'premium') => {
     setLoadingTier(tierKey);
+    setErrorMsg('');
     try {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          merchantId: 'public-merchant-checkout',
-          email: 'demande@menufid.site',
+          merchantId: 'merchant-public',
+          email: 'contact@menufid.site',
           planTier: tierKey,
         }),
       });
       const data = await res.json();
-      if (data.url) {
+      if (res.ok && data.url) {
         window.location.href = data.url;
       } else {
-        window.location.href = `/register?plan=${tierKey}`;
+        setErrorMsg(data.error || 'Veuillez configurer votre clé STRIPE_SECRET_KEY sur Vercel.');
       }
-    } catch {
-      window.location.href = `/register?plan=${tierKey}`;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Impossible d\'ouvrir la page de paiement Stripe.';
+      setErrorMsg(msg);
     } finally {
       setLoadingTier(null);
     }
@@ -54,6 +57,11 @@ export default function PricingPage() {
           <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
             Chaque formule est conçue pour maximiser la rentabilité de votre établissement dès le premier mois. Sans engagement, sans frais d&apos;installation.
           </p>
+          {errorMsg && (
+            <div className="mt-6 p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-2xl font-semibold">
+              ⚠️ {errorMsg}
+            </div>
+          )}
         </div>
 
         {/* Pricing Cards Grid */}

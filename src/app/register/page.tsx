@@ -79,24 +79,26 @@ function RegisterFormContent() {
   // Étape 2 : Confirmation de l'abonnement Stripe
   const handleStep2Checkout = async (tier: 'basic' | 'loyalty' | 'premium') => {
     setLoading(true);
+    setError('');
     try {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          merchantId: merchantId || 'merchant-demo',
-          email,
+          merchantId: merchantId || `merchant-${Date.now()}`,
+          email: email || 'contact@restaurant.com',
           planTier: tier,
         }),
       });
       const data = await res.json();
-      if (data.url) {
+      if (res.ok && data.url) {
         window.location.href = data.url;
       } else {
-        router.push('/dashboard/profile?payment=success');
+        setError(data.error || 'Erreur Stripe Checkout : Vérifiez votre configuration de paiement.');
       }
-    } catch {
-      router.push('/dashboard/profile?payment=success');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Impossible de contacter le serveur Stripe Checkout.';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -224,6 +226,12 @@ function RegisterFormContent() {
             <p className="text-slate-500 text-xs sm:text-sm">
               Choisissez votre formule pour activer votre Menu QR et votre Carte de Fidélité Digitale.
             </p>
+            {error && (
+              <div className="mt-4 p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-2xl flex items-center justify-center gap-2 font-semibold">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
