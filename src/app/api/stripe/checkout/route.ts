@@ -3,8 +3,8 @@ import { stripe } from '@/lib/stripe';
 
 /**
  * Route POST /api/stripe/checkout
- * Génère une session Stripe Checkout pour un commerçant s'abonnant à une formule.
- * Avec fallback de démonstration élégant si la clé Stripe réelle n'est pas encore configurée.
+ * Génère une VRAIE session Stripe Checkout obligatoire pour l'abonnement d'un commerçant.
+ * Mode 'subscription' avec saisie de carte bancaire obligatoire.
  */
 export async function POST(req: Request) {
   try {
@@ -15,13 +15,6 @@ export async function POST(req: Request) {
     }
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://menufid.site';
-    const stripeKey = process.env.STRIPE_SECRET_KEY || '';
-
-    // Si pas de clé Stripe réelle valide configurée -> Mode démonstration immédiat sans erreur
-    if (!stripeKey || stripeKey.includes('sk_test_51') || stripeKey.includes('sk_test_mock')) {
-      const fallbackUrl = `${appUrl}/dashboard/profile?payment=success&tier=${planTier}`;
-      return NextResponse.json({ url: fallbackUrl, simulated: true });
-    }
 
     // Prix mensuels en cents (5€ = 500, 10€ = 1000, 20€ = 2000)
     const priceMap: Record<string, number> = {
@@ -30,12 +23,13 @@ export async function POST(req: Request) {
       premium: 2000,
     };
 
-    const amount = priceMap[planTier] || 1500;
+    const amount = priceMap[planTier] || 500;
 
+    // Création de la session d'abonnement bancaire Stripe Checkout
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'subscription',
-      customer_email: email,
+      customer_email: email && email.includes('@') ? email : undefined,
       client_reference_id: merchantId,
       metadata: {
         merchantId,
@@ -47,7 +41,7 @@ export async function POST(req: Request) {
             currency: 'eur',
             product_data: {
               name: `MenuFid Abonnement ${planTier.toUpperCase()}`,
-              description: `Abonnement mensuel MenuFid ${planTier.toUpperCase()} pour restauration et fidélité.`,
+              description: `Abonnement mensuel MenuFid ${planTier.toUpperCase()} - Digitalisation Menu QR & Carte de Fidélité Digitale.`,
             },
             unit_amount: amount,
             recurring: {
@@ -58,14 +52,20 @@ export async function POST(req: Request) {
         },
       ],
       success_url: `${appUrl}/dashboard/profile?payment=success&tier=${planTier}`,
-      cancel_url: `${appUrl}/dashboard/profile?payment=cancelled`,
+      cancel_url: `${appUrl}/pricing?payment=cancelled`,
     });
+
+    if (!session.url) {
+      throw new Error('Impossible de générer l\'URL de la session Stripe.');
+    }
 
     return NextResponse.json({ url: session.url });
   } catch (error: unknown) {
-    console.warn('[Stripe Checkout Fallback Mode Triggered]', error);
-    const { planTier } = await req.json().catch(() => ({ planTier: 'premium' }));
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://menufid.site';
-    return NextResponse.json({ url: `${appUrl}/dashboard/profile?payment=success&tier=${planTier || 'premium'}`, simulated: true });
+    console.error('[Stripe Checkout Error Direct]', error);
+    const errMessage = error instanceof Error ? error.message : 'Erreur lors de l\'accès à Stripe Checkout.';
+    return NextResponse.json(
+      { error: `Erreur Stripe : ${errMessage}. Vérifiez la clé STRIPE_SECRET_KEY.` },
+      { status: 500 }
+    );
   }
 }

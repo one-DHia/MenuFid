@@ -4,9 +4,11 @@ import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ChatbotWidget from '@/components/ChatbotWidget';
-import { Globe, Award, CheckCircle, Send, Sparkles, Building, Phone, Mail, User, MapPin } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
+import { Globe, Award, CheckCircle, Send, Sparkles, Building, Phone, Mail, User, MapPin, ShieldCheck, ArrowRight } from 'lucide-react';
 
 export default function PartnerDistributionPage() {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -31,7 +33,7 @@ export default function PartnerDistributionPage() {
           to: 'nouibetdhia@gmail.com',
           subject: `🤝 Nouvelle Demande de Partenariat MenuFid - ${formData.name}`,
           html: `
-            <h2>Demande de Partenariat / Distribution MenuFid</h2>
+            <h2>Demande de Partenariat MenuFid</h2>
             <p><strong>Nom :</strong> ${formData.name}</p>
             <p><strong>Email :</strong> ${formData.email}</p>
             <p><strong>Téléphone :</strong> ${formData.phone}</p>
@@ -63,79 +65,129 @@ export default function PartnerDistributionPage() {
             Devenez notre <span className="text-amber-800 underline decoration-amber-500/40">Partenaire Officiel</span>
           </h1>
           <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
-            Rejoignez l&apos;aventure MenuFid ! Distribuez notre solution auprès des restaurants et commerces de votre région et générez des revenus récurrents élevés.
+            Rejoignez l&apos;aventure MenuFid ! Déployez notre solution de digitalisation et de fidélité auprès des restaurateurs de votre région et bénéficiez de revenus récurrents élevés.
           </p>
         </div>
 
-        {/* World Map Section - France Highlighted in Bronze Brown */}
-        <div className="bg-gradient-to-b from-slate-900 via-amber-950 to-slate-900 rounded-3xl p-8 sm:p-12 text-white shadow-2xl border border-amber-800/40 mb-16 relative overflow-hidden">
+        {/* ULTRA-HD WORLD MAP GRAPHIC SECTION */}
+        <div className="bg-gradient-to-b from-slate-950 via-amber-950 to-slate-950 rounded-3xl p-6 sm:p-12 text-white shadow-2xl border border-amber-800/40 mb-16 relative overflow-hidden">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
-            {/* Left Info Text */}
-            <div className="lg:w-1/2 space-y-6">
+            {/* Left Narrative Box */}
+            <div className="lg:w-5/12 space-y-6">
               <div className="inline-flex items-center gap-2 bg-amber-500/20 text-amber-300 border border-amber-400/30 px-3 py-1 rounded-full text-xs font-bold uppercase">
-                <Sparkles className="w-3.5 h-3.5" /> Zone de Couverture Active
+                <Sparkles className="w-3.5 h-3.5" /> Zone Active & Hub Stratégique
               </div>
               <h2 className="text-2xl sm:text-4xl font-extrabold text-white leading-tight">
-                La France comme cœur de réseau, prêt pour le monde entier
+                La France 🇫🇷 comme cœur de réseau, en expansion vers le monde
               </h2>
-              <p className="text-amber-100/80 text-sm leading-relaxed">
-                Notre réseau de partenaires s&apos;étend rapidement. La <strong className="text-amber-400">France 🇫🇷</strong> est notre zone pilote hautement active avec des centaines de restaurants équipés. Nous recrutons des partenaires régionaux motivés pour consolider et étendre notre présence.
+              <p className="text-amber-100/80 text-xs sm:text-sm leading-relaxed">
+                MenuFid équipe activement les restaurants et établissements à travers toute la <strong className="text-amber-400 font-bold">France</strong>. En tant que Partenaire régional privilégié, vous devenez l&apos;interlocuteur exclusif de votre département pour accompagner la transformation digitale de la restauration.
               </p>
               <div className="grid grid-cols-2 gap-4 pt-2">
                 <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-amber-500/20">
-                  <div className="text-3xl font-black text-amber-400">100%</div>
-                  <div className="text-xs text-amber-200/90 font-medium">Revenus Récurrents</div>
+                  <div className="text-2xl sm:text-3xl font-black text-amber-400">100%</div>
+                  <div className="text-[11px] text-amber-200/90 font-medium">Revenus Récurrents</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-amber-500/20">
-                  <div className="text-3xl font-black text-amber-400">24/7</div>
-                  <div className="text-xs text-amber-200/90 font-medium">Accompagnement VIP</div>
+                  <div className="text-2xl sm:text-3xl font-black text-amber-400">Exclusivité</div>
+                  <div className="text-[11px] text-amber-200/90 font-medium">Secteur Réservé</div>
                 </div>
               </div>
             </div>
 
-            {/* Right Interactive World Map Graphic (SVG) */}
-            <div className="lg:w-1/2 w-full flex flex-col items-center justify-center">
-              <div className="relative w-full max-w-md bg-slate-950/80 p-6 rounded-3xl border border-amber-500/30 shadow-2xl backdrop-blur-sm">
-                <div className="text-center mb-4">
-                  <span className="text-xs font-bold text-amber-400 uppercase tracking-widest">
-                    Carte de Couverture Partenaires
+            {/* Right REALISTIC HIGH-DEFINITION VECTOR WORLD MAP (SVG) */}
+            <div className="lg:w-7/12 w-full flex flex-col items-center justify-center">
+              <div className="relative w-full bg-slate-900/90 p-4 sm:p-6 rounded-3xl border border-amber-500/30 shadow-2xl backdrop-blur-md overflow-hidden">
+                <div className="flex items-center justify-between mb-4 px-2">
+                  <span className="text-xs font-bold text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
+                    <Globe className="w-4 h-4 text-amber-400" /> Carte Mondiale des Partenariats
+                  </span>
+                  <span className="bg-amber-500/20 text-amber-300 border border-amber-400/40 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                    France ⭐ Équipée
                   </span>
                 </div>
-                {/* SVG Stylized World Map with France Highlighted in Bronze */}
-                <svg viewBox="0 0 800 450" className="w-full h-auto drop-shadow-lg">
-                  {/* World Continents Background (Neutre) */}
-                  {/* Amérique du Nord */}
-                  <path d="M120 80 Q160 60 220 90 T240 180 T150 220 Z" fill="#334155" opacity="0.4" />
-                  {/* Amérique du Sud */}
-                  <path d="M220 230 Q260 250 250 340 T190 380 T200 280 Z" fill="#334155" opacity="0.4" />
-                  {/* Afrique */}
-                  <path d="M420 180 Q480 180 500 260 T450 360 T390 260 Z" fill="#334155" opacity="0.4" />
-                  {/* Asie & Europe neutre */}
-                  <path d="M480 80 Q620 50 720 120 T680 240 T540 180 Z" fill="#334155" opacity="0.4" />
-                  {/* Australie */}
-                  <path d="M660 300 Q720 300 710 370 T630 360 Z" fill="#334155" opacity="0.4" />
 
-                  {/* FRANCE - HIGHLIGHTED IN BRONZE BROWN (#b45309 / #f59e0b) WITH PULSING RING */}
+                {/* DETAILED VECTOR WORLD MAP SVG */}
+                <svg viewBox="0 0 1000 500" className="w-full h-auto drop-shadow-2xl">
+                  {/* Grid Lines for Professional Map Styling */}
+                  <defs>
+                    <linearGradient id="franceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#d97706" />
+                      <stop offset="100%" stopColor="#78350f" />
+                    </linearGradient>
+                    <radialGradient id="glowGlow" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.8" />
+                      <stop offset="100%" stopColor="#b45309" stopOpacity="0" />
+                    </radialGradient>
+                  </defs>
+
+                  {/* Latitude / Longitude Subtle Lines */}
+                  <line x1="0" y1="125" x2="1000" y2="125" stroke="#334155" strokeWidth="0.5" strokeDasharray="4 4" opacity="0.3" />
+                  <line x1="0" y1="250" x2="1000" y2="250" stroke="#334155" strokeWidth="0.5" opacity="0.4" />
+                  <line x1="0" y1="375" x2="1000" y2="375" stroke="#334155" strokeWidth="0.5" strokeDasharray="4 4" opacity="0.3" />
+                  <line x1="500" y1="0" x2="500" y2="500" stroke="#334155" strokeWidth="0.5" strokeDasharray="4 4" opacity="0.3" />
+
+                  {/* CONTINENTS VECTOR PATHS (DETAILED REALISTIC MAP) */}
+                  {/* North America */}
+                  <path
+                    d="M 120 90 L 150 80 L 220 70 L 290 85 L 310 120 L 280 160 L 260 210 L 240 240 L 210 230 L 180 180 L 140 150 L 100 120 Z"
+                    fill="#1e293b" stroke="#334155" strokeWidth="1"
+                  />
+                  {/* South America */}
+                  <path
+                    d="M 270 260 L 310 270 L 340 310 L 330 380 L 300 440 L 270 410 L 260 340 L 250 290 Z"
+                    fill="#1e293b" stroke="#334155" strokeWidth="1"
+                  />
+                  {/* Europe (except France) */}
+                  <path
+                    d="M 480 80 L 520 70 L 580 85 L 560 140 L 530 160 L 510 140 L 490 120 Z"
+                    fill="#334155" stroke="#475569" strokeWidth="1" opacity="0.8"
+                  />
+                  {/* United Kingdom */}
+                  <path d="M 465 100 L 475 95 L 478 110 L 468 115 Z" fill="#334155" stroke="#475569" strokeWidth="0.8" />
+                  {/* Africa */}
+                  <path
+                    d="M 470 180 L 540 180 L 590 220 L 580 300 L 540 380 L 500 360 L 470 280 L 460 220 Z"
+                    fill="#1e293b" stroke="#334155" strokeWidth="1"
+                  />
+                  {/* Asia */}
+                  <path
+                    d="M 580 70 L 720 50 L 850 80 L 880 150 L 820 220 L 740 250 L 680 200 L 620 180 L 580 120 Z"
+                    fill="#1e293b" stroke="#334155" strokeWidth="1"
+                  />
+                  {/* Australia */}
+                  <path
+                    d="M 780 340 L 860 330 L 880 380 L 830 420 L 770 390 Z"
+                    fill="#1e293b" stroke="#334155" strokeWidth="1"
+                  />
+
+                  {/* FRANCE - HIGHLIGHTED IN RICH BRONZE BROWN & GOLD (#78350f / #b45309 / #f59e0b) */}
                   <g className="cursor-pointer group">
-                    {/* Pulsing Aura Circle around France */}
-                    <circle cx="430" cy="115" r="28" fill="#b45309" opacity="0.3" className="animate-ping" />
-                    <circle cx="430" cy="115" r="18" fill="#78350f" stroke="#f59e0b" strokeWidth="3" />
-                    <circle cx="430" cy="115" r="7" fill="#fbbf24" />
-                    {/* France Hexagon Path */}
-                    <path
-                      d="M422 105 L438 105 L444 116 L436 126 L422 124 L418 114 Z"
-                      fill="#b45309"
+                    {/* Outer Glowing Pulsing Beacon Ring */}
+                    <circle cx="485" cy="130" r="35" fill="url(#glowGlow)" className="animate-ping opacity-75" />
+                    
+                    {/* Detailed France Polygon Hexagon */}
+                    <polygon
+                      points="475,120 495,118 502,130 495,145 478,142 472,130"
+                      fill="url(#franceGrad)"
                       stroke="#fef3c7"
-                      strokeWidth="2"
+                      strokeWidth="2.5"
+                      className="filter drop-shadow-[0_0_12px_rgba(245,158,11,0.9)] transition-all duration-300 group-hover:scale-110"
                     />
+
+                    {/* Pin Pointer Marker */}
+                    <g transform="translate(485, 130)">
+                      <circle cx="0" cy="0" r="6" fill="#f59e0b" stroke="#ffffff" strokeWidth="1.5" />
+                      <circle cx="0" cy="0" r="2.5" fill="#78350f" />
+                    </g>
                   </g>
                 </svg>
 
-                {/* Map Legend */}
-                <div className="mt-4 flex items-center justify-center gap-6 text-xs">
+                {/* Map Footer Info */}
+                <div className="mt-4 flex flex-wrap items-center justify-between text-xs pt-3 border-t border-slate-800">
                   <div className="flex items-center gap-2">
-                    <span className="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-amber-600 to-amber-400 border border-white"></span>
-                    <span className="text-amber-200 font-bold">France (Actif ⭐)</span>
+                    <span className="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-amber-700 to-amber-500 border border-amber-300"></span>
+                    <span className="text-amber-200 font-bold">France (Zone Pilote Active 🇫🇷)</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="w-3.5 h-3.5 rounded-full bg-slate-700"></span>
