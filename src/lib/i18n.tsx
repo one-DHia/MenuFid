@@ -61,7 +61,7 @@ export const translations: Record<Language, Record<string, string>> = {
     pricing_page_subtitle: 'Chaque formule est calibrée pour générer un retour sur investissement immédiat dès la première semaine.',
     plan_basic_name: 'Basic',
     plan_basic_price: '5€',
-    plan_basic_desc: 'Idéal pour digitaliser votre menu et démarrer la présentation de votre carte.',
+    plan_basic_desc: 'Idéal pour digitaliser votre carte en 2 minutes.',
     plan_basic_feat1: 'Menu QR Code Interactif HD',
     plan_basic_feat2: 'Modifications illimitées de la carte',
     plan_basic_feat3: 'Accès au Dashboard restaurateur',
@@ -83,11 +83,12 @@ export const translations: Record<Language, Record<string, string>> = {
     plan_premium_feat4: 'Support prioritaire 7j/7 dédié',
 
     btn_choose_plan: 'Souscrire via Stripe',
-    popular_badge: 'Le Plus Populaire & Rentable',
+    popular_badge: 'Plus Populaire & Rentable',
 
     // Partner / Distribution Page
     partner_page_title: 'Devenez notre Partenaire Exclusif',
     partner_page_subtitle: 'Rejoignez notre réseau de distribution mondial et percevez des commissions récurrentes sur chaque restaurant équipé.',
+    partner_title: 'Devenez notre Partenaire Officiel',
     partner_form_title: 'Candidature Partenaire Exclusif',
     partner_form_name: 'Votre Nom Complet',
     partner_form_email: 'Adresse E-mail Professionnelle',
@@ -97,8 +98,40 @@ export const translations: Record<Language, Record<string, string>> = {
     partner_success_msg: 'Votre candidature partenaire a été enregistrée avec succès. Notre équipe vous recontactera sous 24h.',
 
     // About Page
-    about_title: 'Notre Mission : Maximiser les Gains des Commerçants',
-    about_desc: 'MenuFid a été créé avec une conviction forte : offrir aux restaurateurs et commerçants indépendants la technologie de fidélisation la plus puissante du marché au prix le plus accessible.',
+    about_hero_tag: 'Notre Mission Principale',
+    about_hero_title: 'Multiplier les Gains & Revenus des Restaurateurs & Commerçants',
+    about_hero_desc: 'Chez MenuFid, notre objectif absolu est d\'aider chaque propriétaire d\'établissement à maximiser son chiffre d\'affaires grâce au menu QR interactif et à la fidélité digitale.',
+    about_card1_title: 'Croissance du Chiffre d\'Affaires',
+    about_card1_desc: 'Nous aidons les restaurateurs à augmenter leur ticket moyen de +25% grâce à des récompenses ciblées.',
+    about_card2_title: 'Fidélisation Automatisée',
+    about_card2_desc: 'Le client conserve sa carte fidélité directement dans son smartphone et revient naturellement.',
+    about_card3_title: 'Avis Google 5 Étoiles',
+    about_card3_desc: 'Notre booster d\'avis redirige vos clients satisfaits vers votre fiche Google Maps.',
+
+    // Contact Page
+    contact_title: 'Contactez notre équipe',
+    contact_subtitle: 'Notre équipe support et commerciale est à votre disposition 7j/7 pour répondre à toutes vos questions.',
+    contact_form_name: 'Nom & Prénom',
+    contact_form_email: 'Votre Adresse E-mail',
+    contact_form_subject: 'Sujet du message',
+    contact_form_message: 'Votre message',
+    contact_btn_send: 'Envoyer le Message',
+    contact_success_msg: 'Votre message a bien été envoyé. Notre équipe vous répondra en moins de 2 heures.',
+
+    // Terms Page
+    terms_title: 'Conditions Générales d\'Utilisation & Vente',
+    terms_subtitle: 'Consultez les termes régissant l\'utilisation de la plateforme MenuFid et la protection des données.',
+
+    // Login & Register Pages
+    login_title: 'Connexion Espace Commerçant',
+    login_subtitle: 'Accédez à votre tableau de bord restaurateur pour gérer votre menu et vos clients.',
+    login_email: 'Adresse E-mail',
+    login_password: 'Mot de passe',
+    login_btn: 'Se Connecter au Dashboard',
+    register_step1_title: 'Créer mon Compte Restaurateur',
+    register_step2_title: 'Choisir la Formule pour mon Établissement',
+    register_business_name: 'Nom Commercial de l\'Établissement',
+    register_next_btn: 'Passer au Choix de l\'Abonnement',
 
     // Footer
     footer_desc: 'La plateforme numéro 1 pour digitaliser votre menu et fidéliser vos clients sur smartphone.',
@@ -154,7 +187,7 @@ export const translations: Record<Language, Record<string, string>> = {
     pricing_page_subtitle: 'Every tier is built to deliver immediate return on investment starting in week one.',
     plan_basic_name: 'Basic',
     plan_basic_price: '€5',
-    plan_basic_desc: 'Ideal to digitize your menu and start displaying your dishes online.',
+    plan_basic_desc: 'Ideal to digitize your menu and start displaying your dishes online in 2 minutes.',
     plan_basic_feat1: 'Interactive HD QR Code Menu',
     plan_basic_feat2: 'Unlimited menu modifications',
     plan_basic_feat3: 'Merchant Dashboard Access',
@@ -181,6 +214,7 @@ export const translations: Record<Language, Record<string, string>> = {
     // Partner / Distribution Page
     partner_page_title: 'Become Our Exclusive Partner',
     partner_page_subtitle: 'Join our worldwide distribution network and earn recurring monthly commissions for every onboarded merchant.',
+    partner_title: 'Become Our Official Partner',
     partner_form_title: 'Exclusive Partner Application',
     partner_form_name: 'Your Full Name',
     partner_form_email: 'Professional Email Address',
@@ -190,8 +224,40 @@ export const translations: Record<Language, Record<string, string>> = {
     partner_success_msg: 'Your partner application has been recorded. Our executive team will reach out within 24h.',
 
     // About Page
-    about_title: 'Our Mission: Maximize Merchant Profits',
-    about_desc: 'MenuFid was built with a strong conviction: deliver the most powerful loyalty technology to independent business owners at the most accessible price point.',
+    about_hero_tag: 'Our Main Mission',
+    about_hero_title: 'Multiply Revenue & Profits for Business Owners',
+    about_hero_desc: 'At MenuFid, our sole focus is to help business owners maximize their sales using interactive QR menus and digital wallet loyalty.',
+    about_card1_title: 'Revenue Growth',
+    about_card1_desc: 'We help restaurants boost average ticket size by +25% with targeted loyalty rewards.',
+    about_card2_title: 'Automated Loyalty',
+    about_card2_desc: 'Customers keep their loyalty card in their smartphone wallet and return naturally.',
+    about_card3_title: '5-Star Google Reviews',
+    about_card3_desc: 'Our automated review booster redirects happy customers to your Google Maps page.',
+
+    // Contact Page
+    contact_title: 'Contact Our Team',
+    contact_subtitle: 'Our sales and support team is available 7/7 to answer all your inquiries.',
+    contact_form_name: 'Full Name',
+    contact_form_email: 'Email Address',
+    contact_form_subject: 'Subject',
+    contact_form_message: 'Your Message',
+    contact_btn_send: 'Send Message',
+    contact_success_msg: 'Your message has been sent successfully. We will reply within 2 hours.',
+
+    // Terms Page
+    terms_title: 'Terms of Service & General Conditions',
+    terms_subtitle: 'Review the terms governing the MenuFid platform and user data protection.',
+
+    // Login & Register Pages
+    login_title: 'Merchant Space Login',
+    login_subtitle: 'Access your restaurant dashboard to manage your menu and loyalty customers.',
+    login_email: 'Email Address',
+    login_password: 'Password',
+    login_btn: 'Sign In to Dashboard',
+    register_step1_title: 'Create My Merchant Account',
+    register_step2_title: 'Select Plan for My Business',
+    register_business_name: 'Business Trade Name',
+    register_next_btn: 'Proceed to Subscription Choice',
 
     // Footer
     footer_desc: 'The #1 platform to digitize your menu and retain customers on their smartphones.',
@@ -274,6 +340,7 @@ export const translations: Record<Language, Record<string, string>> = {
     // Partner / Distribution Page
     partner_page_title: 'Conviértase en nuestro Socio Exclusivo',
     partner_page_subtitle: 'Únase a nuestra red global de distribución y reciba comisiones mensuales recurrentes por cada negocio activo.',
+    partner_title: 'Conviértase en nuestro Socio Oficial',
     partner_form_title: 'Solicitud de Socio Exclusivo',
     partner_form_name: 'Nombre Completo',
     partner_form_email: 'Correo Electrónico Profesional',
@@ -283,8 +350,40 @@ export const translations: Record<Language, Record<string, string>> = {
     partner_success_msg: 'Su solicitud ha sido registrada con éxito. Nuestro equipo le contactará en 24 horas.',
 
     // About Page
-    about_title: 'Nuestra Misión: Maximizar las Ganancias del Comerciante',
-    about_desc: 'MenuFid nació con una convicción sólida: ofrecer la tecnología de fidelización más potente a dueños de negocios independientes al precio más accesible del mercado.',
+    about_hero_tag: 'Nuestra Misión Principal',
+    about_hero_title: 'Multiplicar las Ganancias e Ingresos de los Comerciantes',
+    about_hero_desc: 'En MenuFid, nuestro objetivo es ayudar a cada dueño de negocio a maximizar su facturación con el menú QR y la tarjeta digital.',
+    about_card1_title: 'Crecimiento de Ingresos',
+    about_card1_desc: 'Ayudamos a aumentar el ticket promedio un +25% mediante recompensas de fidelización.',
+    about_card2_title: 'Fidelización Automatizada',
+    about_card2_desc: 'El cliente conserva su tarjeta en el teléfono inteligente y regresa de forma natural.',
+    about_card3_title: 'Reseñas en Google 5 Estrellas',
+    about_card3_desc: 'Nuestro acelerador redirige a clientes satisfechos a su ficha de Google Maps.',
+
+    // Contact Page
+    contact_title: 'Contacte con Nuestro Equipo',
+    contact_subtitle: 'Nuestro equipo de soporte y ventas está a su disposición 7 días a la semana.',
+    contact_form_name: 'Nombre y Apellidos',
+    contact_form_email: 'Correo Electrónico',
+    contact_form_subject: 'Asunto',
+    contact_form_message: 'Mensaje',
+    contact_btn_send: 'Enviar Mensaje',
+    contact_success_msg: 'Su mensaje ha sido enviado correctamente. Le responderemos en menos de 2 horas.',
+
+    // Terms Page
+    terms_title: 'Términos Generales de Uso y Venta',
+    terms_subtitle: 'Consulte las condiciones que rigen el uso de la plataforma MenuFid y la protección de datos.',
+
+    // Login & Register Pages
+    login_title: 'Acceso para Comerciantes',
+    login_subtitle: 'Acceda a su panel de control para gestionar su menú y sus clientes leales.',
+    login_email: 'Correo Electrónico',
+    login_password: 'Contraseña',
+    login_btn: 'Entrar al Panel',
+    register_step1_title: 'Crear Mi Cuenta de Comerciante',
+    register_step2_title: 'Elegir el Plan para Mi Negocio',
+    register_business_name: 'Nombre del Establecimiento',
+    register_next_btn: 'Continuar a Selección de Plan',
 
     // Footer
     footer_desc: 'La plataforma número 1 para digitalizar su menú y fidelizar a sus clientes en el teléfono móvil.',
@@ -317,7 +416,7 @@ export const translations: Record<Language, Record<string, string>> = {
     hero_title: 'ضاعف مداخيل وأرباح مطعمك مع برنامج الولاء الرقمي الذكي',
     hero_subtitle: 'قائمة طعام تفاعلية عبر رمز QR، بطاقة ولاء رقمية على محفظة الهاتف Apple & Google Wallet وتنبيهات إعادة جذب الزبائن.',
     hero_cta_primary: 'تفعيل حساب مطعمي (ابتداءً من 5€/شهرياً)',
-    hero_cta_partner: 'الانضمام كشريك توزيع حصير',
+    hero_cta_partner: 'الانضمام كشريك توزيع حصري',
     badge_security: 'دفع آمن 100% عبر Stripe - بدون أي التزام',
     stat_clients: 'زبائن مخلصون',
     stat_revenue: '+35% زيادة في الأرباح',
@@ -367,6 +466,7 @@ export const translations: Record<Language, Record<string, string>> = {
     // Partner / Distribution Page
     partner_page_title: 'كن شريكاً حصرياً لـ MenuFid',
     partner_page_subtitle: 'انضم لشبكة التوزيع العالمية واحصل على عمولات شهرية مستمرة لكل مطعم تقوم بتجهيزه.',
+    partner_title: 'كن شريكنا الرسمي المعترف به',
     partner_form_title: 'طلب تقديم للشراكة الحصرية',
     partner_form_name: 'الاسم الكامل',
     partner_form_email: 'البريد الإلكتروني المهني',
@@ -376,8 +476,40 @@ export const translations: Record<Language, Record<string, string>> = {
     partner_success_msg: 'تم تسجيل طلب الشراكة بنجاح. سيتواصل معك فريقنا خلال 24 ساعة.',
 
     // About Page
-    about_title: 'مهمتنا: تعظيم أرباح أصحاب المطاعم والتجار',
-    about_desc: 'تأسست MenuFid برؤية واضحة: تزويد أصحاب التجارات المستقلة بأقوى تقنية ولاء في السوق بأنسب وأرخص سعر ممكن.',
+    about_hero_tag: 'مهمتنا الرئيسية',
+    about_hero_title: 'تعظيم أرباح ومداخيل أصحاب المطاعم والتجار',
+    about_hero_desc: 'تأسست MenuFid برؤية واضحة: تزويد أصحاب التجارات المستقلة بأقوى تقنية ولاء في السوق بأفضل وأرخص سعر ممكن.',
+    about_card1_title: 'نمو الأرباح والمبيعات',
+    about_card1_desc: 'نساعد المطاعم في رفع متوسط قيمة الطلب بنسبة +25% من خلال مكافآت الولاء.',
+    about_card2_title: 'برنامج ولاء تلقائي',
+    about_card2_desc: 'يحتفظ الزبون ببطاقة الولاء في هاتفه الذكي ويعود لمطعمك تلقائياً.',
+    about_card3_title: 'تقييمات Google 5 نجوم',
+    about_card3_desc: 'يحول نظامنا الزبائن السعداء نحو صفحة خرائط Google لرفع ترتيبك المحلي.',
+
+    // Contact Page
+    contact_title: 'تواصل مع فريقنا',
+    contact_subtitle: 'فريق الدعم والمبيعات في خدمتك 7 أيام في الأسبوع للإجابة على كافة استفساراتك.',
+    contact_form_name: 'الاسم واللقب',
+    contact_form_email: 'البريد الإلكتروني',
+    contact_form_subject: 'موضوع الرسالة',
+    contact_form_message: 'نص الرسالة',
+    contact_btn_send: 'إرسال الرسالة',
+    contact_success_msg: 'تم إرسال رسالتك بنجاح. سنرد عليك في أقل من ساعتين.',
+
+    // Terms Page
+    terms_title: 'الشروط والأحكام العامة للاستخدام والبيع',
+    terms_subtitle: 'اطّلع على القوانين المنظمة لاستخدام منصة MenuFid وحماية بيانات المستخدمين.',
+
+    // Login & Register Pages
+    login_title: 'تسجيل دخول التجار',
+    login_subtitle: 'ادخل إلى لوحة تحكم مطعمك لإدارة منيو الطعام والزبائن المخلصين.',
+    login_email: 'البريد الإلكتروني',
+    login_password: 'كلمة المرور',
+    login_btn: 'تسجيل الدخول للوحة التحكم',
+    register_step1_title: 'إنشاء حساب تاجر جديد',
+    register_step2_title: 'اختيار خطة الاشتراك لمطعمك',
+    register_business_name: 'الاسم التجاري للمطعم',
+    register_next_btn: 'الانتقال لاختيار خطة الاشتراك',
 
     // Footer
     footer_desc: 'المنصة رقم 1 لرقمنة منيو المطاعم والاحتفاظ بالزبائن عبر هواتفهم الذكية.',
@@ -460,6 +592,7 @@ export const translations: Record<Language, Record<string, string>> = {
     // Partner / Distribution Page
     partner_page_title: 'Werden Sie Exklusiver Partner',
     partner_page_subtitle: 'Schließen Sie sich unserem weltweiten Vertriebsnetz an und verdienen Sie monatliche Provisionen.',
+    partner_title: 'Werden Sie Offizieller Partner',
     partner_form_title: 'Bewerbung Exklusiv-Partner',
     partner_form_name: 'Vollständiger Name',
     partner_form_email: 'Geschäftliche E-Mail-Adresse',
@@ -469,8 +602,40 @@ export const translations: Record<Language, Record<string, string>> = {
     partner_success_msg: 'Ihre Bewerbung wurde erfolgreich erfasst. Unser Team meldet sich innerhalb von 24h.',
 
     // About Page
-    about_title: 'Unsere Mission: Gewinnmaximierung für Händler',
-    about_desc: 'MenuFid wurde mit einer klaren Vision gegründet: Unabhängigen Gastronomen die stärkste Kundenbindungstechnologie zum günstigsten Preis zu bieten.',
+    about_hero_tag: 'Unsere Hauptmission',
+    about_hero_title: 'Gewinnmaximierung für Händler & Gastronomen',
+    about_hero_desc: 'MenuFid wurde gegründet, um unabhängigen Gastronomen die stärkste Kundenbindungstechnologie zum günstigsten Preis zu bieten.',
+    about_card1_title: 'Umsatzwachstum',
+    about_card1_desc: 'Wir helfen Gastronomen, den durchschnittlichen Bestellwert um +25% zu steigern.',
+    about_card2_title: 'Automatisierte Bindung',
+    about_card2_desc: 'Gäste behalten ihre Treuekarte auf dem Smartphone und kommen ganz natürlich wieder.',
+    about_card3_title: '5-Sterne Google-Bewertungen',
+    about_card3_desc: 'Unser Bewertungs-Booster leitet zufriedene Gäste direkt zu Ihrem Google Maps-Eintrag.',
+
+    // Contact Page
+    contact_title: 'Kontaktieren Sie Unser Team',
+    contact_subtitle: 'Unser Vertriebs- und Support-Team steht Ihnen 7 Tage die Woche zur Verfügung.',
+    contact_form_name: 'Name & Nachname',
+    contact_form_email: 'E-Mail-Adresse',
+    contact_form_subject: 'Betreff',
+    contact_form_message: 'Ihre Nachricht',
+    contact_btn_send: 'Nachricht Senden',
+    contact_success_msg: 'Ihre Nachricht wurde erfolgreich gesendet. Wir antworten innerhalb von 2 Stunden.',
+
+    // Terms Page
+    terms_title: 'Allgemeine Geschäfts- & Nutzungsbedingungen',
+    terms_subtitle: 'Lesen Sie die Bedingungen für die Nutzung der MenuFid-Plattform und den Datenschutz.',
+
+    // Login & Register Pages
+    login_title: 'Händler-Anmeldung',
+    login_subtitle: 'Zugang zu Ihrem Restaurant-Dashboard zur Verwaltung von Menü und Stammkunden.',
+    login_email: 'E-Mail-Adresse',
+    login_password: 'Passwort',
+    login_btn: 'Ins Dashboard Einloggen',
+    register_step1_title: 'Neues Händler-Konto Erstellen',
+    register_step2_title: 'Tarif für Mein Geschäft Wählen',
+    register_business_name: 'Name des Geschäfts',
+    register_next_btn: 'Weiter zur Tarifauswahl',
 
     // Footer
     footer_desc: 'Die Plattform Nr. 1 zur Digitalisierung von Speisekarten und Kundenbindung auf dem Smartphone.',
@@ -553,6 +718,7 @@ export const translations: Record<Language, Record<string, string>> = {
     // Partner / Distribution Page
     partner_page_title: 'Diventa Nostro Partner Esclusivo',
     partner_page_subtitle: 'Unisciti alla nostra rete globale di distribuzione e ricevi commissioni mensili ricorrenti.',
+    partner_title: 'Diventa Nostro Partner Ufficiale',
     partner_form_title: 'Candidatura Partner Esclusivo',
     partner_form_name: 'Nome Completo',
     partner_form_email: 'Email Professionale',
@@ -562,8 +728,40 @@ export const translations: Record<Language, Record<string, string>> = {
     partner_success_msg: 'La tua candidatura è stata registrata con successo. Il nostro team ti contatterà entro 24 ore.',
 
     // About Page
-    about_title: 'La Nostra Missione: Massimizzare i Guadagni dei Ristoratori',
-    about_desc: 'MenuFid è nata con una convinzione forte: offrire ai ristoratori indipendenti la tecnologia di fidelizzazione più potente al prezzo più accessibile sul mercato.',
+    about_hero_tag: 'La Nostra Missione Principale',
+    about_hero_title: 'Massimizzare i Guadagni dei Ristoratori',
+    about_hero_desc: 'MenuFid è nata per offrire ai ristoratori indipendenti la tecnologia di fidelizzazione più potente al prezzo più accessibile.',
+    about_card1_title: 'Crescita del Fatturato',
+    about_card1_desc: 'Aiutiamo i ristoratori ad aumentare il scontrino medio del +25% grazie a premi dedicati.',
+    about_card2_title: 'Fidelizzazione Automatica',
+    about_card2_desc: 'Il cliente conserva la carta fedeltà nello smartphone e ritorna in modo naturale.',
+    about_card3_title: 'Recensioni Google a 5 Stelle',
+    about_card3_desc: 'Il nostro acceleratore di recensioni reindirizza i clienti felici sulla tua scheda Google Maps.',
+
+    // Contact Page
+    contact_title: 'Contatta il Nostro Team',
+    contact_subtitle: 'Il nostro team di supporto e vendita è a tua disposizione 7 giorni su 7.',
+    contact_form_name: 'Nome e Cognome',
+    contact_form_email: 'Indirizzo Email',
+    contact_form_subject: 'Oggetto',
+    contact_form_message: 'Il Tuo Messaggio',
+    contact_btn_send: 'Invia Messaggio',
+    contact_success_msg: 'Il tuo messaggio è stato inviato con successo. Ti risponderemo entro 2 ore.',
+
+    // Terms Page
+    terms_title: 'Termini Generali di Servizio e Vendita',
+    terms_subtitle: 'Consulta le condizioni che regolano l\'uso della piattaforma MenuFid e la protezione dei dati.',
+
+    // Login & Register Pages
+    login_title: 'Accesso Ristoratori',
+    login_subtitle: 'Accedi alla tua dashboard per gestire il tuo menu e i tuoi clienti fedeli.',
+    login_email: 'Indirizzo Email',
+    login_password: 'Password',
+    login_btn: 'Entra nella Dashboard',
+    register_step1_title: 'Crea Account Ristoratore',
+    register_step2_title: 'Scegli il Piano per il Tuo Locale',
+    register_business_name: 'Nome dell\'Attività',
+    register_next_btn: 'Procedi alla Scelta del Piano',
 
     // Footer
     footer_desc: 'La piattaforma N.1 per digitalizzare il menu e fidelizzare i clienti sullo smartphone.',
@@ -646,6 +844,7 @@ export const translations: Record<Language, Record<string, string>> = {
     // Partner / Distribution Page
     partner_page_title: 'Seja Nosso Parceiro Exclusivo',
     partner_page_subtitle: 'Junte-se à nossa rede mundial de distribuição e receba comissões mensais recorrentes.',
+    partner_title: 'Seja Nosso Parceiro Oficial',
     partner_form_title: 'Candidatura de Parceiro Exclusivo',
     partner_form_name: 'Nome Completo',
     partner_form_email: 'E-mail Profissional',
@@ -655,8 +854,40 @@ export const translations: Record<Language, Record<string, string>> = {
     partner_success_msg: 'Sua candidatura foi registrada com sucesso. Nossa equipe entrará em contato em até 24 horas.',
 
     // About Page
-    about_title: 'Nossa Missão: Maximizar os Lucros dos Comerciantes',
-    about_desc: 'O MenuFid foi criado com uma convicção forte: entregar a tecnologia de fidelização mais poderosa do mercado pelo preço mais acessível.',
+    about_hero_tag: 'Nossa Missão Principal',
+    about_hero_title: 'Maximizar os Lucros dos Comerciantes',
+    about_hero_desc: 'O MenuFid foi criado para entregar a tecnologia de fidelização mais poderosa do mercado pelo preço mais acessível.',
+    about_card1_title: 'Crescimento de Faturamento',
+    about_card1_desc: 'Ajudamos os restaurantes a aumentar o ticket médio em +25% através de recompensas de fidelidade.',
+    about_card2_title: 'Fidelização Automatizada',
+    about_card2_desc: 'O cliente mantém o cartão no smartphone e retorna naturalmente.',
+    about_card3_title: 'Avaliações 5 Estrelas no Google',
+    about_card3_desc: 'Nosso acelerador redireciona clientes satisfeitos para sua página do Google Maps.',
+
+    // Contact Page
+    contact_title: 'Entre em Contato com Nossa Equipe',
+    contact_subtitle: 'Nossa equipe de vendas e suporte está disponível 7 dias por semana.',
+    contact_form_name: 'Nome Completo',
+    contact_form_email: 'Endereço de E-mail',
+    contact_form_subject: 'Assunto',
+    contact_form_message: 'Sua Mensagem',
+    contact_btn_send: 'Enviar Mensagem',
+    contact_success_msg: 'Sua mensagem foi enviada com sucesso. Responderemos em menos de 2 horas.',
+
+    // Terms Page
+    terms_title: 'Termos Gerais de Serviço e Venda',
+    terms_subtitle: 'Consulte as condições que regem a plataforma MenuFid e a proteção de dados.',
+
+    // Login & Register Pages
+    login_title: 'Acesso do Comerciante',
+    login_subtitle: 'Acesse seu painel para gerenciar seu cardápio e seus clientes fiéis.',
+    login_email: 'Endereço de E-mail',
+    login_password: 'Senha',
+    login_btn: 'Entrar no Painel',
+    register_step1_title: 'Criar Minha Conta de Comerciante',
+    register_step2_title: 'Selecionar Plano para Meu Negócio',
+    register_business_name: 'Nome Fantasia da Empresa',
+    register_next_btn: 'Ir para Seleção de Plano',
 
     // Footer
     footer_desc: 'A plataforma N.1 para digitalizar cardápios e fidelizar clientes no smartphone.',

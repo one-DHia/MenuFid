@@ -7,8 +7,10 @@ import { db } from '@/lib/supabase';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Mail, Lock, ArrowRight, AlertCircle, Store } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 export default function LoginPage() {
+  const { t } = useLanguage();
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,7 +23,6 @@ export default function LoginPage() {
     setError('');
 
     try {
-      // Tenter la connexion Supabase ou la session locale
       let merchantId = `merchant-${Date.now()}`;
       try {
         const found = await db.collection('users').getFirstListItem<{ id: string }>(
@@ -54,12 +55,12 @@ export default function LoginPage() {
             <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-900 flex items-center justify-center mx-auto mb-3">
               <Store className="w-6 h-6" />
             </div>
-            <h1 className="text-2xl font-black text-slate-900 mb-1">Connexion Espace Marchand</h1>
-            <p className="text-slate-500 text-xs">Accédez à la gestion de votre menu et de votre fidélité</p>
+            <h1 className="text-2xl font-black text-slate-900 mb-1">{t('login_title')}</h1>
+            <p className="text-slate-500 text-xs">{t('login_subtitle')}</p>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-2xl flex items-center gap-2">
+            <div className="mb-6 p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-2xl flex items-center gap-2 font-medium">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>{error}</span>
             </div>
@@ -67,7 +68,7 @@ export default function LoginPage() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Adresse e-mail *</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">{t('login_email')}</label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
                 <input
@@ -75,14 +76,14 @@ export default function LoginPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="votre@email.com"
-                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:ring-2 focus:ring-amber-800 outline-none"
+                  placeholder="resto@exemple.com"
+                  className="w-full pl-10 pr-4 py-3 rounded-2xl border border-slate-200 text-xs font-medium focus:ring-2 focus:ring-amber-500 outline-none"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Mot de passe *</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">{t('login_password')}</label>
               <div className="relative">
                 <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
                 <input
@@ -91,7 +92,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:ring-2 focus:ring-amber-800 outline-none"
+                  className="w-full pl-10 pr-4 py-3 rounded-2xl border border-slate-200 text-xs font-medium focus:ring-2 focus:ring-amber-500 outline-none"
                 />
               </div>
             </div>
@@ -99,17 +100,17 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 bg-gradient-to-r from-amber-800 to-amber-900 hover:from-amber-700 hover:to-amber-800 text-white font-bold py-3.5 rounded-2xl transition shadow-md text-xs flex items-center justify-center gap-2 btn-press"
+              className="w-full bg-gradient-to-r from-amber-800 to-amber-900 hover:from-amber-700 hover:to-amber-800 text-white font-bold py-3.5 px-4 rounded-2xl transition text-xs flex items-center justify-center gap-2 shadow-lg btn-press mt-2"
             >
-              {loading ? 'Connexion en cours...' : 'Se connecter'}
+              <span>{loading ? '...' : t('login_btn')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
 
-          <div className="mt-6 text-center text-xs text-slate-500">
-            Pas encore de compte ?{' '}
-            <Link href="/register" className="text-amber-800 font-bold hover:underline">
-              Créer un compte marchand
+          <div className="mt-8 pt-6 border-t border-slate-100 text-center text-xs text-slate-500">
+            <span>Pas encore de compte ? </span>
+            <Link href="/register" className="font-bold text-amber-800 hover:underline">
+              {t('nav_register')}
             </Link>
           </div>
         </div>

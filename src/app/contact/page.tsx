@@ -4,9 +4,11 @@ import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ChatbotWidget from '@/components/ChatbotWidget';
-import { Mail, Phone, MapPin, Send, CheckCircle, MessageSquare } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, CheckCircle } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 export default function ContactPage() {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -44,9 +46,9 @@ export default function ContactPage() {
 
       <main className="flex-1 py-14 px-4 max-w-7xl mx-auto w-full">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 mb-3">Contactez-nous</h1>
+          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 mb-3">{t('contact_title')}</h1>
           <p className="text-slate-600 text-sm">
-            Notre équipe support et commerciale est à votre disposition 7j/7 pour répondre à toutes vos questions.
+            {t('contact_subtitle')}
           </p>
         </div>
 
@@ -58,9 +60,8 @@ export default function ContactPage() {
                 <Mail className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-bold text-slate-900 text-sm">E-mail</h4>
-                <p className="text-slate-600 text-xs mt-1">contact@menufid.site</p>
-                <p className="text-slate-400 text-[11px]">Réponse sous 2 heures</p>
+                <h4 className="font-bold text-slate-900 text-sm">Email Direct</h4>
+                <p className="text-slate-500 text-xs mt-0.5">contact@menufid.site</p>
               </div>
             </div>
 
@@ -69,9 +70,8 @@ export default function ContactPage() {
                 <Phone className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-bold text-slate-900 text-sm">Téléphone & WhatsApp</h4>
-                <p className="text-slate-600 text-xs mt-1">+33 7 66 51 82 78</p>
-                <p className="text-slate-400 text-[11px]">Du lundi au dimanche 9h - 20h</p>
+                <h4 className="font-bold text-slate-900 text-sm">Support 7j/7</h4>
+                <p className="text-slate-500 text-xs mt-0.5">+33 1 89 71 42 10</p>
               </div>
             </div>
 
@@ -81,81 +81,68 @@ export default function ContactPage() {
               </div>
               <div>
                 <h4 className="font-bold text-slate-900 text-sm">Siège Social</h4>
-                <p className="text-slate-600 text-xs mt-1">Paris, France 🇫🇷</p>
-                <p className="text-slate-400 text-[11px]">Zone d&apos;activité nationale & internationale</p>
+                <p className="text-slate-500 text-xs mt-0.5">Paris, France 🇫🇷</p>
               </div>
             </div>
           </div>
 
           {/* Form */}
-          <div className="lg:col-span-2 bg-white p-8 rounded-3xl border border-slate-200 shadow-lg">
+          <div className="lg:col-span-2 bg-white p-8 rounded-3xl border border-slate-200 shadow-md">
             {submitted ? (
-              <div className="text-center py-10 space-y-3">
-                <CheckCircle className="w-12 h-12 text-emerald-600 mx-auto" />
-                <h3 className="font-bold text-slate-900 text-lg">Message envoyé !</h3>
-                <p className="text-slate-600 text-xs">
-                  Merci de nous avoir contactés. Nous vous répondrons dans les plus brefs délais.
-                </p>
+              <div className="text-center py-12">
+                <CheckCircle className="w-12 h-12 text-emerald-600 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Message Envoyé !</h3>
+                <p className="text-slate-600 text-sm">{t('contact_success_msg')}</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Votre Nom *</label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="Dhia Nouibet"
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:ring-2 focus:ring-amber-800 outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Votre E-mail *</label>
-                    <input
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="votre@email.com"
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:ring-2 focus:ring-amber-800 outline-none"
-                    />
-                  </div>
-                </div>
-
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Sujet *</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">{t('contact_form_name')}</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs font-medium focus:ring-2 focus:ring-amber-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">{t('contact_form_email')}</label>
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs font-medium focus:ring-2 focus:ring-amber-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">{t('contact_form_subject')}</label>
                   <input
                     type="text"
                     required
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    placeholder="Demande d'information / Support..."
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:ring-2 focus:ring-amber-800 outline-none"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs font-medium focus:ring-2 focus:ring-amber-500 outline-none"
                   />
                 </div>
-
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Message *</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">{t('contact_form_message')}</label>
                   <textarea
                     required
                     rows={4}
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="Écrivez votre message ici..."
-                    className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:ring-2 focus:ring-amber-800 outline-none resize-none"
-                  ></textarea>
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs font-medium focus:ring-2 focus:ring-amber-500 outline-none resize-none"
+                  />
                 </div>
-
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-amber-800 hover:bg-amber-900 text-white font-bold py-3.5 rounded-2xl transition text-xs flex items-center justify-center gap-2 btn-press shadow-md"
+                  className="w-full bg-amber-800 hover:bg-amber-900 text-white font-bold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md transition"
                 >
-                  {loading ? 'Envoi...' : 'Envoyer le message'}
                   <Send className="w-4 h-4" />
+                  <span>{loading ? '...' : t('contact_btn_send')}</span>
                 </button>
               </form>
             )}
