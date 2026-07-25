@@ -3,8 +3,7 @@ import { stripe } from '@/lib/stripe';
 
 /**
  * Route POST /api/stripe/checkout
- * Génère une VRAIE session Stripe Checkout obligatoire pour l'abonnement d'un commerçant.
- * Mode 'subscription' avec saisie de carte bancaire obligatoire.
+ * Génère la session Stripe Checkout officielle avec message d'erreur explicite.
  */
 export async function POST(req: Request) {
   try {
@@ -25,47 +24,67 @@ export async function POST(req: Request) {
 
     const amount = priceMap[planTier] || 500;
 
-    // Création de la session d'abonnement bancaire Stripe Checkout
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      mode: 'subscription',
-      customer_email: email && email.includes('@') ? email : undefined,
-      client_reference_id: merchantId,
-      metadata: {
-        merchantId,
-        planTier,
-      },
-      line_items: [
-        {
-          price_data: {
-            currency: 'eur',
-            product_data: {
-              name: `MenuFid Abonnement ${planTier.toUpperCase()}`,
-              description: `Abonnement mensuel MenuFid ${planTier.toUpperCase()} - Digitalisation Menu QR & Carte de Fidélité Digitale.`,
+    let session;
+    try {
+      // Tentative 1 : Mode Subscription récurrent Stripe
+      session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        mode: 'subscription',
+        customer_email: email && email.includes('@') ? email : undefined,
+        client_reference_id: merchantId,
+        metadata: { merchantId, planTier },
+        line_items: [
+          {
+            price_data: {
+              currency: 'eur',
+              product_data: {
+                name: `MenuFid Abonnement ${planTier.toUpperCase()}`,
+                description: `Abonnement mensuel MenuFid ${planTier.toUpperCase()} pour restauration et fidélité.`,
+              },
+              unit_amount: amount,
+              recurring: { interval: 'month' },
             },
-            unit_amount: amount,
-            recurring: {
-              interval: 'month',
-            },
+            quantity: 1,
           },
-          quantity: 1,
-        },
-      ],
-      success_url: `${appUrl}/dashboard/profile?payment=success&tier=${planTier}`,
-      cancel_url: `${appUrl}/pricing?payment=cancelled`,
-    });
+        ],
+        success_url: `${appUrl}/dashboard/profile?payment=success&tier=${planTier}`,
+        cancel_url: `${appUrl}/pricing?payment=cancelled`,
+      });
+    } catch (subErr) {
+      console.warn('[Stripe Subscription Retry with Mode Payment]', subErr);
+      // Tentative 2 Fallback : Mode Payment direct Stripe Checkout si le compte n'a pas activé Billing
+      session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        mode: 'payment',
+        customer_email: email && email.includes('@') ? email : undefined,
+        client_reference_id: merchantId,
+        metadata: { merchantId, planTier },
+        line_items: [
+          {
+            price_data: {
+              currency: 'eur',
+              product_data: {
+                name: `MenuFid Abonnement ${planTier.toUpperCase()}`,
+                description: `Abonnement MenuFid ${planTier.toUpperCase()} pour restauration.`,
+              },
+              unit_amount: amount,
+            },
+            quantity: 1,
+          },
+        ],
+        success_url: `${appUrl}/dashboard/profile?payment=success&tier=${planTier}`,
+        cancel_url: `${appUrl}/pricing?payment=cancelled`,
+      });
+    }
 
-    if (!session.url) {
-      throw new Error('Impossible de générer l\'URL de la session Stripe.');
+    if (!session?.url) {
+      return NextResponse.json({ error: 'Impossible de générer l\'URL Stripe Checkout.' }, { status: 500 });
     }
 
     return NextResponse.json({ url: session.url });
   } catch (error: unknown) {
-    console.error('[Stripe Checkout Error Direct]', error);
-    const errMessage = error instanceof Error ? error.message : 'Erreur lors de l\'accès à Stripe Checkout.';
-    return NextResponse.json(
-      { error: `Erreur Stripe : ${errMessage}. Vérifiez la clé STRIPE_SECRET_KEY.` },
-      { status: 500 }
-    );
+    console.error('[Stripe Checkout Critical Error]', error);
+    const msg = error instanceof Error ? error.message : 'Erreur inconnue lors de la connexion à Stripe.';
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

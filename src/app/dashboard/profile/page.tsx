@@ -146,10 +146,11 @@ export default function ProfilePage() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        throw new Error(data.error || 'Erreur Stripe');
+        throw new Error(data.error || 'Erreur lors de l\'initialisation de Stripe');
       }
-    } catch {
-      showToast('Impossible de se connecter à Stripe. Vérifiez votre configuration.', 'error');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Impossible de se connecter à Stripe. Vérifiez votre clé API.';
+      showToast(msg, 'error');
     }
   }
 
