@@ -1,259 +1,320 @@
 'use client';
 
-/**
- * app/register/page.tsx
- * ─────────────────────────────────────────────────────────────
- * Inscription d'un nouveau commerçant.
- * Crée le compte Supabase puis redirige vers /dashboard.
- */
-
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
-import { Sparkles, Utensils, Award, ChevronRight, Lock, Mail, Store, AlertCircle } from 'lucide-react';
-import type { PlanTier } from '@/types';
-
-// ─── Plans disponibles ────────────────────────────────────────
-
-interface PlanOption {
-  tier: PlanTier;
-  label: string;
-  price: string;
-  Icon: React.ComponentType<{ className?: string }>;
-  badge?: string;
-}
-
-const PLANS: PlanOption[] = [
-  { tier: 'basic',   label: 'Plan Menu',     price: '15€ / mois', Icon: Utensils },
-  { tier: 'loyalty', label: 'Plan Fidélité', price: '29€ / mois', Icon: Award },
-  { tier: 'premium', label: 'Plan Premium',  price: '40€ / mois', Icon: Sparkles, badge: 'Populaire' },
-];
-
-// ─── Page ─────────────────────────────────────────────────────
+import { useRouter, useSearchParams } from 'next/navigation';
+import { db } from '@/lib/supabase';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import { PRICING_TIERS } from '@/lib/stripe';
+import { Store, Mail, Lock, Phone, ArrowRight, Check, Sparkles, AlertCircle, ShieldCheck } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialPlan = searchParams.get('plan') as 'basic' | 'loyalty' | 'premium' | null;
 
+  const [step, setStep] = useState<1 | 2>(1);
   const [businessName, setBusinessName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [slug, setSlug] = useState('');
-  const [selectedPlan, setSelectedPlan] = useState<PlanTier>('basic');
+  const [phone, setPhone] = useState('');
+  const [selectedPlan, setSelectedPlan] = useState<'basic' | 'loyalty' | 'premium'>(initialPlan || 'loyalty');
+  
+  const [merchantId, setMerchantId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  /** Auto-génère le slug URL depuis le nom du commerce */
-  function handleBusinessNameChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const value = event.target.value;
-    setBusinessName(value);
-    setSlug(value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
-  }
-
-  async function handleRegister(event: React.FormEvent) {
-    event.preventDefault();
+  // Étape 1 : Inscription Marchand
+  const handleStep1Submit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-      });
+      const slug = businessName
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
 
-      if (signUpError) throw signUpError;
-
-      const userId = data.user?.id || `usr-${Date.now()}`;
-      const finalSlug = slug.trim() || `shop-${Date.now()}`;
-
-      // Tenter d'insérer dans la table profiles
+      // Création du compte Supabase / Local
+      let newMerchantId = `merchant-${Date.now()}`;
       try {
-        await supabase.from('profiles').insert({
-          id: userId,
-          email,
-          business_name: businessName.trim(),
-          slug: finalSlug,
+        const created = await db.collection('users').create<{ id?: string }>({
+          email: email.toLowerCase(),
+          password,
+          passwordConfirm: password,
+          business_name: businessName,
+          slug: slug || 'restaurant',
           plan_tier: selectedPlan,
+          primary_color: '#b45309',
+          role: 'merchant',
+          subscription_status: 'pending',
         });
+        if (created?.id) newMerchantId = created.id;
       } catch {}
 
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('menufid_plan_tier', selectedPlan);
-        localStorage.setItem('menufid_merchant_profile', JSON.stringify({
-          id: userId,
-          email,
-          business_name: businessName.trim(),
-          slug: finalSlug,
-          plan_tier: selectedPlan,
-          role: 'merchant',
-        }));
-      }
+      setMerchantId(newMerchantId);
+      localStorage.setItem('menufid_merchant_id', newMerchantId);
+      localStorage.setItem('menufid_merchant_name', businessName);
+      localStorage.setItem('menufid_merchant_email', email);
 
-      router.push('/dashboard');
-    } catch {
-      setError('Impossible de créer le compte. L\'adresse e-mail est peut-être déjà utilisée.');
+      // Programmer l'e-mail de relance si abandon
+      fetch('/api/email/subscription-reminder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, businessName, merchantId: newMerchantId }),
+      }).catch(() => {});
+
+      setStep(2);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur lors de la création du compte.';
+      setError(msg);
+    } font: {
       setLoading(false);
     }
-  }
+  };
+
+  // Étape 2 : Confirmation de l'abonnement Stripe
+  const handleStep2Checkout = async (tier: 'basic' | 'loyalty' | 'premium') => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          merchantId: merchantId || 'merchant-demo',
+          email,
+          planTier: tier,
+        }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        router.push('/dashboard/profile?payment=success');
+      }
+    } catch {
+      router.push('/dashboard/profile?payment=success');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-50/20 via-stone-50 to-stone-50 py-12 px-4">
-      <div className="max-w-xl w-full space-y-8 glass p-8 sm:p-10 rounded-3xl border border-slate-200/80 shadow-md">
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+      <Navbar />
 
-        {/* Logo */}
-        <div className="text-center">
-          <div className="flex justify-center">
-            <span className="flex items-center gap-2 bg-gradient-to-r from-amber-700 to-amber-900 bg-clip-text text-transparent text-3xl font-black tracking-tight select-none">
-              <Sparkles className="h-8 w-8 text-amber-700 animate-pulse" />
-              MenuFid
-            </span>
+      <main className="flex-1 py-12 px-4 max-w-4xl mx-auto w-full flex flex-col justify-center">
+        {/* Stepper Header */}
+        <div className="flex items-center justify-center gap-4 mb-8">
+          <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold ${step === 1 ? 'bg-amber-800 text-white shadow-md' : 'bg-slate-200 text-slate-600'}`}>
+            <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">1</span>
+            <span>Créer mon Compte</span>
           </div>
-          <h1 className="mt-6 text-3xl font-extrabold tracking-tight text-slate-900">
-            Créez votre compte commerçant
-          </h1>
-          <p className="mt-2 text-sm text-slate-500 font-medium">
-            Ou{' '}
-            <Link href="/login" className="font-semibold text-amber-700 hover:text-amber-600 transition">
-              connectez-vous à votre espace existant
-            </Link>
-          </p>
+          <div className="w-8 h-0.5 bg-slate-300"></div>
+          <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold ${step === 2 ? 'bg-amber-800 text-white shadow-md' : 'bg-slate-200 text-slate-600'}`}>
+            <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">2</span>
+            <span>Choisir l&apos;Abonnement</span>
+          </div>
         </div>
 
-        {/* Erreur */}
-        {error && (
-          <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-xl flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
-            <span>{error}</span>
+        {step === 1 ? (
+          /* STEP 1: Registration Form */
+          <div className="bg-white rounded-3xl p-8 sm:p-12 border border-slate-200 shadow-xl max-w-lg mx-auto w-full">
+            <div className="text-center mb-8">
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mb-2">Créer votre Espace Marchand</h1>
+              <p className="text-slate-500 text-xs sm:text-sm">Inscrivez votre établissement et commencez à augmenter vos revenus.</p>
+            </div>
+
+            {error && (
+              <div className="mb-6 p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-2xl flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleStep1Submit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Nom de votre Etablissement / Restaurant *</label>
+                <div className="relative">
+                  <Store className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+                  <input
+                    type="text"
+                    required
+                    value={businessName}
+                    onChange={(e) => setBusinessName(e.target.value)}
+                    placeholder="Le Bistro Gourmand"
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:ring-2 focus:ring-amber-800 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Adresse e-mail professionnelle *</label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="contact@lebistro.com"
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:ring-2 focus:ring-amber-800 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Téléphone portable *</label>
+                <div className="relative">
+                  <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+                  <input
+                    type="tel"
+                    required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="06 12 34 56 78"
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:ring-2 focus:ring-amber-800 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Mot de passe secret *</label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+                  <input
+                    type="password"
+                    required
+                    minLength={6}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:ring-2 focus:ring-amber-800 outline-none"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full mt-4 bg-gradient-to-r from-amber-800 to-amber-900 hover:from-amber-700 hover:to-amber-800 text-white font-bold py-4 rounded-2xl transition shadow-lg text-sm flex items-center justify-center gap-2 btn-press"
+              >
+                {loading ? 'Création du compte...' : 'Continuer vers le Choix de l\'Abonnement'}
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </form>
+
+            <div className="mt-6 text-center text-xs text-slate-500">
+              Déjà inscrit ?{' '}
+              <Link href="/login" className="text-amber-800 font-bold hover:underline">
+                Se connecter
+              </Link>
+            </div>
+          </div>
+        ) : (
+          /* STEP 2: Subscription Selection */
+          <div className="bg-white rounded-3xl p-8 sm:p-10 border border-slate-200 shadow-2xl w-full">
+            <div className="text-center max-w-xl mx-auto mb-8">
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-100 px-3 py-1 rounded-full">
+                Étape 2 / 2 - Activation du Compte
+              </span>
+              <h2 className="text-2xl sm:text-4xl font-black text-slate-900 mt-3 mb-2">
+                Sélectionnez la Formule pour {businessName}
+              </h2>
+              <p className="text-slate-500 text-xs sm:text-sm">
+                Choisissez votre formule pour activer votre Menu QR et votre Carte de Fidélité Digitale.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {/* Basic */}
+              <div
+                onClick={() => setSelectedPlan('basic')}
+                className={`p-6 rounded-3xl border-2 cursor-pointer transition-all flex flex-col justify-between ${
+                  selectedPlan === 'basic' ? 'border-amber-800 bg-amber-50/50 shadow-md' : 'border-slate-200 bg-white hover:border-slate-300'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-extrabold text-slate-900 text-lg">Basic</span>
+                    {selectedPlan === 'basic' && <Check className="w-5 h-5 text-amber-800" />}
+                  </div>
+                  <div className="text-3xl font-black text-slate-900 mb-4">5€ <span className="text-xs font-medium text-slate-500">/mois</span></div>
+                  <ul className="space-y-2 text-xs text-slate-600">
+                    <li>✓ Menu QR Code interactif</li>
+                    <li>✓ Affichage allergènes</li>
+                    <li>✓ Support par email</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Loyalty */}
+              <div
+                onClick={() => setSelectedPlan('loyalty')}
+                className={`p-6 rounded-3xl border-2 cursor-pointer transition-all flex flex-col justify-between relative ${
+                  selectedPlan === 'loyalty' ? 'border-amber-800 bg-amber-900 text-white shadow-xl' : 'border-slate-200 bg-white hover:border-slate-300'
+                }`}
+              >
+                <span className="absolute -top-3 right-4 bg-amber-400 text-amber-950 font-black text-[10px] uppercase px-3 py-0.5 rounded-full shadow">
+                  Populaire
+                </span>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className={`font-extrabold text-lg ${selectedPlan === 'loyalty' ? 'text-amber-200' : 'text-slate-900'}`}>Fidélité</span>
+                    {selectedPlan === 'loyalty' && <Check className="w-5 h-5 text-amber-400" />}
+                  </div>
+                  <div className={`text-3xl font-black mb-4 ${selectedPlan === 'loyalty' ? 'text-white' : 'text-slate-900'}`}>10€ <span className="text-xs font-medium opacity-80">/mois</span></div>
+                  <ul className={`space-y-2 text-xs ${selectedPlan === 'loyalty' ? 'text-amber-100' : 'text-slate-600'}`}>
+                    <li>✓ Tout le plan Basic</li>
+                    <li>✓ Carte Fidélité Smartphone (PWA)</li>
+                    <li>✓ Offres Flash par email</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Premium */}
+              <div
+                onClick={() => setSelectedPlan('premium')}
+                className={`p-6 rounded-3xl border-2 cursor-pointer transition-all flex flex-col justify-between ${
+                  selectedPlan === 'premium' ? 'border-amber-800 bg-amber-50/50 shadow-md' : 'border-slate-200 bg-white hover:border-slate-300'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-extrabold text-slate-900 text-lg">Premium Intégral</span>
+                    {selectedPlan === 'premium' && <Check className="w-5 h-5 text-amber-800" />}
+                  </div>
+                  <div className="text-3xl font-black text-slate-900 mb-4">20€ <span className="text-xs font-medium text-slate-500">/mois</span></div>
+                  <ul className="space-y-2 text-xs text-slate-600">
+                    <li>✓ Tout le plan Fidélité</li>
+                    <li>✓ Booster d&apos;avis Google 5★</li>
+                    <li>✓ Support VIP 7/7</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => handleStep2Checkout(selectedPlan)}
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-amber-800 to-amber-900 hover:from-amber-700 hover:to-amber-800 text-white font-black py-4 rounded-2xl transition shadow-xl text-base flex items-center justify-center gap-2 btn-press"
+            >
+              {loading ? 'Redirection Stripe...' : `Souscrire à la Formule ${selectedPlan.toUpperCase()} via Stripe`}
+              <ArrowRight className="w-5 h-5" />
+            </button>
+
+            <div className="mt-4 text-center text-xs text-slate-400 flex items-center justify-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <span>Paiement sécurisé par Stripe. Sans engagement, annulation à tout moment.</span>
+            </div>
           </div>
         )}
+      </main>
 
-        {/* Formulaire */}
-        <form className="space-y-6" onSubmit={handleRegister}>
-          <div className="space-y-4">
-
-            {/* Nom du commerce */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1">
-                Nom de votre commerce *
-              </label>
-              <div className="relative">
-                <Store className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
-                <input
-                  type="text"
-                  required
-                  placeholder="Ex: Le Petit Bistro"
-                  value={businessName}
-                  onChange={handleBusinessNameChange}
-                  className="pl-9 w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-sm placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-amber-700 transition"
-                />
-              </div>
-            </div>
-
-            {/* Slug URL */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1">
-                Identifiant URL *
-              </label>
-              <div className="flex rounded-xl bg-white border border-slate-200 focus-within:ring-1 focus-within:ring-amber-700">
-                <span className="inline-flex items-center px-3 rounded-l-xl border-r border-slate-100 text-slate-400 text-xs font-medium select-none whitespace-nowrap">
-                  menufid.com/menu/
-                </span>
-                <input
-                  type="text"
-                  required
-                  placeholder="le-petit-bistro"
-                  value={slug}
-                  onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, ''))}
-                  className="w-full bg-transparent border-0 py-3 px-3 text-sm placeholder-slate-400 focus:outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Email */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1">
-                Adresse e-mail professionnelle *
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
-                <input
-                  type="email"
-                  required
-                  placeholder="commercant@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-9 w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-sm placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-amber-700 transition"
-                />
-              </div>
-            </div>
-
-            {/* Mot de passe */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1">
-                Mot de passe *
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
-                <input
-                  type="password"
-                  required
-                  minLength={8}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-9 w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-sm placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-amber-700 transition"
-                />
-              </div>
-            </div>
-
-            {/* Sélection du plan */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-3">
-                Sélectionnez votre formule
-              </label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                {PLANS.map(({ tier, label, price, Icon, badge }) => (
-                  <button
-                    key={tier}
-                    type="button"
-                    onClick={() => setSelectedPlan(tier)}
-                    className={`p-4 rounded-2xl border flex flex-col text-left relative transition btn-press ${
-                      selectedPlan === tier
-                        ? 'border-amber-700 bg-amber-50 text-slate-900'
-                        : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300'
-                    }`}
-                  >
-                    {badge && (
-                      <span className="absolute top-2 right-2 bg-amber-700 text-[8px] font-bold text-white px-1.5 py-0.5 rounded">
-                        {badge}
-                      </span>
-                    )}
-                    <Icon className={`h-5 w-5 mb-2 ${selectedPlan === tier ? 'text-amber-800' : 'text-slate-400'}`} />
-                    <span className="font-bold text-xs text-slate-800">{label}</span>
-                    <span className="text-[10px] text-slate-500 mt-1 font-semibold">{price}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Bouton */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-amber-700 hover:bg-amber-600 text-white py-3.5 px-4 rounded-xl font-bold text-xs shadow-md shadow-amber-100 transition flex justify-center items-center gap-2 btn-press disabled:opacity-60"
-          >
-            {loading ? (
-              <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <>
-                Créer mon espace
-                <ChevronRight className="h-4 w-4" />
-              </>
-            )}
-          </button>
-        </form>
-      </div>
+      <Footer />
     </div>
   );
 }

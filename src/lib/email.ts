@@ -18,7 +18,7 @@ export interface SendEmailPayload {
 }
 
 export async function sendTransactionalEmail(payload: SendEmailPayload) {
-  const fromAddress = payload.from || process.env.EMAIL_FROM_ADDRESS || 'MenuFid <noreply@menufid.com>';
+  const fromAddress = payload.from || process.env.EMAIL_FROM_ADDRESS || 'MenuFid <noreply@menufid.site>';
 
   try {
     const data = await resend.emails.send({
@@ -34,3 +34,5 @@ export async function sendTransactionalEmail(payload: SendEmailPayload) {
     return { success: true, simulated: true };
   }
 }
+
+export const sendEmail = sendTransactionalEmail;

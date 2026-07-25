@@ -23,11 +23,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ url: fallbackUrl, simulated: true });
     }
 
-    // Prix mensuels en cents (15€ = 1500, 29€ = 2900, 40€ = 4000)
+    // Prix mensuels en cents (5€ = 500, 10€ = 1000, 20€ = 2000)
     const priceMap: Record<string, number> = {
-      basic: 1500,
-      loyalty: 2900,
-      premium: 4000,
+      basic: 500,
+      loyalty: 1000,
+      premium: 2000,
     };
 
     const amount = priceMap[planTier] || 1500;
