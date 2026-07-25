@@ -42,23 +42,23 @@ export default function ProfilePage() {
       setPdfMenuUrl(merchant.pdf_menu_url || '');
     }
 
-    // Détection de retour de paiement Stripe réussi (Fallback sans Webhook)
+    // Détection de retour de paiement Stripe réussi
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const isSuccess = params.get('payment') === 'success';
       const tier = params.get('tier') as 'basic' | 'loyalty' | 'premium' | null;
+      const targetId = merchant?.id || localStorage.getItem('menufid_merchant_id');
 
-      if (isSuccess && tier && merchant?.id) {
+      if (isSuccess && tier && targetId) {
         localStorage.setItem('menufid_plan_tier', tier);
-        supabase
-          .from('profiles')
-          .update({ plan_tier: tier })
-          .eq('id', merchant.id)
-          .then(() => {
-            refreshAuth();
-            showToast(`🎉 Félicitations ! Votre abonnement ${tier.toUpperCase()} est désormais activé !`, 'success');
-            window.history.replaceState({}, document.title, window.location.pathname);
-          });
+        (async () => {
+          try {
+            await supabase.from('profiles').update({ plan_tier: tier }).eq('id', targetId);
+          } catch {}
+          await refreshAuth();
+          showToast(`🎉 Félicitations ! Votre abonnement ${tier.toUpperCase()} est désormais activé !`, 'success');
+          window.history.replaceState({}, document.title, window.location.pathname);
+        })();
       }
     }
   }, [merchant, refreshAuth, showToast]);

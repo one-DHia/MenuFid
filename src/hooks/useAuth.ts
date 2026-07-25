@@ -4,7 +4,7 @@
  * hooks/useAuth.ts
  * ─────────────────────────────────────────────────────────────
  * Hook centralisé pour la gestion de l'authentification Supabase & Persistance.
- * Gère la session utilisateur, le profil commerçant et les rôles via Supabase.
+ * Préserve la connexion du commerçant lors des redirections externes Stripe.
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -25,11 +25,14 @@ interface UseAuthReturn {
 export function useAuth(): UseAuthReturn {
   const router = useRouter();
 
-  const [merchant, setMerchant] = useState<Merchant | null>(() => {
+  // Helper pour lire le profil local
+  const getStoredMerchant = (): Merchant | null => {
     if (typeof window === 'undefined') return null;
+    const savedMerchantRaw = localStorage.getItem('menufid_merchant_profile');
+    const savedId = localStorage.getItem('menufid_merchant_id');
+    const savedEmail = localStorage.getItem('menufid_merchant_email');
     const savedPlan = localStorage.getItem('menufid_plan_tier') as PlanTier | null;
     const savedRole = localStorage.getItem('menufid_role');
-    const savedMerchantRaw = localStorage.getItem('menufid_merchant_profile');
 
     if (savedMerchantRaw) {
       try {
@@ -41,45 +44,58 @@ export function useAuth(): UseAuthReturn {
         };
       } catch {}
     }
-    return null;
-  });
 
+    if (savedId && savedEmail) {
+      return {
+        id: savedId,
+        email: savedEmail,
+        business_name: localStorage.getItem('menufid_merchant_name') || 'Mon Établissement',
+        slug: 'restaurant',
+        plan_tier: savedPlan || 'premium',
+        role: savedRole || 'admin',
+        primary_color: '#b45309',
+      };
+    }
+
+    return null;
+  };
+
+  const [merchant, setMerchant] = useState<Merchant | null>(getStoredMerchant);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchProfile = useCallback(async (userId: string, email?: string) => {
     try {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .maybeSingle();
 
       const savedPlan = typeof window !== 'undefined' ? (localStorage.getItem('menufid_plan_tier') as PlanTier | null) : null;
-      const savedRole = typeof window !== 'undefined' ? localStorage.getItem('menufid_role') : null;
 
       let profileMerchant: Merchant;
-
-      if (data && !error) {
+      if (data) {
         profileMerchant = {
           id: data.id,
-          email: data.email || email || 'contact@menufid.com',
+          email: data.email || email || 'contact@menufid.site',
           business_name: data.business_name || 'Mon Établissement',
           slug: data.slug || 'shop',
           plan_tier: savedPlan || (data.plan_tier as PlanTier) || 'premium',
-          role: savedRole || data.role || 'admin',
+          role: data.role || 'admin',
           primary_color: data.primary_color || '#b45309',
           logo_url: data.logo_url,
           google_review_url: data.google_review_url,
           pdf_menu_url: data.pdf_menu_url,
         };
       } else {
-        profileMerchant = {
+        const local = getStoredMerchant();
+        profileMerchant = local || {
           id: userId,
-          email: email || 'contact@menufid.com',
+          email: email || 'contact@menufid.site',
           business_name: 'Mon Établissement',
           slug: `shop-${userId.slice(0, 6)}`,
           plan_tier: savedPlan || 'premium',
-          role: savedRole || 'admin',
+          role: 'admin',
           primary_color: '#b45309',
         };
       }
@@ -87,19 +103,33 @@ export function useAuth(): UseAuthReturn {
       setMerchant(profileMerchant);
       if (typeof window !== 'undefined') {
         localStorage.setItem('menufid_merchant_profile', JSON.stringify(profileMerchant));
+        localStorage.setItem('menufid_merchant_id', profileMerchant.id);
+        localStorage.setItem('menufid_merchant_email', profileMerchant.email);
+        document.cookie = `menufid_merchant_id=${profileMerchant.id}; path=/; max-age=31536000; SameSite=Lax`;
       }
     } catch {
-      // Conservation du profil existant
-    } finally {
+      const local = getStoredMerchant();
+      if (local) setMerchant(local);
+    } font: {
       setIsLoading(false);
     }
   }, []);
 
   const refreshAuth = useCallback(async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user) {
-      await fetchProfile(session.user.id, session.user.email);
-    } else {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        await fetchProfile(session.user.id, session.user.email);
+      } else {
+        const stored = getStoredMerchant();
+        if (stored) {
+          setMerchant(stored);
+        }
+        setIsLoading(false);
+      }
+    } catch {
+      const stored = getStoredMerchant();
+      if (stored) setMerchant(stored);
       setIsLoading(false);
     }
   }, [fetchProfile]);
@@ -110,50 +140,52 @@ export function useAuth(): UseAuthReturn {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
         await fetchProfile(session.user.id, session.user.email);
-      } else if (typeof window !== 'undefined' && !localStorage.getItem('menufid_merchant_profile')) {
-        setMerchant(null);
-        setIsLoading(false);
       } else {
+        const stored = getStoredMerchant();
+        if (stored) {
+          setMerchant(stored);
+        }
         setIsLoading(false);
       }
     });
 
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, [refreshAuth, fetchProfile]);
 
-  async function updatePlan(newPlan: PlanTier) {
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch {}
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('menufid_merchant_profile');
+      localStorage.removeItem('menufid_merchant_id');
+      localStorage.removeItem('menufid_merchant_email');
+      localStorage.removeItem('menufid_plan_tier');
+      document.cookie = 'menufid_merchant_id=; path=/; max-age=0';
+    }
+    setMerchant(null);
+    router.push('/login');
+  };
+
+  const updatePlan = async (newPlan: PlanTier) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('menufid_plan_tier', newPlan);
     }
-
-    setMerchant((prev) => (prev ? { ...prev, plan_tier: newPlan } : null));
-
-    if (merchant?.id) {
+    if (merchant) {
+      const updated = { ...merchant, plan_tier: newPlan };
+      setMerchant(updated);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('menufid_merchant_profile', JSON.stringify(updated));
+      }
       try {
-        await supabase
-          .from('profiles')
-          .update({ plan_tier: newPlan })
-          .eq('id', merchant.id);
+        await supabase.from('profiles').update({ plan_tier: newPlan }).eq('id', merchant.id);
       } catch {}
     }
-  }
-
-  async function logout() {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('menufid_plan_tier');
-      localStorage.removeItem('menufid_role');
-      localStorage.removeItem('menufid_merchant_profile');
-    }
-    await supabase.auth.signOut().catch(() => null);
-    setMerchant(null);
-    router.push('/login');
-  }
+  };
 
   return {
     merchant,
-    merchantId: merchant?.id ?? '',
+    merchantId: merchant?.id || '',
     isLoggedIn: !!merchant,
     isLoading,
     logout,
@@ -162,9 +194,9 @@ export function useAuth(): UseAuthReturn {
   };
 }
 
-export function useRequireAuth(): UseAuthReturn {
-  const router = useRouter();
+export function useRequireAuth() {
   const auth = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     if (!auth.isLoading && !auth.isLoggedIn) {

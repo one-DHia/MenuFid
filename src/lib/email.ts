@@ -1,13 +1,12 @@
 /**
  * lib/email.ts
  * ─────────────────────────────────────────────────────────────
- * Service d'expédition d'e-mails transactionnels (Resend SDK & SMTP).
- * Permet l'envoi de messages de bienvenue, d'offres CRM et de notifications.
+ * Service d'expédition d'e-mails transactionnels réels via Resend API.
  */
 
 import { Resend } from 'resend';
 
-const resendApiKey = process.env.RESEND_API_KEY || 're_mock_key';
+const resendApiKey = process.env.RESEND_API_KEY || '';
 export const resend = new Resend(resendApiKey);
 
 export interface SendEmailPayload {
@@ -18,21 +17,15 @@ export interface SendEmailPayload {
 }
 
 export async function sendTransactionalEmail(payload: SendEmailPayload) {
-  const fromAddress = payload.from || process.env.EMAIL_FROM_ADDRESS || 'MenuFid <noreply@menufid.site>';
+  const fromAddress = payload.from || process.env.EMAIL_FROM_ADDRESS || 'MenuFid <onboarding@resend.dev>';
 
-  try {
-    const data = await resend.emails.send({
-      from: fromAddress,
-      to: payload.to,
-      subject: payload.subject,
-      html: payload.html,
-    });
-    return { success: true, data };
-  } catch (error: unknown) {
-    console.warn('[Email Service Fallback] Utilisation du mode simulation d\'envoi:', error);
-    // Mode simulation / fallback résilient
-    return { success: true, simulated: true };
-  }
+  const data = await resend.emails.send({
+    from: fromAddress,
+    to: payload.to,
+    subject: payload.subject,
+    html: payload.html,
+  });
+  return { success: true, data };
 }
 
 export const sendEmail = sendTransactionalEmail;
