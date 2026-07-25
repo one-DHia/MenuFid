@@ -23,21 +23,21 @@ export const LANGUAGES: LanguageOption[] = [
 
 export const translations: Record<Language, Record<string, string>> = {
   fr: {
-    // Nav & Common
+    // Navigation & Global Header
     nav_home: 'Accueil',
     nav_pricing: 'Abonnements',
     nav_partners: 'Devenir notre Partenaire',
-    nav_about: 'À propos',
-    nav_contact: 'Contact',
-    nav_login: 'Connexion',
-    nav_register: 'Créer mon compte',
+    nav_about: 'À propos de nous',
+    nav_contact: 'Contactez-nous',
+    nav_login: 'Se connecter',
+    nav_register: 'Créer un compte',
     nav_dashboard: 'Mon Espace Resto',
     nav_logout: 'Déconnexion',
 
-    // Hero Section
+    // Hero Section Landing
     hero_title: 'Multipliez le chiffre d\'affaires de votre établissement avec la fidélité digitale',
     hero_subtitle: 'Menu QR Code interactif HD, carte de fidélité sur smartphone Apple & Google Wallet et relances automatiques pour faire revenir vos clients 2x plus souvent.',
-    hero_cta_primary: 'Activer mon établissement (Dès 5€/m)',
+    hero_cta_primary: 'Activer mon établissement (Dès 5€/mois)',
     hero_cta_partner: 'Devenir notre Partenaire Réseau',
     badge_security: 'Paiement Stripe 100% Sécurisé - Sans aucun engagement',
     stat_clients: 'Clients Fidélisés',
@@ -56,8 +56,8 @@ export const translations: Record<Language, Record<string, string>> = {
     feat_crm_title: 'Fichier Client & Marketing SMS/WhatsApp',
     feat_crm_desc: 'Collectez les coordonnées certifiées de vos clients et relancez-les lors de leurs anniversaires ou nouveautés.',
 
-    // Pricing Page
-    pricing_page_title: 'Tarifs Simples & Transparentes pour Boostez vos Gains',
+    // Pricing Page & Cards
+    pricing_page_title: 'Tarifs Simples & Transparentes pour Booster vos Gains',
     pricing_page_subtitle: 'Chaque formule est calibrée pour générer un retour sur investissement immédiat dès la première semaine.',
     plan_basic_name: 'Basic',
     plan_basic_price: '5€',
@@ -84,9 +84,10 @@ export const translations: Record<Language, Record<string, string>> = {
 
     btn_choose_plan: 'Souscrire via Stripe',
     popular_badge: 'Plus Populaire & Rentable',
+    no_credit_card: 'Paiement Stripe 100% Sécurisé - Résiliation en 1 Clic',
 
-    // Partner / Distribution Page
-    partner_page_title: 'Devenez notre Partenaire Exclusif',
+    // Partner & Distribution Page
+    partner_page_title: 'Réseau de Partenaires Internationaux',
     partner_page_subtitle: 'Rejoignez notre réseau de distribution mondial et percevez des commissions récurrentes sur chaque restaurant équipé.',
     partner_title: 'Devenez notre Partenaire Officiel',
     partner_form_title: 'Candidature Partenaire Exclusif',
@@ -100,7 +101,7 @@ export const translations: Record<Language, Record<string, string>> = {
     // About Page
     about_hero_tag: 'Notre Mission Principale',
     about_hero_title: 'Multiplier les Gains & Revenus des Restaurateurs & Commerçants',
-    about_hero_desc: 'Chez MenuFid, notre objectif absolu est d\'aider chaque propriétaire d\'établissement à maximiser son chiffre d\'affaires grâce au menu QR interactif et à la fidélité digitale.',
+    about_hero_desc: 'Chez MenuFid, notre objectif absolu est d\'aider chaque propriétaire d\'établissement à maximiser son chiffre d\'affaires grâce au menu QR interactif et à la fidélité digitale sur smartphone.',
     about_card1_title: 'Croissance du Chiffre d\'Affaires',
     about_card1_desc: 'Nous aidons les restaurateurs à augmenter leur ticket moyen de +25% grâce à des récompenses ciblées.',
     about_card2_title: 'Fidélisation Automatisée',
@@ -137,54 +138,54 @@ export const translations: Record<Language, Record<string, string>> = {
     footer_desc: 'La plateforme numéro 1 pour digitaliser votre menu et fidéliser vos clients sur smartphone.',
     footer_rights: 'Tous droits réservés.',
 
-    // Chatbot
+    // Chatbot Widget
     bot_greeting: 'Bonjour 👋 ! Je suis l\'Assistant virtuel MenuFid. Comment puis-je vous aider à augmenter vos gains aujourd\'hui ?',
     bot_q1: 'Comment MenuFid augmente mes revenus ?',
-    bot_a1: 'MenuFid transforme vos visiteurs en clients fidèles. Avec la carte digitale enregistrée sur leur smartphone, vos clients reviennent 2x plus souvent !',
-    bot_q2: 'Combien coûtent les formules ?',
-    bot_a2: 'Nos formules sont transparentes : Basic 5€/mois, Fidélité 10€/mois et Premium 20€/mois. Sans engagement !',
+    bot_a1: 'MenuFid transforme vos visiteurs occasionnels en clients réguliers. Avec la carte digitale enregistrée sur leur smartphone, vos clients reviennent 2x plus souvent !',
+    bot_q2: 'Combien coûtent les formules MenuFid ?',
+    bot_a2: 'Nos abonnements sont simples : Basic 5€/mois, Fidélité 10€/mois et Premium 20€/mois. Sans aucun engagement !',
     bot_q3: 'Comment fonctionne le Menu QR Code ?',
-    bot_a3: 'Vos clients scannent le QR Code à table sans application. Le menu s\'affiche instantanément avec photos HD.',
+    bot_a3: 'Vos clients scannent le QR Code à table sans installer d\'application. Le menu s\'affiche instantanément avec photos HD et filtres d\'allergènes.',
     bot_q4: 'Comment devenir Partenaire officiel ?',
-    bot_a4: 'Déposez votre candidature sur notre page Partenaires pour obtenir un secteur d\'exclusivité.',
+    bot_a4: 'Remplissez le formulaire sur notre page Partenaires pour obtenir un secteur d\'exclusivité et distribuer MenuFid avec commission récurrente.',
   },
   en: {
-    // Nav & Common
+    // Navigation & Global Header
     nav_home: 'Home',
-    nav_pricing: 'Pricing',
+    nav_pricing: 'Pricing & Plans',
     nav_partners: 'Become Our Partner',
     nav_about: 'About Us',
-    nav_contact: 'Contact',
+    nav_contact: 'Contact Us',
     nav_login: 'Log In',
     nav_register: 'Get Started',
     nav_dashboard: 'Merchant Space',
     nav_logout: 'Log Out',
 
-    // Hero Section
-    hero_title: 'Multiply your establishment revenue with digital customer loyalty',
-    hero_subtitle: 'Interactive HD QR Code menu, Apple & Google Wallet smartphone loyalty card, and automated retention to make customers return 2x more often.',
+    // Hero Section Landing
+    hero_title: 'Maximize your establishment revenue with smart digital loyalty',
+    hero_subtitle: 'Interactive HD QR Code menu, Apple & Google Wallet smartphone loyalty card, and automated marketing to double customer return visits.',
     hero_cta_primary: 'Activate My Business (From €5/mo)',
     hero_cta_partner: 'Become Our Network Partner',
-    badge_security: '100% Secure Stripe Checkout - No Long Term Contract',
+    badge_security: '100% Secure Stripe Checkout - No Commitment',
     stat_clients: 'Loyal Customers',
     stat_revenue: '+35% Revenue Boost',
     stat_return: '2x Return Visits',
 
     // Features Section
-    feat_title: 'Technology engineered to skyrocket your business profitability',
+    feat_title: 'Technology built to skyrocket your business profitability',
     feat_subtitle: 'Everything you need to capture, retain, and automatically re-engage your guests.',
     feat_qr_title: 'Interactive HD QR Code Menu',
-    feat_qr_desc: 'Instant loading with no app download, high-definition photos, allergen filters, and 1-click menu updates.',
+    feat_qr_desc: 'Instant loading without app download, high-definition photos, allergen filters, and 1-click menu updates.',
     feat_wallet_title: 'Smartphone Wallet Loyalty Card',
-    feat_wallet_desc: 'Customers add their loyalty card to Apple Wallet & Google Wallet in 1 scan. No more lost paper cards!',
+    feat_wallet_desc: 'Customers add their loyalty card to Apple Wallet & Google Wallet in 1 scan. Never lose paper cards again!',
     feat_revenue_title: 'Automated Revenue Booster',
-    feat_revenue_desc: 'Automatic promo push notifications to fill your tables during off-peak hours.',
+    feat_revenue_desc: 'Automatic promotional push notifications to fill your restaurant during off-peak hours.',
     feat_crm_title: 'Customer Database & SMS/WhatsApp Marketing',
     feat_crm_desc: 'Collect verified customer contact details and re-engage them on birthdays or special events.',
 
-    // Pricing Page
+    // Pricing Page & Cards
     pricing_page_title: 'Simple & Transparent Pricing to Boost Your Earnings',
-    pricing_page_subtitle: 'Every tier is built to deliver immediate return on investment starting in week one.',
+    pricing_page_subtitle: 'Every plan is engineered to deliver immediate return on investment starting in week one.',
     plan_basic_name: 'Basic',
     plan_basic_price: '€5',
     plan_basic_desc: 'Ideal to digitize your menu and start displaying your dishes online in 2 minutes.',
@@ -194,7 +195,7 @@ export const translations: Record<Language, Record<string, string>> = {
     
     plan_loyalty_name: 'Loyalty',
     plan_loyalty_price: '€10',
-    plan_loyalty_desc: 'The core system to build your customer list and double repeat visits.',
+    plan_loyalty_desc: 'The core engine to build your customer list and double repeat visits.',
     plan_loyalty_feat1: 'All Basic features included',
     plan_loyalty_feat2: 'Apple & Google Wallet Loyalty Card',
     plan_loyalty_feat3: 'Customer data collection',
@@ -202,7 +203,7 @@ export const translations: Record<Language, Record<string, string>> = {
 
     plan_premium_name: 'Full Premium',
     plan_premium_price: '€20',
-    plan_premium_desc: 'The ultimate growth engine with automated marketing and Google reviews.',
+    plan_premium_desc: 'The ultimate growth solution with automated marketing and Google reviews.',
     plan_premium_feat1: 'All Loyalty features included',
     plan_premium_feat2: 'Automated SMS & WhatsApp campaigns',
     plan_premium_feat3: 'Automated Google Maps Review Booster',
@@ -210,9 +211,10 @@ export const translations: Record<Language, Record<string, string>> = {
 
     btn_choose_plan: 'Subscribe via Stripe',
     popular_badge: 'Most Popular & Profitable',
+    no_credit_card: '100% Secure Stripe Payment - Cancel Anytime in 1 Click',
 
-    // Partner / Distribution Page
-    partner_page_title: 'Become Our Exclusive Partner',
+    // Partner & Distribution Page
+    partner_page_title: 'Global Partner Network',
     partner_page_subtitle: 'Join our worldwide distribution network and earn recurring monthly commissions for every onboarded merchant.',
     partner_title: 'Become Our Official Partner',
     partner_form_title: 'Exclusive Partner Application',
@@ -221,18 +223,18 @@ export const translations: Record<Language, Record<string, string>> = {
     partner_form_phone: 'Phone Number',
     partner_form_country: 'Target Country / Exclusive Region',
     partner_form_btn: 'Submit Partner Application',
-    partner_success_msg: 'Your partner application has been recorded. Our executive team will reach out within 24h.',
+    partner_success_msg: 'Your partner application has been recorded. Our team will reach out within 24h.',
 
     // About Page
     about_hero_tag: 'Our Main Mission',
-    about_hero_title: 'Multiply Revenue & Profits for Business Owners',
+    about_hero_title: 'Maximize Revenue & Profits for Restaurant Owners',
     about_hero_desc: 'At MenuFid, our sole focus is to help business owners maximize their sales using interactive QR menus and digital wallet loyalty.',
     about_card1_title: 'Revenue Growth',
-    about_card1_desc: 'We help restaurants boost average ticket size by +25% with targeted loyalty rewards.',
-    about_card2_title: 'Automated Loyalty',
-    about_card2_desc: 'Customers keep their loyalty card in their smartphone wallet and return naturally.',
+    about_card1_desc: 'We help restaurant owners boost average order value by +25% with targeted loyalty rewards.',
+    about_card2_title: 'Automated Retention',
+    about_card2_desc: 'Customers keep their loyalty card right in their smartphone wallet and return naturally.',
     about_card3_title: '5-Star Google Reviews',
-    about_card3_desc: 'Our automated review booster redirects happy customers to your Google Maps page.',
+    about_card3_desc: 'Our automated review booster redirects happy customers straight to your Google Maps page.',
 
     // Contact Page
     contact_title: 'Contact Our Team',
@@ -245,8 +247,8 @@ export const translations: Record<Language, Record<string, string>> = {
     contact_success_msg: 'Your message has been sent successfully. We will reply within 2 hours.',
 
     // Terms Page
-    terms_title: 'Terms of Service & General Conditions',
-    terms_subtitle: 'Review the terms governing the MenuFid platform and user data protection.',
+    terms_title: 'Terms of Service & General Sales Conditions',
+    terms_subtitle: 'Review the terms governing the MenuFid platform and data protection.',
 
     // Login & Register Pages
     login_title: 'Merchant Space Login',
@@ -255,7 +257,7 @@ export const translations: Record<Language, Record<string, string>> = {
     login_password: 'Password',
     login_btn: 'Sign In to Dashboard',
     register_step1_title: 'Create My Merchant Account',
-    register_step2_title: 'Select Plan for My Business',
+    register_step2_title: 'Select Plan for My Establishment',
     register_business_name: 'Business Trade Name',
     register_next_btn: 'Proceed to Subscription Choice',
 
@@ -263,7 +265,7 @@ export const translations: Record<Language, Record<string, string>> = {
     footer_desc: 'The #1 platform to digitize your menu and retain customers on their smartphones.',
     footer_rights: 'All rights reserved.',
 
-    // Chatbot
+    // Chatbot Widget
     bot_greeting: 'Hello 👋! I am the MenuFid Virtual Assistant. How can I help you boost your earnings today?',
     bot_q1: 'How does MenuFid increase my revenue?',
     bot_a1: 'MenuFid turns casual guests into loyal regulars. Smartphone wallet cards make them return 2x more often!',
@@ -275,23 +277,23 @@ export const translations: Record<Language, Record<string, string>> = {
     bot_a4: 'Submit your application on our Partner page to secure an exclusive distribution territory.',
   },
   es: {
-    // Nav & Common
+    // Navigation & Global Header
     nav_home: 'Inicio',
-    nav_pricing: 'Planes',
+    nav_pricing: 'Planes y Precios',
     nav_partners: 'Ser nuestro Socio',
-    nav_about: 'Nosotros',
+    nav_about: 'Sobre Nosotros',
     nav_contact: 'Contacto',
     nav_login: 'Iniciar sesión',
-    nav_register: 'Comenzar',
+    nav_register: 'Comenzar Ahora',
     nav_dashboard: 'Espacio Comercio',
     nav_logout: 'Cerrar sesión',
 
-    // Hero Section
-    hero_title: 'Multiplique los ingresos de su establecimiento con fidelidad digital',
-    hero_subtitle: 'Menú con Código QR interactivo HD, tarjeta de fidelidad para teléfono inteligente en Apple & Google Wallet y ofertas automáticas.',
-    hero_cta_primary: 'Activar mi negocio (Desde 5€/mes)',
-    hero_cta_partner: 'Ser Socio de Red',
-    badge_security: 'Pago 100% Seguro con Stripe - Sin Compromiso',
+    // Hero Section Landing
+    hero_title: 'Multiplique la facturación de su establecimiento con fidelidad digital',
+    hero_subtitle: 'Menú con Código QR interactivo HD, tarjeta de fidelidad para teléfono inteligente en Apple & Google Wallet y promociones automáticas.',
+    hero_cta_primary: 'Activar Mi Negocio (Desde 5€/mes)',
+    hero_cta_partner: 'Ser Socio de Nuestra Red',
+    badge_security: 'Pago 100% Seguro con Stripe - Sin Permanencia',
     stat_clients: 'Clientes Fidelizados',
     stat_revenue: '+35% de Ingresos',
     stat_return: '2x Más Recurrentes',
@@ -308,12 +310,12 @@ export const translations: Record<Language, Record<string, string>> = {
     feat_crm_title: 'Base de Datos y Marketing por SMS/WhatsApp',
     feat_crm_desc: 'Obtenga datos verificados de sus clientes y envíeles ofertas en sus cumpleaños o eventos especiales.',
 
-    // Pricing Page
+    // Pricing Page & Cards
     pricing_page_title: 'Precios Simples y Transparentes para Aumentar sus Ganancias',
     pricing_page_subtitle: 'Cada plan está diseñado para generar un retorno de inversión inmediato desde la primera semana.',
     plan_basic_name: 'Básico',
     plan_basic_price: '5€',
-    plan_basic_desc: 'Ideal para digitalizar su menú y comenzar a mostrar su carta en línea.',
+    plan_basic_desc: 'Ideal para digitalizar su menú y mostrar su carta en línea en 2 minutos.',
     plan_basic_feat1: 'Menú Código QR Interactivo HD',
     plan_basic_feat2: 'Modificaciones ilimitadas de la carta',
     plan_basic_feat3: 'Acceso al panel de control de comerciante',
@@ -336,10 +338,11 @@ export const translations: Record<Language, Record<string, string>> = {
 
     btn_choose_plan: 'Suscribirse por Stripe',
     popular_badge: 'El Más Popular y Rentable',
+    no_credit_card: 'Pago 100% Seguro con Stripe - Cancelación en 1 Clic',
 
-    // Partner / Distribution Page
-    partner_page_title: 'Conviértase en nuestro Socio Exclusivo',
-    partner_page_subtitle: 'Únase a nuestra red global de distribución y reciba comisiones mensuales recurrentes por cada negocio activo.',
+    // Partner & Distribution Page
+    partner_page_title: 'Red Global de Socios',
+    partner_page_subtitle: 'Únase a nuestra red mundial de distribución y reciba comisiones mensuales recurrentes por cada negocio activo.',
     partner_title: 'Conviértase en nuestro Socio Oficial',
     partner_form_title: 'Solicitud de Socio Exclusivo',
     partner_form_name: 'Nombre Completo',
@@ -379,7 +382,7 @@ export const translations: Record<Language, Record<string, string>> = {
     login_subtitle: 'Acceda a su panel de control para gestionar su menú y sus clientes leales.',
     login_email: 'Correo Electrónico',
     login_password: 'Contraseña',
-    login_btn: 'Entrar al Panel',
+    login_btn: 'Entrar al Panel de Control',
     register_step1_title: 'Crear Mi Cuenta de Comerciante',
     register_step2_title: 'Elegir el Plan para Mi Negocio',
     register_business_name: 'Nombre del Establecimiento',
@@ -389,11 +392,11 @@ export const translations: Record<Language, Record<string, string>> = {
     footer_desc: 'La plataforma número 1 para digitalizar su menú y fidelizar a sus clientes en el teléfono móvil.',
     footer_rights: 'Todos los derechos reservados.',
 
-    // Chatbot
+    // Chatbot Widget
     bot_greeting: '¡Hola 👋! Soy el Asistente Virtual MenuFid. ¿Cómo puedo ayudarte a aumentar tus ganancias hoy?',
     bot_q1: '¿Cómo aumenta MenuFid mis ingresos?',
     bot_a1: 'MenuFid transforma visitantes ocasionales en clientes habituales. ¡Vuelven el doble de veces gracias a la tarjeta digital!',
-    bot_q2: '¿Cuánto cuestan los planes?',
+    bot_q2: '¿Cuánto cuestan los planes MenuFid?',
     bot_a2: 'Nuestros precios son transparentes: Básico 5€/mes, Fidelidad 10€/mes y Premium 20€/mes. ¡Sin permanencia!',
     bot_q3: '¿Cómo funciona el Menú QR?',
     bot_a3: 'Los clientes escanean el código QR en la mesa sin instalar aplicaciones. El menú se abre al instante.',
@@ -401,18 +404,18 @@ export const translations: Record<Language, Record<string, string>> = {
     bot_a4: 'Envíe su solicitud en nuestra página de socios para reservar una región exclusiva.',
   },
   ar: {
-    // Nav & Common
+    // Navigation & Global Header
     nav_home: 'الرئيسية',
-    nav_pricing: 'الاشتراكات',
+    nav_pricing: 'خطط الاشتراكات',
     nav_partners: 'كن شريكاً معنا',
     nav_about: 'من نحن',
     nav_contact: 'اتصل بنا',
     nav_login: 'تسجيل الدخول',
-    nav_register: 'إنشاء حساب',
+    nav_register: 'إنشاء حساب جديد',
     nav_dashboard: 'لوحة التجار',
     nav_logout: 'تسجيل الخروج',
 
-    // Hero Section
+    // Hero Section Landing
     hero_title: 'ضاعف مداخيل وأرباح مطعمك مع برنامج الولاء الرقمي الذكي',
     hero_subtitle: 'قائمة طعام تفاعلية عبر رمز QR، بطاقة ولاء رقمية على محفظة الهاتف Apple & Google Wallet وتنبيهات إعادة جذب الزبائن.',
     hero_cta_primary: 'تفعيل حساب مطعمي (ابتداءً من 5€/شهرياً)',
@@ -434,12 +437,12 @@ export const translations: Record<Language, Record<string, string>> = {
     feat_crm_title: 'قاعدة بيانات الزبائن والتسويق عبر SMS/WhatsApp',
     feat_crm_desc: 'اجمع بيانات زبائنك المعتمدة وأعد تذكيرهم في أعياد ميلادهم أو العروض الخاصة.',
 
-    // Pricing Page
+    // Pricing Page & Cards
     pricing_page_title: 'أسعار بسيطة وشفافة لمضاعفة أرباحك',
     pricing_page_subtitle: 'كل خطة صممت لتحقيق عائد استثماري فوري يغطي التكلفة منذ الأسبوع الأول.',
     plan_basic_name: 'الأساسية',
     plan_basic_price: '5€',
-    plan_basic_desc: 'مثالية لرقمنة منيو مطعمك وبدء عرضه على الإنترنت.',
+    plan_basic_desc: 'مثالية لرقمنة منيو مطعمك وبدء عرضه على الإنترنت في دقيقتين.',
     plan_basic_feat1: 'قائمة طعام رمز QR تفاعلية HD',
     plan_basic_feat2: 'تعديلات غير محدودة للقائمة',
     plan_basic_feat3: 'الوصول للوحة تحكم صاحب المطعم',
@@ -462,9 +465,10 @@ export const translations: Record<Language, Record<string, string>> = {
 
     btn_choose_plan: 'الاشتراك عبر Stripe',
     popular_badge: 'الأكثر شعبية وربحية',
+    no_credit_card: 'دفع آمن 100% عبر Stripe - إلغاء بنقرة واحدة في أي وقت',
 
-    // Partner / Distribution Page
-    partner_page_title: 'كن شريكاً حصرياً لـ MenuFid',
+    // Partner & Distribution Page
+    partner_page_title: 'شبكة الشركاء العالمية',
     partner_page_subtitle: 'انضم لشبكة التوزيع العالمية واحصل على عمولات شهرية مستمرة لكل مطعم تقوم بتجهيزه.',
     partner_title: 'كن شريكنا الرسمي المعترف به',
     partner_form_title: 'طلب تقديم للشراكة الحصرية',
@@ -487,7 +491,7 @@ export const translations: Record<Language, Record<string, string>> = {
     about_card3_desc: 'يحول نظامنا الزبائن السعداء نحو صفحة خرائط Google لرفع ترتيبك المحلي.',
 
     // Contact Page
-    contact_title: 'تواصل مع فريقنا',
+    contact_title: 'تواصل مع فريقنا المباشر',
     contact_subtitle: 'فريق الدعم والمبيعات في خدمتك 7 أيام في الأسبوع للإجابة على كافة استفساراتك.',
     contact_form_name: 'الاسم واللقب',
     contact_form_email: 'البريد الإلكتروني',
@@ -515,21 +519,21 @@ export const translations: Record<Language, Record<string, string>> = {
     footer_desc: 'المنصة رقم 1 لرقمنة منيو المطاعم والاحتفاظ بالزبائن عبر هواتفهم الذكية.',
     footer_rights: 'جميع الحقوق محفوظة.',
 
-    // Chatbot
+    // Chatbot Widget
     bot_greeting: 'مرحباً بك 👋! أنا المساعد الافتراضي لـ MenuFid. كيف يمكنني مساعدتك في زيادة أرباحك اليوم؟',
     bot_q1: 'كيف يساعد MenuFid في زيادة أرباحي؟',
     bot_a1: 'يحول MenuFid الزوار العاديين إلى زبائن دائمين. يعود الزبائن مرتين أكثر بفضل بطاقة الولاء الرقمية على هواتفهم!',
     bot_q2: 'كم تبلغ تكلفة الاشتراكات؟',
     bot_a2: 'الأسعار شفافة: الأساسية 5€/شهرياً، الولاء 10€/شهرياً، والاحترافية 20€/شهرياً. بدون التزام!',
     bot_q3: 'كيف تعمل قائمة رمز QR؟',
-    bot_a3: 'يمسح الزبائن الرمز الموجود على الطاولة دون تحميل أي تطبيق، لتظهر قائمة الطعام فوراً.',
+    bot_a3: 'يمسح الزبائن الرمز الموجود على الطاولة دون تحميل أي تطبيق، لتظهر قائمة الطعام فوراً بصور عالية الجودة.',
     bot_q4: 'كيف أصبح شريكاً رسمياً؟',
-    bot_a4: 'قدم طلبك على صفحة الشركاء للحصول على منطقة حصرية.',
+    bot_a4: 'قدم طلبك على صفحة الشركاء للحصول على منطقة حصرية وتوزيع MenuFid بعمولات مستمرة.',
   },
   de: {
-    // Nav & Common
+    // Navigation & Global Header
     nav_home: 'Startseite',
-    nav_pricing: 'Tarife',
+    nav_pricing: 'Preise & Tarife',
     nav_partners: 'Partner Werden',
     nav_about: 'Über Uns',
     nav_contact: 'Kontakt',
@@ -538,7 +542,7 @@ export const translations: Record<Language, Record<string, string>> = {
     nav_dashboard: 'Händler-Bereich',
     nav_logout: 'Abmelden',
 
-    // Hero Section
+    // Hero Section Landing
     hero_title: 'Vervielfachen Sie Ihren Umsatz mit digitaler Kundenbindung',
     hero_subtitle: 'Interaktives HD QR-Code-Menü, Smartphone-Treuekarte in Apple & Google Wallet und automatische Kundenrückgewinnung.',
     hero_cta_primary: 'Mein Geschäft Aktivieren (Ab 5€/Monat)',
@@ -560,12 +564,12 @@ export const translations: Record<Language, Record<string, string>> = {
     feat_crm_title: 'Kundenkartei & SMS/WhatsApp-Marketing',
     feat_crm_desc: 'Sammeln Sie verifizierte Kontaktdaten und machen Sie Angebote zum Geburtstag.',
 
-    // Pricing Page
+    // Pricing Page & Cards
     pricing_page_title: 'Einfache & Transparente Preise für Maximale Gewinne',
     pricing_page_subtitle: 'Jeder Tarif ist darauf ausgelegt, ab der ersten Woche einen unmittelbaren ROI zu erzielen.',
     plan_basic_name: 'Basis',
     plan_basic_price: '5€',
-    plan_basic_desc: 'Ideal, um Ihre Speisekarte zu digitalisieren und online zu präsentieren.',
+    plan_basic_desc: 'Ideal, um Ihre Speisekarte zu digitalisieren und in 2 Minuten online zu präsentieren.',
     plan_basic_feat1: 'Interaktives HD QR-Code-Menü',
     plan_basic_feat2: 'Unbegrenzte Speisekarten-Updates',
     plan_basic_feat3: 'Zugang zum Händler-Dashboard',
@@ -588,9 +592,10 @@ export const translations: Record<Language, Record<string, string>> = {
 
     btn_choose_plan: 'Über Stripe Buchen',
     popular_badge: 'Am Beliebtesten & Profitabelsten',
+    no_credit_card: '100% Sichere Stripe-Zahlung - Jederzeit mit 1 Klick Kündbar',
 
-    // Partner / Distribution Page
-    partner_page_title: 'Werden Sie Exklusiver Partner',
+    // Partner & Distribution Page
+    partner_page_title: 'Weltweites Partner-Netzwerk',
     partner_page_subtitle: 'Schließen Sie sich unserem weltweiten Vertriebsnetz an und verdienen Sie monatliche Provisionen.',
     partner_title: 'Werden Sie Offizieller Partner',
     partner_form_title: 'Bewerbung Exklusiv-Partner',
@@ -641,7 +646,7 @@ export const translations: Record<Language, Record<string, string>> = {
     footer_desc: 'Die Plattform Nr. 1 zur Digitalisierung von Speisekarten und Kundenbindung auf dem Smartphone.',
     footer_rights: 'Alle Rechte vorbehalten.',
 
-    // Chatbot
+    // Chatbot Widget
     bot_greeting: 'Hallo 👋! Ich bin der virtuelle Assistent von MenuFid. Wie kann ich Ihnen heute helfen, Ihren Gewinn zu steigern?',
     bot_q1: 'Wie steigert MenuFid meinen Umsatz?',
     bot_a1: 'MenuFid verwandelt Gelegenheitsgäste in Stammkunden. Dank der digitalen Treuekarte kommen Kunden 2x öfter wieder!',
@@ -653,9 +658,9 @@ export const translations: Record<Language, Record<string, string>> = {
     bot_a4: 'Reichen Sie Ihre Bewerbung auf unserer Partnerseite ein.',
   },
   it: {
-    // Nav & Common
+    // Navigation & Global Header
     nav_home: 'Home',
-    nav_pricing: 'Piani',
+    nav_pricing: 'Piani e Prezzi',
     nav_partners: 'Diventa Partner',
     nav_about: 'Chi Siamo',
     nav_contact: 'Contatti',
@@ -664,7 +669,7 @@ export const translations: Record<Language, Record<string, string>> = {
     nav_dashboard: 'Area Ristoratore',
     nav_logout: 'Esci',
 
-    // Hero Section
+    // Hero Section Landing
     hero_title: 'Moltiplica il fatturato del tuo locale con la fidelizzazione digitale',
     hero_subtitle: 'Menu QR Code interattivo HD, carta fedeltà su smartphone Apple & Google Wallet e richiami automatici per far ritornare i clienti 2 volte più spesso.',
     hero_cta_primary: 'Attiva il mio Locale (Da 5€/mese)',
@@ -686,12 +691,12 @@ export const translations: Record<Language, Record<string, string>> = {
     feat_crm_title: 'Database Clienti e Marketing SMS/WhatsApp',
     feat_crm_desc: 'Raccogli i dati verificati dei clienti e invia offerte dedicate per compleanni o eventi.',
 
-    // Pricing Page
+    // Pricing Page & Cards
     pricing_page_title: 'Prezzi Semplici e Trasparenti per Aumentare i Tuoi Guadagni',
     pricing_page_subtitle: 'Ogni piano è calibrato per generare un ritorno sull\'investimento immediato fin dalla prima settimana.',
     plan_basic_name: 'Base',
     plan_basic_price: '5€',
-    plan_basic_desc: 'Ideale per digitalizzare il menu e iniziare a mostrare i piatti online.',
+    plan_basic_desc: 'Ideale per digitalizzare il menu e iniziare a mostrare i piatti online in 2 minuti.',
     plan_basic_feat1: 'Menu QR Code Interattivo HD',
     plan_basic_feat2: 'Modifiche illimitate al menu',
     plan_basic_feat3: 'Accesso alla Dashboard Ristoratore',
@@ -714,9 +719,10 @@ export const translations: Record<Language, Record<string, string>> = {
 
     btn_choose_plan: 'Abbonati con Stripe',
     popular_badge: 'Il Più Popolare e Redditizio',
+    no_credit_card: 'Pagamento 100% Sicuro con Stripe - Disdici in 1 Click',
 
-    // Partner / Distribution Page
-    partner_page_title: 'Diventa Nostro Partner Esclusivo',
+    // Partner & Distribution Page
+    partner_page_title: 'Rete Globale Partner',
     partner_page_subtitle: 'Unisciti alla nostra rete globale di distribuzione e ricevi commissioni mensili ricorrenti.',
     partner_title: 'Diventa Nostro Partner Ufficiale',
     partner_form_title: 'Candidatura Partner Esclusivo',
@@ -767,7 +773,7 @@ export const translations: Record<Language, Record<string, string>> = {
     footer_desc: 'La piattaforma N.1 per digitalizzare il menu e fidelizzare i clienti sullo smartphone.',
     footer_rights: 'Tutti i diritti riservati.',
 
-    // Chatbot
+    // Chatbot Widget
     bot_greeting: 'Ciao 👋! Sono l\'Assistente Virtuale MenuFid. Come posso aiutarti ad aumentare i tuoi guadagni oggi?',
     bot_q1: 'In che modo MenuFid aumenta le mie entrate?',
     bot_a1: 'MenuFid trasforma i clienti occasionali in clienti abituali. Ritornano 2 volte più spesso grazie alla carta digitale!',
@@ -779,9 +785,9 @@ export const translations: Record<Language, Record<string, string>> = {
     bot_a4: 'Invia la candidatura nella nostra pagina Partner.',
   },
   pt: {
-    // Nav & Common
+    // Navigation & Global Header
     nav_home: 'Início',
-    nav_pricing: 'Planos',
+    nav_pricing: 'Planos e Preços',
     nav_partners: 'Seja Nosso Parceiro',
     nav_about: 'Sobre Nós',
     nav_contact: 'Contato',
@@ -790,7 +796,7 @@ export const translations: Record<Language, Record<string, string>> = {
     nav_dashboard: 'Área do Comerciante',
     nav_logout: 'Sair',
 
-    // Hero Section
+    // Hero Section Landing
     hero_title: 'Multiplique o faturamento do seu restaurante com fidelidade digital',
     hero_subtitle: 'Menu QR Code interativo HD, cartão de fidelidade no smartphone Apple & Google Wallet e retencão automática de clientes.',
     hero_cta_primary: 'Ativar Meu Negócio (A partir de 5€/mês)',
@@ -812,12 +818,12 @@ export const translations: Record<Language, Record<string, string>> = {
     feat_crm_title: 'Base de Dados e Marketing SMS/WhatsApp',
     feat_crm_desc: 'Obtenha dados verificados dos clientes e envie ofertas especiais no aniversário deles.',
 
-    // Pricing Page
+    // Pricing Page & Cards
     pricing_page_title: 'Preços Simples e Transparentes para Aumentar seus Lucros',
     pricing_page_subtitle: 'Cada plano foi projetado para gerar retorno financeiro imediato desde a primeira semana.',
     plan_basic_name: 'Básico',
     plan_basic_price: '5€',
-    plan_basic_desc: 'Ideal para digitalizar seu cardápio e começar a exibir seus pratos online.',
+    plan_basic_desc: 'Ideal para digitalizar seu cardápio e começar a exibir seus pratos online em 2 minutos.',
     plan_basic_feat1: 'Menu QR Code Interativo HD',
     plan_basic_feat2: 'Modificações ilimitadas do cardápio',
     plan_basic_feat3: 'Acesso ao Painel do Comerciante',
@@ -840,9 +846,10 @@ export const translations: Record<Language, Record<string, string>> = {
 
     btn_choose_plan: 'Assinar via Stripe',
     popular_badge: 'O Mais Popular e Lucrativo',
+    no_credit_card: 'Pagamento 100% Seguro Stripe - Cancele Quando Quiser com 1 Clique',
 
-    // Partner / Distribution Page
-    partner_page_title: 'Seja Nosso Parceiro Exclusivo',
+    // Partner & Distribution Page
+    partner_page_title: 'Rede Global de Parceiros',
     partner_page_subtitle: 'Junte-se à nossa rede mundial de distribuição e receba comissões mensais recorrentes.',
     partner_title: 'Seja Nosso Parceiro Oficial',
     partner_form_title: 'Candidatura de Parceiro Exclusivo',
@@ -856,7 +863,7 @@ export const translations: Record<Language, Record<string, string>> = {
     // About Page
     about_hero_tag: 'Nossa Missão Principal',
     about_hero_title: 'Maximizar os Lucros dos Comerciantes',
-    about_hero_desc: 'O MenuFid foi criado para entregar a tecnologia de fidelização mais poderosa do mercado pelo preço mais acessível.',
+    about_hero_desc: 'O MenuFid foi criado para entregar a tecnologia de fidelização mais poderosa do mercado pelo preço mais acessibile.',
     about_card1_title: 'Crescimento de Faturamento',
     about_card1_desc: 'Ajudamos os restaurantes a aumentar o ticket médio em +25% através de recompensas de fidelidade.',
     about_card2_title: 'Fidelização Automatizada',
@@ -893,7 +900,7 @@ export const translations: Record<Language, Record<string, string>> = {
     footer_desc: 'A plataforma N.1 para digitalizar cardápios e fidelizar clientes no smartphone.',
     footer_rights: 'Todos os direitos reservados.',
 
-    // Chatbot
+    // Chatbot Widget
     bot_greeting: 'Olá 👋! Sou o Assistente Virtual MenuFid. Como posso ajudar você a aumentar seus lucros hoje?',
     bot_q1: 'Como o MenuFid aumenta meu faturamento?',
     bot_a1: 'O MenuFid converte clientes casuais em clientes fiéis. Eles retornam 2x mais vezes graças ao cartão digital!',
