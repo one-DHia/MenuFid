@@ -228,7 +228,7 @@ export default function CrmPage() {
                     <td className="p-4 text-slate-500">
                       <div className="flex items-center gap-1.5">
                         <Calendar className="h-3.5 w-3.5 text-slate-400 flex-shrink-0" />
-                        {new Date(customer.created).toLocaleDateString('fr-FR')}
+                        {customer.created ? new Date(customer.created).toLocaleDateString('fr-FR') : 'Récemment'}
                       </div>
                     </td>
                     <td className="p-4 text-right">

@@ -75,7 +75,9 @@ export interface Customer {
   email: string;
   phone: string;
   points_balance: number;
-  created: string;
+  total_visits?: number;
+  last_visit?: string;
+  created?: string;
 }
 
 // ─── Offre de récompense ───────────────────────────────────────
