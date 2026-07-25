@@ -16,7 +16,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Define main SaaS domains
-  const mainDomains = ['localhost:3000', 'menufid.com', 'menufid.vercel.app'];
+  const mainDomains = ['localhost', 'menufid.site', 'menufid.com', 'menufid.vercel.app', 'vercel.app'];
   const isMainDomain = mainDomains.some(domain => hostname.includes(domain));
 
   if (!isMainDomain) {
