@@ -59,13 +59,13 @@ export default function PartnerDistributionPage() {
         {/* Header Hero Section */}
         <div className="text-center max-w-3xl mx-auto mb-14">
           <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-900 border border-amber-300 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-4 shadow-sm">
-            <Globe className="w-4 h-4 text-amber-700" /> Réseau de Partenaires Internationaux
+            <Globe className="w-4 h-4 text-amber-700" /> {t('partner_page_title')}
           </div>
           <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight mb-4">
-            Devenez notre <span className="text-amber-800 underline decoration-amber-500/40">Partenaire Officiel</span>
+            {t('partner_title')}
           </h1>
           <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
-            Rejoignez l&apos;aventure MenuFid ! Déployez notre solution de digitalisation et de fidélité auprès des restaurateurs de votre région et bénéficiez de revenus récurrents élevés.
+            {t('partner_page_subtitle')}
           </p>
         </div>
 

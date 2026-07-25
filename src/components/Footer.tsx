@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import LanguageSelector from '@/components/LanguageSelector';
 import { useLanguage } from '@/lib/i18n';
-import { QrCode, Heart } from 'lucide-react';
+import { QrCode } from 'lucide-react';
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -21,48 +21,48 @@ export default function Footer() {
             <span className="font-black text-lg text-white tracking-tight">MenuFid</span>
           </div>
           <p className="text-slate-400 text-xs leading-relaxed">
-            La solution SaaS tout-en-un pour booster les gains et le chiffre d&apos;affaires des restaurateurs grâce au menu QR et à la fidélité digitale.
+            {t('footer_desc')}
           </p>
           <LanguageSelector />
         </div>
 
         {/* Col 2 */}
         <div>
-          <h4 className="font-bold text-white uppercase text-[11px] tracking-wider mb-4">Plateforme</h4>
+          <h4 className="font-bold text-white uppercase text-[11px] tracking-wider mb-4">Navigation</h4>
           <ul className="space-y-2.5">
-            <li><Link href="/pricing" className="hover:text-amber-400 transition">{t('pricing')}</Link></li>
-            <li><Link href="/distribution" className="hover:text-amber-400 transition">{t('partners')}</Link></li>
-            <li><Link href="/about" className="hover:text-amber-400 transition">{t('about')}</Link></li>
-            <li><Link href="/contact" className="hover:text-amber-400 transition">{t('contact')}</Link></li>
+            <li><Link href="/pricing" className="hover:text-amber-400 transition">{t('nav_pricing')}</Link></li>
+            <li><Link href="/distribution" className="hover:text-amber-400 transition">{t('nav_partners')}</Link></li>
+            <li><Link href="/about" className="hover:text-amber-400 transition">{t('nav_about')}</Link></li>
+            <li><Link href="/contact" className="hover:text-amber-400 transition">{t('nav_contact')}</Link></li>
           </ul>
         </div>
 
         {/* Col 3 */}
         <div>
-          <h4 className="font-bold text-white uppercase text-[11px] tracking-wider mb-4">Espace Marchand</h4>
+          <h4 className="font-bold text-white uppercase text-[11px] tracking-wider mb-4">{t('nav_dashboard')}</h4>
           <ul className="space-y-2.5">
-            <li><Link href="/register" className="hover:text-amber-400 transition">{t('register')}</Link></li>
-            <li><Link href="/login" className="hover:text-amber-400 transition">{t('login')}</Link></li>
-            <li><Link href="/dashboard" className="hover:text-amber-400 transition">Tableau de bord</Link></li>
+            <li><Link href="/register" className="hover:text-amber-400 transition">{t('nav_register')}</Link></li>
+            <li><Link href="/login" className="hover:text-amber-400 transition">{t('nav_login')}</Link></li>
+            <li><Link href="/dashboard" className="hover:text-amber-400 transition">{t('nav_dashboard')}</Link></li>
           </ul>
         </div>
 
         {/* Col 4 */}
         <div>
-          <h4 className="font-bold text-white uppercase text-[11px] tracking-wider mb-4">Informations Légales</h4>
+          <h4 className="font-bold text-white uppercase text-[11px] tracking-wider mb-4">Légal</h4>
           <ul className="space-y-2.5">
             <li><Link href="/terms" className="hover:text-amber-400 transition">{t('terms')}</Link></li>
             <li><span className="text-slate-500">Conformité RGPD 🇪🇺</span></li>
-            <li><span className="text-slate-500">Sécurité Paiements Stripe 🔒</span></li>
+            <li><span className="text-slate-500">Stripe Checkout 🔒</span></li>
           </ul>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-500 text-[11px]">
-        <div>© {new Date().getFullYear()} MenuFid. Tous droits réservés.</div>
-        <div className="flex items-center gap-1">
-          <span>Développé pour la réussite des commerçants</span>
-          <Heart className="w-3 h-3 text-amber-500 fill-amber-500" />
+      <div className="max-w-7xl mx-auto pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-slate-500 text-[11px] gap-2">
+        <div>© {new Date().getFullYear()} MenuFid SaaS. {t('footer_rights')}</div>
+        <div className="flex items-center gap-4">
+          <Link href="/terms" className="hover:underline">{t('terms')}</Link>
+          <Link href="/contact" className="hover:underline">{t('nav_contact')}</Link>
         </div>
       </div>
     </footer>

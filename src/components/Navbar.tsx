@@ -31,17 +31,17 @@ export default function Navbar() {
         {/* Desktop Navigation Links */}
         <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-700">
           <Link href="/pricing" className="hover:text-amber-800 transition py-1">
-            {t('pricing')}
+            {t('nav_pricing')}
           </Link>
           <Link href="/distribution" className="hover:text-amber-800 transition py-1 flex items-center gap-1">
-            <span>{t('partners')}</span>
-            <span className="bg-amber-100 text-amber-900 text-[10px] px-1.5 py-0.5 rounded-full font-black">Nouveau</span>
+            <span>{t('nav_partners')}</span>
+            <span className="bg-amber-100 text-amber-900 text-[10px] px-1.5 py-0.5 rounded-full font-black">⭐</span>
           </Link>
           <Link href="/about" className="hover:text-amber-800 transition py-1">
-            {t('about')}
+            {t('nav_about')}
           </Link>
           <Link href="/contact" className="hover:text-amber-800 transition py-1">
-            {t('contact')}
+            {t('nav_contact')}
           </Link>
         </nav>
 
@@ -52,78 +52,79 @@ export default function Navbar() {
             href="/login"
             className="text-xs font-bold text-slate-700 hover:text-amber-800 px-3 py-2 transition"
           >
-            {t('login')}
+            {t('nav_login')}
           </Link>
           <Link
             href="/register"
             className="bg-gradient-to-r from-amber-800 to-amber-900 hover:from-amber-700 hover:to-amber-800 text-white font-bold text-xs px-4 py-2.5 rounded-2xl shadow-md transition flex items-center gap-1.5 btn-press"
           >
-            <span>{t('register')}</span>
+            <span>{t('nav_register')}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        {/* Mobile Hamburger Toggle */}
+        {/* Mobile Toggle & Selector */}
         <div className="flex md:hidden items-center gap-2">
           <LanguageSelector />
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition"
+            aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-slate-200 px-4 py-6 space-y-4 shadow-xl animate-in slide-in-from-top-4 duration-200">
-          <nav className="flex flex-col space-y-3 font-bold text-sm text-slate-800">
+        <div className="md:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
+          <nav className="flex flex-col gap-2.5 text-sm font-bold text-slate-800">
             <Link
               href="/pricing"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-xl hover:bg-amber-50 text-slate-900"
+              className="px-3 py-2 rounded-xl hover:bg-amber-50 hover:text-amber-800 transition"
             >
-              {t('pricing')}
+              {t('nav_pricing')}
             </Link>
             <Link
               href="/distribution"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-xl hover:bg-amber-50 text-amber-900 font-extrabold flex items-center justify-between"
+              className="px-3 py-2 rounded-xl hover:bg-amber-50 hover:text-amber-800 transition flex items-center justify-between"
             >
-              <span>{t('partners')}</span>
-              <span className="bg-amber-100 text-amber-900 text-xs px-2 py-0.5 rounded-full">Recrutement</span>
+              <span>{t('nav_partners')}</span>
+              <span className="bg-amber-100 text-amber-900 text-[10px] px-2 py-0.5 rounded-full font-black">⭐</span>
             </Link>
             <Link
               href="/about"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-xl hover:bg-amber-50 text-slate-900"
+              className="px-3 py-2 rounded-xl hover:bg-amber-50 hover:text-amber-800 transition"
             >
-              {t('about')}
+              {t('nav_about')}
             </Link>
             <Link
               href="/contact"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-xl hover:bg-amber-50 text-slate-900"
+              className="px-3 py-2 rounded-xl hover:bg-amber-50 hover:text-amber-800 transition"
             >
-              {t('contact')}
+              {t('nav_contact')}
             </Link>
           </nav>
 
-          <div className="pt-4 border-t border-slate-100 flex flex-col gap-2">
+          <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
             <Link
               href="/login"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center py-3 rounded-xl border border-slate-200 font-bold text-xs text-slate-800"
+              className="w-full text-center py-2.5 text-sm font-bold text-slate-700 bg-slate-100 rounded-xl"
             >
-              {t('login')}
+              {t('nav_login')}
             </Link>
             <Link
               href="/register"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center py-3 rounded-xl bg-amber-800 text-white font-bold text-xs shadow-md"
+              className="w-full text-center py-2.5 text-sm font-bold text-white bg-gradient-to-r from-amber-800 to-amber-900 rounded-xl shadow-md"
             >
-              {t('register')}
+              {t('nav_register')}
             </Link>
           </div>
         </div>
