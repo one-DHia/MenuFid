@@ -108,9 +108,9 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-8 pt-6 border-t border-slate-100 text-center text-xs text-slate-500">
-            <span>Pas encore de compte ? </span>
+            <span>{t('login_no_account')} </span>
             <Link href="/register" className="font-bold text-amber-800 hover:underline">
-              {t('nav_register')}
+              {t('login_create_account')}
             </Link>
           </div>
         </div>

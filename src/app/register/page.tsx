@@ -6,10 +6,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { db } from '@/lib/supabase';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { PRICING_TIERS } from '@/lib/stripe';
-import { Store, Mail, Lock, Phone, ArrowRight, Check, Sparkles, AlertCircle, ShieldCheck } from 'lucide-react';
+import { Store, Mail, Lock, Phone, ArrowRight, Check, AlertCircle, ShieldCheck } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 function RegisterFormContent() {
+  const { t } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialPlan = searchParams.get('plan') as 'basic' | 'loyalty' | 'premium' | null;
@@ -25,7 +26,6 @@ function RegisterFormContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Étape 1 : Inscription Marchand
   const handleStep1Submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -38,7 +38,6 @@ function RegisterFormContent() {
         .replace(/-+/g, '-')
         .replace(/^-|-$/g, '');
 
-      // Création du compte Supabase / Local
       let newMerchantId = `merchant-${Date.now()}`;
       try {
         const created = await db.collection('users').create<{ id?: string }>({
@@ -60,7 +59,6 @@ function RegisterFormContent() {
       localStorage.setItem('menufid_merchant_name', businessName);
       localStorage.setItem('menufid_merchant_email', email);
 
-      // Programmer l'e-mail de relance si abandon
       fetch('/api/email/subscription-reminder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -76,7 +74,6 @@ function RegisterFormContent() {
     }
   };
 
-  // Étape 2 : Confirmation de l'abonnement Stripe
   const handleStep2Checkout = async (tier: 'basic' | 'loyalty' | 'premium') => {
     setLoading(true);
     setError('');
@@ -94,10 +91,10 @@ function RegisterFormContent() {
       if (res.ok && data.url) {
         window.location.href = data.url;
       } else {
-        setError(data.error || 'Erreur Stripe Checkout : Vérifiez votre configuration de paiement.');
+        setError(data.error || 'Erreur Stripe Checkout.');
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Impossible de contacter le serveur Stripe Checkout.';
+      const msg = err instanceof Error ? err.message : 'Impossible de contacter le serveur Stripe.';
       setError(msg);
     } finally {
       setLoading(false);
@@ -110,12 +107,12 @@ function RegisterFormContent() {
       <div className="flex items-center justify-center gap-4 mb-8">
         <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold ${step === 1 ? 'bg-amber-800 text-white shadow-md' : 'bg-slate-200 text-slate-600'}`}>
           <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">1</span>
-          <span>Créer mon Compte</span>
+          <span>{t('register_step1_badge')}</span>
         </div>
         <div className="w-8 h-0.5 bg-slate-300"></div>
         <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold ${step === 2 ? 'bg-amber-800 text-white shadow-md' : 'bg-slate-200 text-slate-600'}`}>
           <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">2</span>
-          <span>Choisir l&apos;Abonnement</span>
+          <span>{t('register_step2_badge')}</span>
         </div>
       </div>
 
@@ -123,8 +120,8 @@ function RegisterFormContent() {
         /* STEP 1: Registration Form */
         <div className="bg-white rounded-3xl p-8 sm:p-12 border border-slate-200 shadow-xl max-w-lg mx-auto w-full">
           <div className="text-center mb-8">
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mb-2">Créer votre Espace Marchand</h1>
-            <p className="text-slate-500 text-xs sm:text-sm">Inscrivez votre établissement et commencez à augmenter vos revenus.</p>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mb-2">{t('register_title')}</h1>
+            <p className="text-slate-500 text-xs sm:text-sm">{t('register_subtitle')}</p>
           </div>
 
           {error && (
@@ -136,7 +133,7 @@ function RegisterFormContent() {
 
           <form onSubmit={handleStep1Submit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Nom de votre Etablissement / Restaurant *</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">* {t('register_business_name')}</label>
               <div className="relative">
                 <Store className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
                 <input
@@ -151,7 +148,7 @@ function RegisterFormContent() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Adresse e-mail professionnelle *</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">* {t('register_email')}</label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
                 <input
@@ -166,7 +163,7 @@ function RegisterFormContent() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Téléphone portable *</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">* {t('register_phone')}</label>
               <div className="relative">
                 <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
                 <input
@@ -181,7 +178,7 @@ function RegisterFormContent() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Mot de passe secret *</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">* {t('register_password')}</label>
               <div className="relative">
                 <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
                 <input
@@ -201,15 +198,15 @@ function RegisterFormContent() {
               disabled={loading}
               className="w-full mt-4 bg-gradient-to-r from-amber-800 to-amber-900 hover:from-amber-700 hover:to-amber-800 text-white font-bold py-4 rounded-2xl transition shadow-lg text-sm flex items-center justify-center gap-2 btn-press"
             >
-              {loading ? 'Création du compte...' : 'Continuer vers le Choix de l\'Abonnement'}
+              <span>{loading ? '...' : t('register_next_btn')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
 
           <div className="mt-6 text-center text-xs text-slate-500">
-            Déjà inscrit ?{' '}
+            <span>{t('register_already_account')} </span>
             <Link href="/login" className="text-amber-800 font-bold hover:underline">
-              Se connecter
+              {t('nav_login')}
             </Link>
           </div>
         </div>
@@ -218,13 +215,13 @@ function RegisterFormContent() {
         <div className="bg-white rounded-3xl p-8 sm:p-10 border border-slate-200 shadow-2xl w-full">
           <div className="text-center max-w-xl mx-auto mb-8">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-100 px-3 py-1 rounded-full">
-              Étape 2 / 2 - Activation du Compte
+              {t('register_step2_badge')}
             </span>
             <h2 className="text-2xl sm:text-4xl font-black text-slate-900 mt-3 mb-2">
-              Sélectionnez la Formule pour {businessName}
+              {t('pricing_page_title')}
             </h2>
             <p className="text-slate-500 text-xs sm:text-sm">
-              Choisissez votre formule pour activer votre Menu QR et votre Carte de Fidélité Digitale.
+              {t('pricing_page_subtitle')}
             </p>
             {error && (
               <div className="mt-4 p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-2xl flex items-center justify-center gap-2 font-semibold">
@@ -244,14 +241,14 @@ function RegisterFormContent() {
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-extrabold text-slate-900 text-lg">Basic</span>
+                  <span className="font-extrabold text-slate-900 text-lg">{t('plan_basic_name')}</span>
                   {selectedPlan === 'basic' && <Check className="w-5 h-5 text-amber-800" />}
                 </div>
-                <div className="text-3xl font-black text-slate-900 mb-4">5€ <span className="text-xs font-medium text-slate-500">/mois</span></div>
+                <div className="text-3xl font-black text-slate-900 mb-4">{t('plan_basic_price')} <span className="text-xs font-medium text-slate-500">/mois</span></div>
                 <ul className="space-y-2 text-xs text-slate-600">
-                  <li>✓ Menu QR Code interactif</li>
-                  <li>✓ Affichage allergènes</li>
-                  <li>✓ Support par email</li>
+                  <li>✓ {t('plan_basic_feat1')}</li>
+                  <li>✓ {t('plan_basic_feat2')}</li>
+                  <li>✓ {t('plan_basic_feat3')}</li>
                 </ul>
               </div>
             </div>
@@ -264,18 +261,18 @@ function RegisterFormContent() {
               }`}
             >
               <span className="absolute -top-3 right-4 bg-amber-400 text-amber-950 font-black text-[10px] uppercase px-3 py-0.5 rounded-full shadow">
-                Populaire
+                {t('popular_badge')}
               </span>
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className={`font-extrabold text-lg ${selectedPlan === 'loyalty' ? 'text-amber-200' : 'text-slate-900'}`}>Fidélité</span>
+                  <span className={`font-extrabold text-lg ${selectedPlan === 'loyalty' ? 'text-amber-200' : 'text-slate-900'}`}>{t('plan_loyalty_name')}</span>
                   {selectedPlan === 'loyalty' && <Check className="w-5 h-5 text-amber-400" />}
                 </div>
-                <div className={`text-3xl font-black mb-4 ${selectedPlan === 'loyalty' ? 'text-white' : 'text-slate-900'}`}>10€ <span className="text-xs font-medium opacity-80">/mois</span></div>
+                <div className={`text-3xl font-black mb-4 ${selectedPlan === 'loyalty' ? 'text-white' : 'text-slate-900'}`}>{t('plan_loyalty_price')} <span className="text-xs font-medium opacity-80">/mois</span></div>
                 <ul className={`space-y-2 text-xs ${selectedPlan === 'loyalty' ? 'text-amber-100' : 'text-slate-600'}`}>
-                  <li>✓ Tout le plan Basic</li>
-                  <li>✓ Carte Fidélité Smartphone (PWA)</li>
-                  <li>✓ Offres Flash par email</li>
+                  <li>✓ {t('plan_loyalty_feat1')}</li>
+                  <li>✓ {t('plan_loyalty_feat2')}</li>
+                  <li>✓ {t('plan_loyalty_feat3')}</li>
                 </ul>
               </div>
             </div>
@@ -289,14 +286,14 @@ function RegisterFormContent() {
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-extrabold text-slate-900 text-lg">Premium Intégral</span>
+                  <span className="font-extrabold text-slate-900 text-lg">{t('plan_premium_name')}</span>
                   {selectedPlan === 'premium' && <Check className="w-5 h-5 text-amber-800" />}
                 </div>
-                <div className="text-3xl font-black text-slate-900 mb-4">20€ <span className="text-xs font-medium text-slate-500">/mois</span></div>
+                <div className="text-3xl font-black text-slate-900 mb-4">{t('plan_premium_price')} <span className="text-xs font-medium text-slate-500">/mois</span></div>
                 <ul className="space-y-2 text-xs text-slate-600">
-                  <li>✓ Tout le plan Fidélité</li>
-                  <li>✓ Booster d&apos;avis Google 5★</li>
-                  <li>✓ Support VIP 7/7</li>
+                  <li>✓ {t('plan_premium_feat1')}</li>
+                  <li>✓ {t('plan_premium_feat2')}</li>
+                  <li>✓ {t('plan_premium_feat3')}</li>
                 </ul>
               </div>
             </div>
@@ -307,13 +304,13 @@ function RegisterFormContent() {
             disabled={loading}
             className="w-full bg-gradient-to-r from-amber-800 to-amber-900 hover:from-amber-700 hover:to-amber-800 text-white font-black py-4 rounded-2xl transition shadow-xl text-base flex items-center justify-center gap-2 btn-press"
           >
-            {loading ? 'Redirection Stripe...' : `Souscrire à la Formule ${selectedPlan.toUpperCase()} via Stripe`}
+            <span>{loading ? '...' : t('btn_choose_plan')}</span>
             <ArrowRight className="w-5 h-5" />
           </button>
 
           <div className="mt-4 text-center text-xs text-slate-400 flex items-center justify-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>Paiement sécurisé par Stripe. Sans engagement, annulation à tout moment.</span>
+            <span>{t('no_credit_card')}</span>
           </div>
         </div>
       )}
@@ -325,7 +322,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       <Navbar />
-      <Suspense fallback={<div className="py-20 text-center text-xs text-slate-400">Chargement de la page...</div>}>
+      <Suspense fallback={<div className="py-20 text-center text-xs text-slate-400">...</div>}>
         <RegisterFormContent />
       </Suspense>
       <Footer />

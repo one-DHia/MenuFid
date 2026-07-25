@@ -1,12 +1,5 @@
 'use client';
 
-/**
- * app/dashboard/page.tsx
- * ─────────────────────────────────────────────────────────────
- * Vue générale du dashboard commerçant.
- * Affiche le QR code, les stats, et des raccourcis vers les modules.
- */
-
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
@@ -18,16 +11,13 @@ import { db } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { hasLoyalty } from '@/types';
 import { useToast } from '@/components/ui/Toast';
-
-// ─── Types locaux ─────────────────────────────────────────────
+import { useLanguage } from '@/lib/i18n';
 
 interface Stats {
   customersCount: number;
   pointsAwarded: number;
   visitsToday: number;
 }
-
-// ─── Chargement des stats fidélité ───────────────────────────
 
 async function loadLoyaltyStats(merchantId: string): Promise<Stats> {
   const [customers, visits] = await Promise.all([
@@ -57,8 +47,6 @@ async function loadLoyaltyStats(merchantId: string): Promise<Stats> {
   };
 }
 
-// ─── Composant carte stat ─────────────────────────────────────
-
 function StatCard({
   label,
   value,
@@ -76,20 +64,14 @@ function StatCard({
       <span className={`text-2xl sm:text-3xl font-black block ${locked ? 'text-slate-300' : 'text-slate-900'}`}>
         {locked ? '—' : value}
       </span>
-      {locked && (
-        <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full inline-block">
-          Désactivé
-        </span>
-      )}
     </div>
   );
 }
 
-// ─── Page principale ──────────────────────────────────────────
-
 export default function DashboardPage() {
   const { merchant, merchantId } = useAuth();
   const { showToast } = useToast();
+  const { t } = useLanguage();
 
   const [menuUrl, setMenuUrl] = useState('');
   const [stats, setStats] = useState<Stats>({ customersCount: 0, pointsAwarded: 0, visitsToday: 0 });
@@ -100,23 +82,19 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!merchant) return;
 
-    // Construire l'URL publique de la carte
     const origin = window.location.origin;
     setMenuUrl(`${origin}/menu/${merchant.slug}`);
 
-    // Charger les stats fidélité si le plan le permet
     if (loyaltyEnabled) {
       loadLoyaltyStats(merchantId).then(setStats).catch(console.error);
     }
   }, [merchant, merchantId, loyaltyEnabled]);
 
-  // Copier le lien du menu dans le presse-papier
   function handleCopyLink() {
     navigator.clipboard.writeText(menuUrl);
-    showToast('Lien copié dans le presse-papier !', 'success');
+    showToast('Lien copié !', 'success');
   }
 
-  // Ouvrir une fenêtre d'impression avec le QR code
   function handlePrintQR() {
     const svgEl = document.getElementById('merchant-qr-svg');
     if (!svgEl) return;
@@ -124,7 +102,6 @@ export default function DashboardPage() {
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
 
-    // Construction sécurisée du HTML d'impression (sans innerHTML dynamique)
     const svgHtml = svgEl.innerHTML;
     const businessName = merchant?.business_name ?? '';
 
@@ -145,7 +122,7 @@ export default function DashboardPage() {
       <body>
         <div class="container">
           <h1>${businessName}</h1>
-          <p>Scannez pour consulter notre carte sur votre téléphone</p>
+          <p>Scan to view our digital menu</p>
           <svg xmlns="http://www.w3.org/2000/svg">${svgHtml}</svg>
           <p style="font-size:11px;color:#94a3b8;margin-top:28px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">MenuFid System</p>
         </div>
@@ -158,15 +135,14 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-
       {/* ── Bannière de bienvenue ── */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-amber-50/40 to-stone-50 border border-amber-100 p-6 sm:p-8 rounded-3xl shadow-sm">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
-            Ravi de vous revoir, {merchant?.business_name} !
+            {t('dash_welcome')}, {merchant?.business_name} !
           </h1>
           <p className="text-stone-500 mt-2 text-xs sm:text-sm font-semibold max-w-xl">
-            Gérez vos catégories de plats, configurez vos offres et fidélisez vos clients.
+            {t('dash_welcome_sub')}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -176,7 +152,7 @@ export default function DashboardPage() {
             className="flex items-center gap-1.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm transition btn-press"
           >
             <Eye className="h-4 w-4 text-slate-500" />
-            <span>Voir ma carte</span>
+            <span>{t('dash_view_card_btn')}</span>
           </Link>
           {loyaltyEnabled && (
             <Link
@@ -184,7 +160,7 @@ export default function DashboardPage() {
               className="flex items-center gap-1.5 bg-amber-700 hover:bg-amber-600 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md shadow-amber-100 transition btn-press"
             >
               <Scan className="h-4 w-4" />
-              <span>Scanner</span>
+              <span>{t('dash_scanner_btn')}</span>
             </Link>
           )}
         </div>
@@ -199,10 +175,10 @@ export default function DashboardPage() {
             </div>
             <div>
               <h3 className="font-bold text-slate-900 text-sm sm:text-base">
-                Faites revenir vos clients +35% plus souvent
+                {t('feat_revenue_title')}
               </h3>
               <p className="text-stone-500 text-xs sm:text-sm mt-1 max-w-xl font-semibold">
-                Activez le module Fidélité CRM pour proposer des cartes mobiles sur Apple/Google Wallet.
+                {t('feat_wallet_desc')}
               </p>
             </div>
           </div>
@@ -210,7 +186,7 @@ export default function DashboardPage() {
             href="/register"
             className="w-full sm:w-auto bg-amber-700 hover:bg-amber-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md shadow-amber-100 transition flex items-center justify-center gap-1.5 flex-shrink-0 btn-press"
           >
-            <span>Activer (+14€/mois)</span>
+            <span>{t('hero_cta_primary')}</span>
             <ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>
@@ -218,10 +194,10 @@ export default function DashboardPage() {
 
       {/* ── Grille de stats ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <StatCard label="Scans de carte" value="142" locked={false} />
-        <StatCard label="Clients enregistrés" value={stats.customersCount} locked={!loyaltyEnabled} />
-        <StatCard label="Points attribués" value={stats.pointsAwarded} locked={!loyaltyEnabled} />
-        <StatCard label="Visites du jour" value={stats.visitsToday} locked={!loyaltyEnabled} />
+        <StatCard label={t('dash_stat_scans')} value="142" locked={false} />
+        <StatCard label={t('dash_stat_clients')} value={stats.customersCount} locked={!loyaltyEnabled} />
+        <StatCard label={t('dash_stat_points')} value={stats.pointsAwarded} locked={!loyaltyEnabled} />
+        <StatCard label={t('dash_stat_visits')} value={stats.visitsToday} locked={!loyaltyEnabled} />
       </div>
 
       {/* ── Plats les plus vus / Consultations ── */}
@@ -232,27 +208,27 @@ export default function DashboardPage() {
               <Zap className="h-4 w-4" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 text-sm">Plats les plus consultés par les clients</h3>
-              <p className="text-stone-400 text-xs font-semibold">Statistiques d&apos;intérêt sur votre carte interactive</p>
+              <h3 className="font-bold text-slate-900 text-sm">{t('dash_top_dishes')}</h3>
+              <p className="text-stone-400 text-xs font-semibold">{t('dash_top_sub')}</p>
             </div>
           </div>
           <span className="text-[10px] font-bold uppercase bg-amber-50 text-amber-800 border border-amber-100 px-2.5 py-1 rounded-full">
-            Top Tendance
+            TOP
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
           {[
-            { rank: '#1', name: 'Burger Classic Double', views: '284 vues', badge: '🔥 Le + consulté' },
-            { rank: '#2', name: 'Mushroom Swiss Burger', views: '196 vues', badge: '⭐ Vedette' },
-            { rank: '#3', name: 'Fondant Chocolat Intense', views: '152 vues', badge: '🍰 Dessert populaire' },
+            { rank: '#1', name: 'Burger Classic Double', views: '284 views', badge: '🔥' },
+            { rank: '#2', name: 'Mushroom Swiss Burger', views: '196 views', badge: '⭐' },
+            { rank: '#3', name: 'Fondant Chocolat Intense', views: '152 views', badge: '🍰' },
           ].map((dish) => (
             <div key={dish.rank} className="p-4 bg-stone-50 border border-stone-200/70 rounded-2xl flex justify-between items-center">
               <div className="space-y-0.5">
                 <span className="text-amber-800 font-black text-xs block">{dish.rank} {dish.name}</span>
                 <span className="text-stone-400 text-[11px] font-semibold block">{dish.views}</span>
               </div>
-              <span className="text-[9px] font-bold bg-white border border-stone-200 px-2 py-0.5 rounded-md text-stone-600">
+              <span className="text-[10px] font-bold bg-white border border-stone-200 px-2 py-0.5 rounded-md text-stone-600">
                 {dish.badge}
               </span>
             </div>
@@ -266,9 +242,9 @@ export default function DashboardPage() {
         {/* QR Code */}
         <div className="bg-white border border-slate-200/80 p-6 rounded-3xl flex flex-col gap-6 shadow-sm">
           <div>
-            <h3 className="font-bold text-slate-900 text-lg">Votre QR Code Client</h3>
+            <h3 className="font-bold text-slate-900 text-lg">{t('dash_qr_client')}</h3>
             <p className="text-slate-500 text-xs mt-1 font-semibold leading-relaxed">
-              Imprimez et posez ce QR Code sur vos tables. Vos clients n&apos;ont qu&apos;à le scanner.
+              {t('dash_qr_sub')}
             </p>
           </div>
 
@@ -279,7 +255,7 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div className="h-[150px] w-[150px] bg-slate-100 rounded flex items-center justify-center text-slate-400 text-xs">
-                Génération...
+                ...
               </div>
             )}
           </div>
@@ -296,7 +272,7 @@ export default function DashboardPage() {
                 onClick={handleCopyLink}
                 className="bg-amber-700 hover:bg-amber-600 text-white text-xs font-bold px-3 py-2 rounded-xl transition btn-press flex-shrink-0"
               >
-                Copier
+                {t('dash_qr_copy')}
               </button>
             </div>
             <button
@@ -304,7 +280,7 @@ export default function DashboardPage() {
               className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 shadow-sm transition btn-press"
             >
               <Printer className="h-3.5 w-3.5 text-slate-500" />
-              <span>Imprimer le QR Code</span>
+              <span>{t('dash_qr_print')}</span>
             </button>
           </div>
         </div>
@@ -316,17 +292,17 @@ export default function DashboardPage() {
               <div className="bg-amber-50 border border-amber-100 p-2.5 text-amber-700 rounded-2xl">
                 <Utensils className="h-5 w-5" />
               </div>
-              <h3 className="font-bold text-slate-900 text-lg">Carte en Ligne</h3>
+              <h3 className="font-bold text-slate-900 text-lg">{t('dash_online_card')}</h3>
             </div>
             <p className="text-stone-500 text-xs leading-relaxed font-medium">
-              Modifiez vos catégories, ajoutez des plats et mettez à jour la disponibilité en temps réel.
+              {t('dash_online_sub')}
             </p>
           </div>
           <Link
             href="/dashboard/menu"
             className="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold py-2.5 rounded-xl flex items-center justify-center mt-6 transition group btn-press"
           >
-            <span>Gérer ma carte</span>
+            <span>{t('dash_online_btn')}</span>
             <ChevronRight className="h-3.5 w-3.5 ml-1 transition group-hover:translate-x-0.5" />
           </Link>
         </div>
@@ -336,9 +312,9 @@ export default function DashboardPage() {
           {!loyaltyEnabled && (
             <div className="absolute inset-0 bg-white/70 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center p-6 text-center">
               <Lock className="h-8 w-8 text-amber-800 mb-2" />
-              <h4 className="font-bold text-slate-900 text-sm">Module Fidélité & CRM</h4>
+              <h4 className="font-bold text-slate-900 text-sm">{t('dash_loyalty_offers')}</h4>
               <p className="text-slate-500 text-xs mt-1 max-w-[200px] leading-relaxed font-medium">
-                Activez l&apos;offre Fidélité ou Premium pour accéder à ce module.
+                {t('plan_loyalty_desc')}
               </p>
             </div>
           )}
@@ -347,17 +323,17 @@ export default function DashboardPage() {
               <div className="bg-amber-50 border border-amber-100 p-2.5 text-amber-700 rounded-2xl">
                 <Award className="h-5 w-5" />
               </div>
-              <h3 className="font-bold text-slate-900 text-lg">Offres de Fidélité</h3>
+              <h3 className="font-bold text-slate-900 text-lg">{t('dash_loyalty_offers')}</h3>
             </div>
             <p className="text-slate-500 text-xs leading-relaxed font-medium">
-              Définissez les cadeaux que vos clients débloquent en accumulant des points.
+              {t('dash_loyalty_sub')}
             </p>
           </div>
           <Link
             href="/dashboard/loyalty"
             className="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold py-2.5 rounded-xl flex items-center justify-center mt-6 transition group btn-press"
           >
-            <span>Configurer mes cadeaux</span>
+            <span>{t('dash_loyalty_btn')}</span>
             <ChevronRight className="h-3.5 w-3.5 ml-1 transition group-hover:translate-x-0.5" />
           </Link>
         </div>
