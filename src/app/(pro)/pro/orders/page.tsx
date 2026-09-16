@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/ui/Toast';
@@ -27,9 +28,12 @@ import {
   ArrowLeft,
   DollarSign
 } from 'lucide-react';
+import { Spinner } from '@/components/ui/Spinner';
 import ProBottomNav from '@/components/ProBottomNav';
 
 export default function ProOrdersPage() {
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const { t, dir } = useLanguage();
   const isRtl = dir === 'rtl';
   const { merchant, isLoading } = useAuth();
@@ -44,6 +48,16 @@ export default function ProOrdersPage() {
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const alarmIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !isLoading && !merchant) {
+      router.replace('/pro/login');
+    }
+  }, [mounted, isLoading, merchant, router]);
 
   // Initialisation et récupération des commandes
   useEffect(() => {
@@ -224,6 +238,14 @@ export default function ProOrdersPage() {
   const pendingCount = orders.filter((o) => o.order_status === 'pending').length;
   const preparingCount = orders.filter((o) => o.order_status === 'preparing').length;
   const inDeliveryCount = orders.filter((o) => o.order_status === 'in_delivery').length;
+
+  if (!mounted || isLoading || !merchant) {
+    return (
+      <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
+        <Spinner size={36} className="text-black" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-black pb-28 sm:pb-24 font-sans" dir={dir}>

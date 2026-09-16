@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
 import { 
@@ -33,6 +34,8 @@ import { uploadMerchantMedia } from '@/lib/storageHelper';
 import ProBottomNav from '@/components/ProBottomNav';
 
 export default function ProDashboardPage() {
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const { t } = useLanguage();
   const { merchant, isLoading, logout } = useAuth();
   const { showToast } = useToast();
@@ -47,6 +50,16 @@ export default function ProDashboardPage() {
   });
   const [loadingStats, setLoadingStats] = useState(true);
   const [distributorCode, setDistributorCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !isLoading && !merchant) {
+      router.replace('/pro/login');
+    }
+  }, [mounted, isLoading, merchant, router]);
 
   useEffect(() => {
     if (merchant?.id) {
@@ -144,7 +157,7 @@ export default function ProDashboardPage() {
     }
   }
 
-  if (isLoading) {
+  if (!mounted || isLoading || !merchant) {
     return (
       <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
         <Spinner size={36} className="text-black" />
@@ -494,7 +507,7 @@ export default function ProDashboardPage() {
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
                   typeof window !== 'undefined'
                     ? `${window.location.origin}/menu/${merchant.slug}`
-                    : ''
+                    : `https://www.menufid.site/menu/${merchant.slug}`
                 )}`}
                 alt={t('qr_code_restaurant_alt', 'QR Code Restaurant')}
                 className="w-full h-full object-contain"

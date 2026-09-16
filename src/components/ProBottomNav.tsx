@@ -16,12 +16,18 @@ import {
 } from 'lucide-react';
 
 export default function ProBottomNav() {
-  const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+  const rawPathname = usePathname();
+  const pathname = rawPathname || '';
+
   const { merchant } = useAuth();
   const { t, dir } = useLanguage();
-  const isRtl = dir === 'rtl';
 
   const [pendingOrdersCount, setPendingOrdersCount] = useState<number>(0);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!merchant?.id) return;
@@ -66,6 +72,10 @@ export default function ProBottomNav() {
       supabase.removeChannel(channel);
     };
   }, [merchant?.id]);
+
+  if (!mounted || !merchant) {
+    return null;
+  }
 
   const isStarter = merchant?.plan_tier === 'basic';
 

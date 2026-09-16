@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/lib/i18n';
 import LanguageSelector from '@/components/LanguageSelector';
@@ -81,9 +82,21 @@ const FLYER_THEMES = [
 ];
 
 export default function QRPage() {
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const { merchant, isLoading } = useAuth();
   const { t, language } = useLanguage();
   const { showToast } = useToast();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !isLoading && !merchant) {
+      router.replace('/pro/login');
+    }
+  }, [mounted, isLoading, merchant, router]);
 
   const [activeTab, setActiveTab] = useState<'customizer' | 'posters' | 'install_guide'>('customizer');
   const [menuUrl, setMenuUrl] = useState('');
@@ -172,7 +185,7 @@ export default function QRPage() {
     loadQrUrl();
   }, [merchant]);
 
-  if (isLoading) {
+  if (!mounted || isLoading || !merchant) {
     return (
       <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
         <Spinner size={36} className="text-black" />

@@ -45,10 +45,21 @@ import { InstagramIcon } from '@/components/icons/InstagramIcon';
 import ProBottomNav from '@/components/ProBottomNav';
 
 export default function ProProfilePage() {
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const { t } = useLanguage();
   const { merchant, isLoading } = useAuth();
   const { showToast } = useToast();
-  const router = useRouter();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !isLoading && !merchant) {
+      router.replace('/pro/login');
+    }
+  }, [mounted, isLoading, merchant, router]);
 
   // Établissement
   const [businessName, setBusinessName] = useState('');
@@ -547,7 +558,7 @@ export default function ProProfilePage() {
     }
   }
 
-  if (isLoading) {
+  if (!mounted || isLoading || !merchant) {
     return (
       <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
         <Spinner size={36} className="text-black" />

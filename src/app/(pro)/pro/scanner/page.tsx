@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/hooks/useAuth';
 import { walletService } from '@/lib/services/walletService';
@@ -29,9 +30,21 @@ import ProFeatureLock from '@/components/ProFeatureLock';
 import ProBottomNav from '@/components/ProBottomNav';
 
 export default function ProScannerPage() {
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const { t } = useLanguage();
   const { merchant, isLoading } = useAuth();
   const { showToast } = useToast();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !isLoading && !merchant) {
+      router.replace('/pro/login');
+    }
+  }, [mounted, isLoading, merchant, router]);
 
   const [identifier, setIdentifier] = useState('');
   const [searching, setSearching] = useState(false);
@@ -240,7 +253,7 @@ export default function ProScannerPage() {
     setSuccessAnimation(false);
   }
 
-  if (isLoading) {
+  if (!mounted || isLoading || !merchant) {
     return (
       <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
         <Spinner size={36} className="text-black" />
@@ -248,7 +261,7 @@ export default function ProScannerPage() {
     );
   }
 
-  if (merchant?.plan_tier === 'basic') {
+  if (merchant.plan_tier === 'basic') {
     return (
       <div className="min-h-screen bg-[#FAFAFA] flex flex-col">
         <header className="bg-white border-b-4 border-black p-4">
