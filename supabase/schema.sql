@@ -1,137 +1,140 @@
--- ─────────────────────────────────────────────────────────────
--- SCHEMA SQL SUPABASE POUR MENUFID (PostgreSQL)
--- À exécuter dans l'éditeur SQL de votre console Supabase
--- ─────────────────────────────────────────────────────────────
+-- =====================================================================
+-- MenuFid - Architecture Base de Données PostgreSQL & RLS (Supabase)
+-- =====================================================================
 
--- 1. Table des commerçants (PROFILES / USERS)
-CREATE TABLE IF NOT EXISTS public.profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  email TEXT UNIQUE NOT NULL,
-  business_name TEXT NOT NULL,
-  slug TEXT UNIQUE NOT NULL,
-  plan_tier TEXT NOT NULL DEFAULT 'basic',
-  role TEXT NOT NULL DEFAULT 'merchant',
-  primary_color TEXT DEFAULT '#b45309',
-  logo_url TEXT,
-  google_review_url TEXT,
-  pdf_menu_url TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+-- 1. EXTENSIONS & TYPES
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TYPE plan_tier_enum AS ENUM ('basic', 'loyalty', 'premium');
+CREATE TYPE plan_status_enum AS ENUM ('active', 'past_due', 'canceled', 'trialing');
+
+-- 2. TABLE MERCHANTS (Établissements)
+CREATE TABLE IF NOT EXISTS public.merchants (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  owner_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  domain TEXT UNIQUE,
+  plan_tier plan_tier_enum NOT NULL DEFAULT 'basic',
+  plan_status plan_status_enum NOT NULL DEFAULT 'trialing',
+  stripe_customer_id TEXT,
+  stripe_subscription_id TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 2. Table des Catégories de menu
+-- Index pour recherche rapide par slug et propriétaire
+CREATE INDEX IF NOT EXISTS idx_merchants_slug ON public.merchants(slug);
+CREATE INDEX IF NOT EXISTS idx_merchants_owner ON public.merchants(owner_id);
+
+-- 3. TABLE CATEGORIES
 CREATE TABLE IF NOT EXISTS public.categories (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  merchant UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  merchant_id UUID NOT NULL REFERENCES public.merchants(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
-  display_order INT DEFAULT 1,
-  is_active BOOLEAN DEFAULT TRUE,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  sort_order INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 3. Table des Plats (MENU_ITEMS)
+CREATE INDEX IF NOT EXISTS idx_categories_merchant ON public.categories(merchant_id);
+
+-- 4. TABLE MENU_ITEMS (Articles de Carte)
 CREATE TABLE IF NOT EXISTS public.menu_items (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  merchant UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-  category UUID REFERENCES public.categories(id) ON DELETE CASCADE,
-  category_id UUID REFERENCES public.categories(id) ON DELETE CASCADE,
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  merchant_id UUID NOT NULL REFERENCES public.merchants(id) ON DELETE CASCADE,
+  category_id UUID NOT NULL REFERENCES public.categories(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
-  description TEXT DEFAULT '',
-  price NUMERIC(10, 2) NOT NULL,
-  image_url TEXT DEFAULT '',
-  is_available BOOLEAN DEFAULT TRUE,
-  is_featured BOOLEAN DEFAULT FALSE,
-  allergens JSONB DEFAULT '[]'::jsonb,
-  options JSONB DEFAULT '[]'::jsonb,
-  views_count INT DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  description TEXT,
+  price NUMERIC(10,2) NOT NULL DEFAULT 0.00,
+  image_url TEXT,
+  allergens TEXT[] DEFAULT '{}',
+  is_available BOOLEAN NOT NULL DEFAULT true,
+  translations JSONB DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 4. Table des Clients (CUSTOMERS)
+CREATE INDEX IF NOT EXISTS idx_menu_items_merchant ON public.menu_items(merchant_id);
+CREATE INDEX IF NOT EXISTS idx_menu_items_category ON public.menu_items(category_id);
+
+-- 5. TABLE CUSTOMERS (Membres Fidélité)
 CREATE TABLE IF NOT EXISTS public.customers (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  merchant UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  email TEXT NOT NULL,
-  phone TEXT DEFAULT '',
-  points_balance INT DEFAULT 0,
-  total_visits INT DEFAULT 0,
-  last_visit TIMESTAMPTZ DEFAULT NOW(),
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  merchant_id UUID NOT NULL REFERENCES public.merchants(id) ON DELETE CASCADE,
+  email TEXT,
+  phone TEXT,
+  name TEXT,
+  total_points INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT unique_customer_merchant_phone UNIQUE(merchant_id, phone)
 );
 
--- 5. Table des Visites / Tampons (VISITS)
-CREATE TABLE IF NOT EXISTS public.visits (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  merchant UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-  customer UUID REFERENCES public.customers(id) ON DELETE CASCADE,
-  points_earned INT DEFAULT 10,
-  scanned_at TIMESTAMPTZ DEFAULT NOW()
+CREATE INDEX IF NOT EXISTS idx_customers_merchant ON public.customers(merchant_id);
+
+-- 6. TABLE POINTS_LEDGER (Journal d'Audit Immuable Anti-Fraude)
+CREATE TABLE IF NOT EXISTS public.points_ledger (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  merchant_id UUID NOT NULL REFERENCES public.merchants(id) ON DELETE CASCADE,
+  customer_id UUID NOT NULL REFERENCES public.customers(id) ON DELETE CASCADE,
+  points INT NOT NULL,
+  reason TEXT NOT NULL,
+  device_hash TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 6. Table des Récompenses / Offres (REWARDS)
-CREATE TABLE IF NOT EXISTS public.rewards (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  merchant UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-  title TEXT NOT NULL,
-  description TEXT DEFAULT '',
-  points_required INT NOT NULL,
-  is_active BOOLEAN DEFAULT TRUE,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+CREATE INDEX IF NOT EXISTS idx_points_ledger_customer ON public.points_ledger(customer_id);
+
+-- 7. TABLE PROCESSED_WEBHOOKS (Idempotence Stripe)
+CREATE TABLE IF NOT EXISTS public.processed_webhooks (
+  event_id TEXT PRIMARY KEY,
+  event_type TEXT NOT NULL,
+  processed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 7. Table des Thèmes de Carte (THEMES)
-CREATE TABLE IF NOT EXISTS public.themes (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  merchant UUID UNIQUE REFERENCES public.profiles(id) ON DELETE CASCADE,
-  template_id TEXT DEFAULT 'minimalist',
-  primary_color TEXT DEFAULT '#b45309',
-  background_color TEXT DEFAULT '#fdfbf7',
-  text_color TEXT DEFAULT '#1c1917',
-  font_family TEXT DEFAULT 'serif',
-  card_style TEXT DEFAULT 'bordered',
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+-- =====================================================================
+-- ROW LEVEL SECURITY (RLS) POLICIES
+-- =====================================================================
 
--- 8. Table des Plugins Config (PLUGINS_CONFIG)
-CREATE TABLE IF NOT EXISTS public.plugins_config (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  merchant UUID UNIQUE REFERENCES public.profiles(id) ON DELETE CASCADE,
-  allergens BOOLEAN DEFAULT TRUE,
-  options BOOLEAN DEFAULT TRUE,
-  featured BOOLEAN DEFAULT TRUE,
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- ─────────────────────────────────────────────────────────────
--- POLITIQUES DE SÉCURITÉ (ROW LEVEL SECURITY - RLS)
--- ─────────────────────────────────────────────────────────────
-
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+-- Activer RLS sur toutes les tables
+ALTER TABLE public.merchants ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.menu_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.visits ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.rewards ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.themes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.plugins_config ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.points_ledger ENABLE ROW LEVEL SECURITY;
 
--- Politiques de lecture publique pour la carte digitale
-CREATE POLICY "Lecture publique profiles" ON public.profiles FOR SELECT USING (true);
-CREATE POLICY "Lecture publique categories" ON public.categories FOR SELECT USING (true);
-CREATE POLICY "Lecture publique menu_items" ON public.menu_items FOR SELECT USING (true);
-CREATE POLICY "Lecture publique rewards" ON public.rewards FOR SELECT USING (true);
-CREATE POLICY "Lecture publique themes" ON public.themes FOR SELECT USING (true);
-CREATE POLICY "Lecture publique plugins_config" ON public.plugins_config FOR SELECT USING (true);
-CREATE POLICY "Création publique customers" ON public.customers FOR INSERT WITH CHECK (true);
-CREATE POLICY "Lecture publique customers" ON public.customers FOR SELECT USING (true);
+-- 1. Merchants: lecture/écriture réservée au propriétaire authentifié
+CREATE POLICY merchants_owner_all ON public.merchants
+  FOR ALL TO authenticated
+  USING (owner_id = auth.uid())
+  WITH CHECK (owner_id = auth.uid());
 
--- Politiques d'écriture pour les utilisateurs authentifiés
-CREATE POLICY "Gestion complete par authentifie categories" ON public.categories FOR ALL USING (auth.uid() IS NOT NULL);
-CREATE POLICY "Gestion complete par authentifie menu_items" ON public.menu_items FOR ALL USING (auth.uid() IS NOT NULL);
-CREATE POLICY "Gestion complete par authentifie customers" ON public.customers FOR ALL USING (auth.uid() IS NOT NULL);
-CREATE POLICY "Gestion complete par authentifie visits" ON public.visits FOR ALL USING (auth.uid() IS NOT NULL);
-CREATE POLICY "Gestion complete par authentifie rewards" ON public.rewards FOR ALL USING (auth.uid() IS NOT NULL);
-CREATE POLICY "Gestion complete par authentifie profiles" ON public.profiles FOR ALL USING (auth.uid() IS NOT NULL);
-CREATE POLICY "Gestion complete par authentifie themes" ON public.themes FOR ALL USING (auth.uid() IS NOT NULL);
-CREATE POLICY "Gestion complete par authentifie plugins_config" ON public.plugins_config FOR ALL USING (auth.uid() IS NOT NULL);
+-- Lecture publique pour l'accès aux cartes par slug/domaine
+CREATE POLICY merchants_public_read ON public.merchants
+  FOR SELECT TO anon, authenticated
+  USING (true);
+
+-- 2. Categories: écriture par le proprio, lecture publique
+CREATE POLICY categories_owner_all ON public.categories
+  FOR ALL TO authenticated
+  USING (merchant_id IN (SELECT id FROM public.merchants WHERE owner_id = auth.uid()));
+
+CREATE POLICY categories_public_read ON public.categories
+  FOR SELECT TO anon, authenticated
+  USING (true);
+
+-- 3. Menu Items: écriture par le proprio, lecture publique
+CREATE POLICY menu_items_owner_all ON public.menu_items
+  FOR ALL TO authenticated
+  USING (merchant_id IN (SELECT id FROM public.merchants WHERE owner_id = auth.uid()));
+
+CREATE POLICY menu_items_public_read ON public.menu_items
+  FOR SELECT TO anon, authenticated
+  USING (is_available = true);
+
+-- 4. Customers & Points Ledger: écriture réservée au marchand authentifié
+CREATE POLICY customers_owner_all ON public.customers
+  FOR ALL TO authenticated
+  USING (merchant_id IN (SELECT id FROM public.merchants WHERE owner_id = auth.uid()));
+
+CREATE POLICY points_ledger_owner_all ON public.points_ledger
+  FOR ALL TO authenticated
+  USING (merchant_id IN (SELECT id FROM public.merchants WHERE owner_id = auth.uid()));

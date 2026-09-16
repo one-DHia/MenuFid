@@ -5,16 +5,16 @@ import { useLanguage, LANGUAGES, Language } from '@/lib/i18n';
 import { Globe, ChevronDown, Check } from 'lucide-react';
 
 export default function LanguageSelector() {
-  const { language, setLanguage } = useLanguage();
-  const [open, setOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const { language, setLanguage, t } = useLanguage();
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const currentLang = LANGUAGES.find((l) => l.code === language) || LANGUAGES[0];
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setOpen(false);
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -22,47 +22,47 @@ export default function LanguageSelector() {
   }, []);
 
   return (
-    <div className="relative" ref={menuRef}>
+    <div className="relative inline-block text-left" ref={dropdownRef}>
       <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 hover:bg-amber-50/80 text-slate-800 text-xs font-bold transition border border-amber-900/10 shadow-sm hover:shadow group"
-        title="Changer la langue / Switch language"
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200/80 text-stone-800 text-xs font-bold transition border border-stone-200/80 shadow-xs btn-press"
+        aria-label={t('change_language', 'Changer de langue')}
       >
-        <Globe className="w-3.5 h-3.5 text-amber-800 group-hover:rotate-12 transition-transform" />
-        <span className="text-base leading-none">{currentLang.flag}</span>
-        <span className="hidden sm:inline text-slate-700 tracking-wide font-medium">{currentLang.name}</span>
-        <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${open ? 'rotate-180 text-amber-800' : ''}`} />
+        <span className="text-sm leading-none">{currentLang.flag}</span>
+        <span className="uppercase font-black tracking-wider text-[11px]">{currentLang.code}</span>
+        <ChevronDown className={`w-3.5 h-3.5 text-stone-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
-      {open && (
-        <div className="absolute right-0 mt-2 w-48 rounded-2xl bg-white/95 backdrop-blur-md border border-amber-900/10 shadow-2xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="px-3.5 py-1.5 text-[10px] uppercase font-extrabold text-amber-900/60 border-b border-slate-100 flex items-center justify-between">
-            <span>Langue / Language</span>
-            <span className="text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-md font-bold">7 Langues</span>
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-44 rounded-2xl bg-white border border-stone-200 shadow-xl z-50 py-1.5 animate-in fade-in zoom-in-95 duration-150">
+          <div className="px-3 py-1 text-[10px] font-black uppercase text-stone-400 tracking-wider border-b border-stone-100 mb-1">
+            {t('select_language', 'Choisir la langue')}
           </div>
-
-          <div className="py-1 max-h-64 overflow-y-auto">
-            {LANGUAGES.map((item) => (
+          {LANGUAGES.map((lang) => {
+            const isSelected = lang.code === language;
+            return (
               <button
-                key={item.code}
+                key={lang.code}
+                type="button"
                 onClick={() => {
-                  setLanguage(item.code as Language);
-                  setOpen(false);
+                  setLanguage(lang.code as Language);
+                  setIsOpen(false);
                 }}
-                className={`w-full flex items-center justify-between px-3.5 py-2 text-xs text-left transition ${
-                  language === item.code
-                    ? 'font-bold text-amber-900 bg-amber-100/60'
-                    : 'text-slate-700 hover:bg-slate-50 hover:text-amber-800'
+                className={`w-full flex items-center justify-between px-3.5 py-2 text-xs font-bold transition text-left ${
+                  isSelected
+                    ? 'bg-amber-50 text-amber-900 font-black'
+                    : 'text-stone-700 hover:bg-stone-50'
                 }`}
               >
-                <div className="flex items-center gap-2.5">
-                  <span className="text-base leading-none">{item.flag}</span>
-                  <span className="tracking-tight">{item.name}</span>
-                </div>
-                {language === item.code && <Check className="w-3.5 h-3.5 text-amber-800" />}
+                <span className="flex items-center gap-2">
+                  <span className="text-base leading-none">{lang.flag}</span>
+                  <span>{lang.name}</span>
+                </span>
+                {isSelected && <Check className="w-3.5 h-3.5 text-amber-800" />}
               </button>
-            ))}
-          </div>
+            );
+          })}
         </div>
       )}
     </div>

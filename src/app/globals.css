@@ -1,76 +1,311 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fdfbf7; /* warm soft cream */
-  --foreground: #1c1917; /* warm stone text */
-  --primary: #b45309; /* warm gold / amber-700 */
+  --background: #FAFAFA;
+  --foreground: #000000;
+  --neo-yellow: #FFB800;
+  --neo-green: #00F59B;
+  --neo-border: #000000;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-neo-yellow: var(--neo-yellow);
+  --color-neo-green: var(--neo-green);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
+/* ── PWA & MOBILE STATUS BAR / NOTCH / DYNAMIC ISLAND SAFE AREAS ── */
+header, 
+.safe-header-top {
+  padding-top: max(0px, env(safe-area-inset-top, 0px));
+}
+
+.safe-pwa-top {
+  padding-top: max(1rem, calc(env(safe-area-inset-top, 0px) + 0.5rem));
+}
+
+.safe-pwa-bottom {
+  padding-bottom: max(1rem, calc(env(safe-area-inset-bottom, 0px) + 0.5rem));
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: #FAFAFA;
+  color: #000000;
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
-/* Light Theme Warm Apple-Style Glassmorphism */
-.glass {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(20px) saturate(190%);
-  -webkit-backdrop-filter: blur(20px) saturate(190%);
-  border: 1px solid rgba(217, 119, 6, 0.08); /* subtle gold border hint */
-  box-shadow: 0 4px 30px rgba(180, 83, 9, 0.01);
+::selection {
+  background-color: #FFB800;
+  color: #000000;
 }
 
-.glass-dark {
-  background: rgba(253, 251, 247, 0.9);
-  backdrop-filter: blur(20px) saturate(190%);
-  -webkit-backdrop-filter: blur(20px) saturate(190%);
-  border: 1px solid rgba(217, 119, 6, 0.08);
+/* ── NEOBRUTALISM UTILITIES ── */
+.neo-box {
+  background: #FFFFFF;
+  border: 2px solid #000000;
+  border-radius: 1rem; /* rounded-2xl */
+  box-shadow: 4px 4px 0px 0px #000000;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.glass-card {
-  background: #ffffff;
-  border: 1px solid rgba(217, 119, 6, 0.06);
-  box-shadow: 0 10px 25px -5px rgba(180, 83, 9, 0.02), 0 8px 10px -6px rgba(180, 83, 9, 0.02);
+.neo-box-hover:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #000000;
 }
 
-/* Custom scrollbars - Warm theme style */
+.neo-box-yellow {
+  background: #FFB800;
+  color: #000000;
+  border: 2px solid #000000;
+  border-radius: 1rem;
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+.neo-box-green {
+  background: #00F59B;
+  color: #000000;
+  border: 2px solid #000000;
+  border-radius: 1rem;
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+.neo-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2px solid #000000;
+  border-radius: 9999px;
+  background: #000000;
+  color: #FFFFFF;
+  font-weight: 800;
+  padding: 0.625rem 1.5rem;
+  box-shadow: 3px 3px 0px 0px #000000;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.neo-pill-btn:hover {
+  background: #18181B;
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+.neo-pill-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px 0px #000000;
+}
+
+.neo-pill-btn-white {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2px solid #000000;
+  border-radius: 9999px;
+  background: #FFFFFF;
+  color: #000000;
+  font-weight: 800;
+  padding: 0.625rem 1.5rem;
+  box-shadow: 3px 3px 0px 0px #000000;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.neo-pill-btn-white:hover {
+  background: #F4F4F5;
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+.neo-pill-btn-white:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px 0px #000000;
+}
+
+.neo-pill-btn-yellow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2px solid #000000;
+  border-radius: 9999px;
+  background: #FFB800;
+  color: #000000;
+  font-weight: 900;
+  padding: 0.625rem 1.5rem;
+  box-shadow: 3px 3px 0px 0px #000000;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.neo-pill-btn-yellow:hover {
+  background: #FACC15;
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+.neo-pill-btn-yellow:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px 0px #000000;
+}
+
+.neo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border: 2px solid #000000;
+  border-radius: 9999px;
+  background: #FFFFFF;
+  color: #000000;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.25rem 0.75rem;
+  box-shadow: 2px 2px 0px 0px #000000;
+}
+
+.neo-badge-yellow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border: 2px solid #000000;
+  border-radius: 9999px;
+  background: #FFB800;
+  color: #000000;
+  font-size: 0.75rem;
+  font-weight: 900;
+  padding: 0.25rem 0.75rem;
+  box-shadow: 2px 2px 0px 0px #000000;
+}
+
+/* ── FORM INPUTS NEOBRUTALISM ── */
+.neo-input {
+  background-color: #FFFFFF;
+  background-repeat: no-repeat;
+  border: 2px solid #000000;
+  border-radius: 0.75rem; /* 12px */
+  padding: 0.65rem 1rem;
+  font-weight: 700;
+  color: #000000;
+  box-shadow: 2px 2px 0px 0px #000000;
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+select.neo-input {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: #FFFFFF;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+[dir="rtl"] select.neo-input {
+  background-position: left 0.75rem center;
+  padding-right: 1rem;
+  padding-left: 2.5rem;
+}
+
+.neo-input:focus {
+  border-color: #000000;
+  box-shadow: 4px 4px 0px 0px #FFB800, 4px 4px 0px 2px #000000;
+  transform: translate(-1px, -1px);
+}
+
+.neo-input::placeholder {
+  color: #888888;
+  font-weight: 600;
+}
+
+/* ── CATEGORY PILLS & SECONDARY BUTTONS ── */
+.neo-category-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 2px solid #000000;
+  border-radius: 9999px;
+  background: #FFFFFF;
+  color: #000000;
+  font-weight: 800;
+  padding: 0.4rem 1rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 2px 2px 0px 0px #000000;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.neo-category-pill:hover {
+  background: #F4F4F5;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px 0px #000000;
+}
+
+.neo-category-pill:active {
+  transform: translate(1px, 1px);
+  box-shadow: 0px 0px 0px 0px #000000;
+}
+
+.neo-category-pill.active {
+  background: #FFB800;
+  color: #000000;
+  font-weight: 900;
+}
+
+.neo-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2px solid #000000;
+  border-radius: 0.75rem;
+  background: #FFFFFF;
+  color: #000000;
+  font-weight: 800;
+  padding: 0.5rem 1rem;
+  box-shadow: 2px 2px 0px 0px #000000;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.neo-btn-secondary:hover {
+  background: #F4F4F5;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px 0px #000000;
+}
+
+.neo-btn-secondary:active {
+  transform: translate(1px, 1px);
+  box-shadow: 0px 0px 0px 0px #000000;
+}
+
+
+/* Custom scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(180, 83, 9, 0.02);
+  background: #FAFAFA;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(180, 83, 9, 0.1);
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(180, 83, 9, 0.2);
-}
-
-/* Easing helper for Apple-style active button states */
-.btn-press:active {
-  transform: scale(0.97);
-  transition: transform 100ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+  background: #000000;
+  border-radius: 0px;
 }
 
 /* ── Print / PDF Generation Styles ── */

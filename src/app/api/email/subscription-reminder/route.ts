@@ -1,11 +1,19 @@
 import { NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 /**
  * Route POST /api/email/subscription-reminder
  * Envoie un e-mail de relance automatique à un restaurateur qui s'est inscrit mais n'a pas encore choisi d'abonnement.
  */
 export async function POST(req: Request) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'anonymous-client';
+  const rateCheck = checkRateLimit(`api-email-reminder-${ip}`, { limit: 5, windowMs: 60 * 1000 });
+
+  if (!rateCheck.success) {
+    return NextResponse.json({ error: 'Trop d\'envois d\'emails. Veuillez réessayer plus tard.' }, { status: 429 });
+  }
+
   try {
     const { email, businessName, merchantId } = await req.json();
 
@@ -21,10 +29,10 @@ export async function POST(req: Request) {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #334155;">
         <h2 style="color: #78350f;">Bonjour ${businessName || ''} 👋</h2>
         <p>Vous avez créé votre compte sur <strong>MenuFid</strong>, mais vous n'avez pas encore choisi votre formule d'abonnement pour activer votre menu QR et votre carte de fidélité.</p>
-        <p>Pour commencer à recevoir vos premiers clients et booster vos revenus dès aujourd'hui, choisissez votre formule à partir de seulement <strong>5€/mois</strong> :</p>
+        <p>Pour commencer à recevoir vos premiers clients et booster vos revenus dès aujourd'hui, choisissez votre formule à partir de seulement <strong>19 €/mois</strong> :</p>
         <div style="text-align: center; margin: 30px 0;">
           <a href="${finishUrl}" style="background-color: #b45309; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 16px; display: inline-block;">
-            Finaliser mon Abonnement (Dès 5€/mois) &rarr;
+            Finaliser mon Abonnement (Dès 19 €/mois) &rarr;
           </a>
         </div>
         <p style="font-size: 12px; color: #64748b;">Abonnement sans engagement. Support client dédié 7j/7.</p>

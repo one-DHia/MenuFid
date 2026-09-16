@@ -18,21 +18,35 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
 });
 
-// Helper de compatibilité unifié pour requêtes rapides
+// Helper de compatibilité unifié pour requêtes rapides avec filtres réels
 export const db = {
   collection: (table: string) => ({
-    getFullList: async <T = unknown>(_options?: { filter?: string; sort?: string }): Promise<T[]> => {
+    getFullList: async <T = unknown>(options?: { filter?: string; sort?: string }): Promise<T[]> => {
       try {
-        const { data, error } = await supabase.from(table).select('*');
+        let query = supabase.from(table).select('*');
+        if (options?.filter) {
+          const match = options.filter.match(/(\w+)\s*=\s*"([^"]+)"/);
+          if (match) {
+            query = query.eq(match[1], match[2]);
+          }
+        }
+        const { data, error } = await query;
         if (error || !data) return [];
         return data as T[];
       } catch {
         return [];
       }
     },
-    getList: async <T = unknown>(_page = 1, _perPage = 50, _options?: { filter?: string }): Promise<{ totalItems: number; items: T[] }> => {
+    getList: async <T = unknown>(_page = 1, _perPage = 50, options?: { filter?: string }): Promise<{ totalItems: number; items: T[] }> => {
       try {
-        const { data, error } = await supabase.from(table).select('*');
+        let query = supabase.from(table).select('*');
+        if (options?.filter) {
+          const match = options.filter.match(/(\w+)\s*=\s*"([^"]+)"/);
+          if (match) {
+            query = query.eq(match[1], match[2]);
+          }
+        }
+        const { data, error } = await query;
         if (error || !data) return { totalItems: 0, items: [] };
         return { totalItems: data.length, items: data as T[] };
       } catch {
@@ -48,9 +62,16 @@ export const db = {
         return null;
       }
     },
-    getFirstListItem: async <T = unknown>(_filter?: string): Promise<T | null> => {
+    getFirstListItem: async <T = unknown>(filterStr?: string): Promise<T | null> => {
       try {
-        const { data, error } = await supabase.from(table).select('*').limit(1).maybeSingle();
+        let query = supabase.from(table).select('*');
+        if (filterStr) {
+          const match = filterStr.match(/(\w+)\s*=\s*"([^"]+)"/);
+          if (match) {
+            query = query.eq(match[1], match[2]);
+          }
+        }
+        const { data, error } = await query.limit(1).maybeSingle();
         if (error || !data) return null;
         return data as T;
       } catch {

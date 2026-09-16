@@ -1,0 +1,36 @@
+# Build and cache
+.next
+.vercel
+node_modules
+out
+build
+coverage
+
+# Git & System
+.git
+.DS_Store
+
+# Temporary local scripts and databases (DO NOT ignore config files)
+pocketbase/
+docs/
+scripts/
+*.sql
+*.log
+test.js
+test_insert.js
+backfill.js
+backfill_loyalty_codes.js
+backfill_loyalty_codes.mjs
+check.js
+check_qr.js
+delete_ghost.js
+import_menu.js
+inspect_schema.js
+parse_json.js
+query_merchants.js
+add_back_keys.js
+add_distributor_translations.js
+add_pro_translations.js
+add_pro_translations_extra.js
+add_pwa_translations.js
+add_translations_new.js

@@ -22,7 +22,7 @@ const FAQ_DATA: QAPair[] = [
     answerKey: 'bot_a1',
     fallbackQ: 'Comment MenuFid augmente mes revenus ?',
     fallbackA: 'MenuFid transforme vos visiteurs occasionnels en clients fidèles réguliers. Grâce à la carte de fidélité digitale enregistrée sur leur smartphone, vos clients reviennent 2x plus souvent et dépensent davantage à chaque commande !',
-    actionText: 'Découvrir nos Abonnements (Dès 5€/m)',
+    actionText: 'Découvrir nos Abonnements',
     actionUrl: '/pricing',
   },
   {
@@ -30,7 +30,7 @@ const FAQ_DATA: QAPair[] = [
     questionKey: 'bot_q2',
     answerKey: 'bot_a2',
     fallbackQ: 'Combien coûtent les formules MenuFid ?',
-    fallbackA: 'Nos formules sont ultra-accessibles : Formule Basic à 5€/mois, Formule Fidélité complète à 10€/mois et Formule Premium Intégrale à 20€/mois. Sans aucun engagement !',
+    fallbackA: 'Nos formules sont simples et transparentes : Formule Starter à 19 €/mois et Formule Pro à 39 €/mois. Sans aucun engagement !',
     actionText: 'Voir la grille des tarifs',
     actionUrl: '/pricing',
   },
@@ -98,7 +98,7 @@ export default function ChatbotWidget() {
             <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-400"></span>
           </span>
           <Bot className="w-5 h-5 text-amber-200 group-hover:rotate-12 transition-transform" />
-          <span className="text-sm tracking-wide">Assistant IA MenuFid</span>
+          <span className="text-sm tracking-wide">{t('bot_name')}</span>
         </button>
       )}
 
@@ -112,9 +112,9 @@ export default function ChatbotWidget() {
               </div>
               <div>
                 <h3 className="font-bold text-sm flex items-center gap-1.5">
-                  Assistant MenuFid <Sparkles className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                  {t('bot_name')} <Sparkles className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                 </h3>
-                <p className="text-xs text-amber-200/80">En ligne pour augmenter vos revenus</p>
+                <p className="text-xs text-amber-200/80">{t('bot_tagline')}</p>
               </div>
             </div>
             <button
@@ -166,7 +166,7 @@ export default function ChatbotWidget() {
           {/* Suggestions */}
           <div className="p-3 bg-white border-t border-slate-100">
             <p className="text-[10px] font-bold uppercase text-slate-400 mb-2 px-1">
-              Questions suggérées :
+              {t('bot_suggested')}
             </p>
             <div className="flex flex-col gap-1.5 max-h-36 overflow-y-auto">
               {FAQ_DATA.map((qa) => {

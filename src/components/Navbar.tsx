@@ -4,44 +4,43 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import LanguageSelector from '@/components/LanguageSelector';
 import { useLanguage } from '@/lib/i18n';
-import { QrCode, Menu, X, ArrowRight, Sparkles } from 'lucide-react';
+import { Menu, X, ArrowRight, UtensilsCrossed, Wallet, Globe, Building2 } from 'lucide-react';
 
 export default function Navbar() {
   const { t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-amber-900/10 shadow-sm transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
+    <header className="sticky top-0 z-50 bg-[#FAFAFA]/95 backdrop-blur-md border-b-2 border-black transition-all">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-18 sm:h-20 flex items-center justify-between">
         {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-700 via-amber-800 to-amber-950 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform border border-amber-500/30">
-            <QrCode className="w-5 h-5 text-amber-200" />
+          <div className="w-10 h-10 rounded-xl bg-[#FFB800] border-2 border-black flex items-center justify-center text-black shadow-[2px_2px_0px_0px_#000] group-hover:translate-x-0.5 group-hover:translate-y-0.5 group-hover:shadow-none transition-all">
+            <UtensilsCrossed className="w-5 h-5 text-black" />
           </div>
-          <div className="flex flex-col">
-            <span className="font-black text-xl tracking-tight text-slate-900 leading-none">
-              Menu<span className="text-amber-800">Fid</span>
-            </span>
-            <span className="text-[9px] font-bold text-amber-700 uppercase tracking-widest leading-tight">
-              SaaS Restauration
-            </span>
-          </div>
+          <span className="font-black text-2xl tracking-tight text-black leading-none">
+            Menu<span className="bg-[#FFB800] px-1 ml-0.5 rounded border border-black text-black">Fid</span>
+          </span>
         </Link>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-700">
-          <Link href="/pricing" className="hover:text-amber-800 transition py-1">
+        <nav className="hidden md:flex items-center gap-5 text-xs font-black uppercase tracking-wider text-black">
+          <Link href="/" className="hover:bg-[#FFB800] px-2.5 py-1 rounded border border-transparent hover:border-black transition">
+            {t('nav_home')}
+          </Link>
+          <Link href="/pricing" className="hover:bg-[#FFB800] px-2.5 py-1 rounded border border-transparent hover:border-black transition">
             {t('nav_pricing')}
           </Link>
-          <Link href="/distribution" className="hover:text-amber-800 transition py-1 flex items-center gap-1">
-            <span>{t('nav_partners')}</span>
-            <span className="bg-amber-100 text-amber-900 text-[10px] px-1.5 py-0.5 rounded-full font-black">⭐</span>
+          <Link href="/installer" className="hover:bg-[#FFB800] px-2.5 py-1 rounded border border-transparent hover:border-black transition">
+            {t('nav_install', 'Installer l\'App')}
           </Link>
-          <Link href="/about" className="hover:text-amber-800 transition py-1">
-            {t('nav_about')}
+          <Link href="/wallet" className="hover:bg-[#00F59B] px-2.5 py-1 rounded border border-transparent hover:border-black transition flex items-center gap-1.5">
+            <Wallet className="w-3.5 h-3.5" />
+            <span>{t('nav_wallet', 'Portefeuille')}</span>
           </Link>
-          <Link href="/contact" className="hover:text-amber-800 transition py-1">
-            {t('nav_contact')}
+          <Link href="/distributor" className="hover:bg-[#FFB800] px-2.5 py-1 rounded border border-transparent hover:border-black transition flex items-center gap-1.5">
+            <Building2 className="w-3.5 h-3.5" />
+            <span>{t('distributor_portal', 'Portail Distributeur')}</span>
           </Link>
         </nav>
 
@@ -49,16 +48,16 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-3">
           <LanguageSelector />
           <Link
-            href="/login"
-            className="text-xs font-bold text-slate-700 hover:text-amber-800 px-3 py-2 transition"
+            href="/pro/login"
+            className="neo-pill-btn-white text-xs py-2 px-4"
           >
-            {t('nav_login')}
+            {t('nav_pro_space', 'Espace Pro')}
           </Link>
           <Link
-            href="/register"
-            className="bg-gradient-to-r from-amber-800 to-amber-900 hover:from-amber-700 hover:to-amber-800 text-white font-bold text-xs px-4 py-2.5 rounded-2xl shadow-md transition flex items-center gap-1.5 btn-press"
+            href="/pro/register"
+            className="neo-pill-btn text-xs py-2 px-5"
           >
-            <span>{t('nav_register')}</span>
+            <span>{t('nav_start', 'Commencer')}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -68,63 +67,71 @@ export default function Navbar() {
           <LanguageSelector />
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition"
+            className="p-2 rounded-xl border-2 border-black bg-white shadow-[2px_2px_0px_0px_#000] text-black"
             aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
-          <nav className="flex flex-col gap-2.5 text-sm font-bold text-slate-800">
+        <div className="md:hidden bg-white border-b-2 border-black px-4 pt-4 pb-6 space-y-3">
+          <nav className="flex flex-col gap-2 text-sm font-black uppercase text-black">
+            <Link
+              href="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2 rounded-xl border border-black bg-neutral-50 hover:bg-[#FFB800] transition"
+            >
+              {t('nav_home')}
+            </Link>
             <Link
               href="/pricing"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-xl hover:bg-amber-50 hover:text-amber-800 transition"
+              className="p-2 rounded-xl border border-black bg-neutral-50 hover:bg-[#FFB800] transition"
             >
               {t('nav_pricing')}
             </Link>
             <Link
-              href="/distribution"
+              href="/installer"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-xl hover:bg-amber-50 hover:text-amber-800 transition flex items-center justify-between"
+              className="p-2 rounded-xl border border-black bg-neutral-50 hover:bg-[#FFB800] transition"
             >
-              <span>{t('nav_partners')}</span>
-              <span className="bg-amber-100 text-amber-900 text-[10px] px-2 py-0.5 rounded-full font-black">⭐</span>
+              {t('nav_install', 'Installer l\'App')}
             </Link>
             <Link
-              href="/about"
+              href="/wallet"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-xl hover:bg-amber-50 hover:text-amber-800 transition"
+              className="p-2 rounded-xl border border-black bg-neutral-50 hover:bg-[#00F59B] transition flex items-center gap-2"
             >
-              {t('nav_about')}
+              <Wallet className="w-4 h-4" />
+              <span>{t('nav_wallet_client', 'Portefeuille Client')}</span>
             </Link>
             <Link
-              href="/contact"
+              href="/distributor"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-xl hover:bg-amber-50 hover:text-amber-800 transition"
+              className="p-2 rounded-xl border border-black bg-neutral-50 hover:bg-[#FFB800] transition flex items-center gap-2"
             >
-              {t('nav_contact')}
+              <Building2 className="w-4 h-4" />
+              <span>{t('distributor_portal', 'Portail Distributeur')}</span>
             </Link>
           </nav>
 
-          <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
+          <div className="pt-2 border-t-2 border-black flex flex-col gap-2.5">
             <Link
-              href="/login"
+              href="/pro/login"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center py-2.5 text-sm font-bold text-slate-700 bg-slate-100 rounded-xl"
+              className="neo-pill-btn-white text-center text-xs py-2.5"
             >
-              {t('nav_login')}
+              {t('nav_pro_login', 'Connexion Pro')}
             </Link>
             <Link
-              href="/register"
+              href="/pro/register"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center py-2.5 text-sm font-bold text-white bg-gradient-to-r from-amber-800 to-amber-900 rounded-xl shadow-md"
+              className="neo-pill-btn text-center text-xs py-2.5"
             >
-              {t('nav_register')}
+              {t('nav_start', 'Commencer')}
             </Link>
           </div>
         </div>

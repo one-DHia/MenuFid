@@ -1,7 +1,7 @@
 /**
  * lib/email.ts
  * ─────────────────────────────────────────────────────────────
- * Service d'expédition d'e-mails transactionnels réels via Resend API.
+ * Service d'expédition d'e-mails transactionnels via Resend API (Domaine Vérifié: menufid.site).
  */
 
 import { Resend } from 'resend';
@@ -17,7 +17,7 @@ export interface SendEmailPayload {
 }
 
 export async function sendTransactionalEmail(payload: SendEmailPayload) {
-  const fromAddress = payload.from || process.env.EMAIL_FROM_ADDRESS || 'MenuFid <onboarding@resend.dev>';
+  const fromAddress = payload.from || process.env.EMAIL_FROM_ADDRESS || 'MenuFid <contact@menufid.site>';
 
   const data = await resend.emails.send({
     from: fromAddress,
