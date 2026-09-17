@@ -230,10 +230,10 @@ export default function RestaurantReviewsSection() {
             </button>
 
             <h3 className="text-xl sm:text-2xl font-black text-black mb-1">
-              Partagez votre avis
+              {t('review_modal_title', 'Partagez votre avis')}
             </h3>
             <p className="text-xs text-neutral-600 font-medium mb-6">
-              Votre retour d’expérience aide d’autres restaurateurs à faire leur choix.
+              {t('review_modal_sub', 'Votre retour d’expérience aide d’autres restaurateurs à faire leur choix.')}
             </p>
 
             {isMerchantLoggedIn ? (
@@ -241,7 +241,7 @@ export default function RestaurantReviewsSection() {
                 {/* Sélecteur d'étoiles */}
                 <div>
                   <label className="block text-xs font-black uppercase text-neutral-700 mb-1.5">
-                    Votre note
+                    {t('review_rating_label', 'Votre note')}
                   </label>
                   <div className="flex items-center gap-2">
                     {[1, 2, 3, 4, 5].map((star) => (
@@ -269,13 +269,13 @@ export default function RestaurantReviewsSection() {
                 {/* Nom du gérant (optionnel) */}
                 <div>
                   <label className="block text-xs font-black uppercase text-neutral-700 mb-1">
-                    Votre prénom / fonction
+                    {t('review_owner_label', 'Votre prénom / fonction')}
                   </label>
                   <input
                     type="text"
                     value={ownerName}
                     onChange={(e) => setOwnerName(e.target.value)}
-                    placeholder="Ex: Karim (Gérant)"
+                    placeholder={t('review_owner_ph', 'Ex: Karim (Gérant)')}
                     maxLength={50}
                     className="w-full px-4 py-2.5 rounded-xl border-2 border-black text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#FFB800]"
                   />
@@ -284,13 +284,13 @@ export default function RestaurantReviewsSection() {
                 {/* Commentaire */}
                 <div>
                   <label className="block text-xs font-black uppercase text-neutral-700 mb-1">
-                    Votre commentaire
+                    {t('review_comment_label', 'Votre commentaire')}
                   </label>
                   <textarea
                     rows={4}
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    placeholder="Ce que MenuFid a changé pour votre restaurant, vos commandes ou votre fidélité client..."
+                    placeholder={t('review_comment_ph', 'Ce que MenuFid a changé pour votre restaurant, vos commandes ou votre fidélité client...')}
                     maxLength={600}
                     required
                     className="w-full px-4 py-3 rounded-xl border-2 border-black text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FFB800] resize-none"
@@ -307,7 +307,7 @@ export default function RestaurantReviewsSection() {
                   className="w-full py-3.5 rounded-full bg-black text-white hover:bg-neutral-800 text-xs font-black flex items-center justify-center gap-2 shadow-[3px_3px_0px_0px_#FFB800] disabled:opacity-50"
                 >
                   <Send className="w-4 h-4" />
-                  <span>{submitting ? 'Publication...' : 'Publier mon avis'}</span>
+                  <span>{submitting ? t('review_submitting', 'Publication...') : t('review_submit_btn', 'Publier mon avis')}</span>
                 </button>
               </form>
             ) : (
@@ -316,20 +316,20 @@ export default function RestaurantReviewsSection() {
                   🔒
                 </div>
                 <p className="text-xs font-bold text-neutral-700 max-w-sm mx-auto">
-                  Pour garantir l’authenticité des avis, vous devez être connecté à votre compte restaurateur MenuFid.
+                  {t('review_auth_required', 'Pour garantir l’authenticité des avis, vous devez être connecté à votre compte restaurateur MenuFid.')}
                 </p>
                 <div className="flex items-center justify-center gap-3 pt-2">
                   <Link
                     href="/login"
                     className="px-6 py-2.5 rounded-full bg-black text-white text-xs font-black shadow-[2px_2px_0px_0px_#FFB800]"
                   >
-                    Se connecter à l’Espace Pro
+                    {t('review_login_pro', 'Se connecter à l’Espace Pro')}
                   </Link>
                   <Link
                     href="/pro/register"
                     className="px-6 py-2.5 rounded-full bg-white border-2 border-black text-black text-xs font-black shadow-[2px_2px_0px_0px_#000]"
                   >
-                    Créer mon compte
+                    {t('review_register_pro', 'Créer mon compte')}
                   </Link>
                 </div>
               </div>

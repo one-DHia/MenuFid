@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/components/ui/Toast';
+import { useLanguage } from '@/lib/i18n';
+import LanguageSelector from '@/components/LanguageSelector';
 import {
   Bike,
   Plus,
@@ -33,6 +35,7 @@ interface Driver {
 
 export default function ProDriversManagementPage() {
   const { showToast } = useToast();
+  const { t, dir } = useLanguage();
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -63,7 +66,7 @@ export default function ProDriversManagementPage() {
         setDrivers(json.drivers);
       }
     } catch {
-      showToast('Erreur lors du chargement des livreurs.', 'error');
+      showToast(t('driver_err_loading_list', 'Erreur lors du chargement des livreurs.'), 'error');
     } finally {
       setLoading(false);
     }
@@ -75,7 +78,7 @@ export default function ProDriversManagementPage() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        showToast('Session expirée. Reconnectez-vous.', 'error');
+        showToast(t('session_expired', 'Session expirée. Reconnectez-vous.'), 'error');
         setSubmitting(false);
         return;
       }
@@ -91,7 +94,7 @@ export default function ProDriversManagementPage() {
 
       const json = await res.json();
       if (json.success) {
-        showToast(json.message || 'Livreur créé avec succès !', 'success');
+        showToast(json.message || t('driver_created_success', 'Livreur créé avec succès !'), 'success');
         setModalOpen(false);
         setName('');
         setUsername('');
@@ -99,10 +102,10 @@ export default function ProDriversManagementPage() {
         setPhone('');
         fetchDrivers();
       } else {
-        showToast(json.error || 'Erreur lors de la création du livreur.', 'error');
+        showToast(json.error || t('driver_created_error', 'Erreur lors de la création du livreur.'), 'error');
       }
     } catch {
-      showToast('Erreur réseau.', 'error');
+      showToast(t('driver_network_error', 'Erreur réseau.'), 'error');
     } finally {
       setSubmitting(false);
     }
@@ -127,18 +130,18 @@ export default function ProDriversManagementPage() {
 
       const json = await res.json();
       if (json.success) {
-        showToast(`Statut de ${driver.name} mis à jour.`, 'success');
+        showToast(`${t('driver_status_updated_prefix', 'Statut de')} ${driver.name} ${t('driver_status_updated_suffix', 'mis à jour.')}`, 'success');
         setDrivers((prev) =>
           prev.map((d) => (d.id === driver.id ? { ...d, is_active: !d.is_active } : d))
         );
       }
     } catch {
-      showToast('Erreur lors de la modification.', 'error');
+      showToast(t('driver_update_error', 'Erreur lors de la modification.'), 'error');
     }
   }
 
   async function handleDeleteDriver(driver: Driver) {
-    if (!window.confirm(`Supprimer définitivement le compte du livreur ${driver.name} ?`)) return;
+    if (!window.confirm(`${t('driver_delete_confirm_prefix', 'Supprimer définitivement le compte du livreur')} ${driver.name} ?`)) return;
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -151,13 +154,13 @@ export default function ProDriversManagementPage() {
 
       const json = await res.json();
       if (json.success) {
-        showToast(`Livreur ${driver.name} supprimé.`, 'info');
+        showToast(`${t('driver_deleted_prefix', 'Livreur')} ${driver.name} ${t('driver_deleted_suffix', 'supprimé.')}`, 'info');
         setDrivers((prev) => prev.filter((d) => d.id !== driver.id));
       } else {
-        showToast(json.error || 'Erreur lors de la suppression.', 'error');
+        showToast(json.error || t('driver_delete_error', 'Erreur lors de la suppression.'), 'error');
       }
     } catch {
-      showToast('Erreur réseau.', 'error');
+      showToast(t('driver_network_error', 'Erreur réseau.'), 'error');
     }
   }
 
@@ -165,12 +168,12 @@ export default function ProDriversManagementPage() {
     const portalUrl = `${window.location.origin}/driver`;
     navigator.clipboard.writeText(portalUrl);
     setCopied(true);
-    showToast('Lien du portail livreur copié !', 'success');
+    showToast(t('pro_drivers_copied', 'Lien du portail livreur copié !'), 'success');
     setTimeout(() => setCopied(false), 2000);
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-black flex flex-col font-sans">
+    <div className="min-h-screen bg-[#FAFAFA] text-black flex flex-col font-sans" dir={dir}>
       {/* Top Header Navigation */}
       <header className="border-b-4 border-black bg-white sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
@@ -186,9 +189,13 @@ export default function ProDriversManagementPage() {
                 <Bike className="w-4 h-4" />
               </div>
               <h1 className="font-black text-lg sm:text-xl tracking-tight uppercase">
-                Gestion des Livreurs
+                {t('pro_drivers_title', 'Gestion des Livreurs')}
               </h1>
             </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <LanguageSelector />
           </div>
         </div>
       </header>
@@ -199,14 +206,13 @@ export default function ProDriversManagementPage() {
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFB800] border-2 border-black text-black text-xs font-black">
               <Bike className="w-3.5 h-3.5" />
-              <span>Portail Mobile Chauffeurs</span>
+              <span>{t('pro_drivers_badge', 'Portail Mobile Chauffeurs')}</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-black text-black">
-              Lien d’accès pour vos livreurs
+              {t('pro_drivers_link_title', 'Lien d’accès pour vos livreurs')}
             </h2>
             <p className="text-xs text-neutral-600 font-medium max-w-xl">
-              Donnez cette adresse à vos livreurs. Ils pourront s’y connecter depuis leur smartphone
-              pour voir leurs commandes, lancer le GPS, appeler les clients et valider les encaissements.
+              {t('pro_drivers_link_desc', 'Donnez cette adresse à vos livreurs. Ils pourront s’y connecter depuis leur smartphone pour voir leurs commandes, lancer le GPS, appeler les clients et valider les encaissements.')}
             </p>
           </div>
 
@@ -217,7 +223,7 @@ export default function ProDriversManagementPage() {
               className="px-4 py-2.5 rounded-full bg-white hover:bg-neutral-50 text-black border-2 border-black text-xs font-black flex items-center gap-2 shadow-[2px_2px_0px_0px_#000]"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Copié !' : 'Copier le lien'}</span>
+              <span>{copied ? t('pro_drivers_copied', 'Copié !') : t('pro_drivers_copy_link', 'Copier le lien')}</span>
             </button>
 
             <Link
@@ -225,7 +231,7 @@ export default function ProDriversManagementPage() {
               target="_blank"
               className="px-5 py-2.5 rounded-full bg-black text-white hover:bg-neutral-800 text-xs font-black flex items-center gap-2 shadow-[2px_2px_0px_0px_#FFB800]"
             >
-              <span>Ouvrir le portail</span>
+              <span>{t('pro_drivers_open_portal', 'Ouvrir le portail')}</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -234,9 +240,9 @@ export default function ProDriversManagementPage() {
         {/* En-tête de la liste & Bouton Ajouter */}
         <div className="flex items-center justify-between pt-2">
           <div>
-            <h3 className="text-lg font-black text-black">Vos Livreurs Enregistrés</h3>
+            <h3 className="text-lg font-black text-black">{t('pro_drivers_list_title', 'Vos Livreurs Enregistrés')}</h3>
             <p className="text-xs text-neutral-500 font-medium">
-              {drivers.length} livreur{drivers.length > 1 ? 's' : ''} configuré{drivers.length > 1 ? 's' : ''}
+              {drivers.length} {t('pro_drivers_count', 'livreur(s) configuré(s)')}
             </p>
           </div>
 
@@ -246,7 +252,7 @@ export default function ProDriversManagementPage() {
             className="px-5 py-2.5 rounded-full bg-[#FFB800] hover:bg-[#ffa700] text-black border-2 border-black text-xs font-black flex items-center gap-2 shadow-[3px_3px_0px_0px_#000]"
           >
             <Plus className="w-4 h-4" />
-            <span>Ajouter un livreur</span>
+            <span>{t('pro_drivers_add_btn', 'Ajouter un livreur')}</span>
           </button>
         </div>
 
@@ -254,24 +260,23 @@ export default function ProDriversManagementPage() {
         {loading ? (
           <div className="text-center py-16">
             <RefreshCw className="w-8 h-8 animate-spin mx-auto text-neutral-400" />
-            <p className="text-xs text-neutral-500 mt-2 font-bold">Chargement des livreurs...</p>
+            <p className="text-xs text-neutral-500 mt-2 font-bold">{t('loading', 'Chargement des livreurs...')}</p>
           </div>
         ) : drivers.length === 0 ? (
           <div className="p-10 bg-white border-3 border-black rounded-3xl text-center space-y-4 shadow-[4px_4px_0px_0px_#000]">
             <div className="w-14 h-14 rounded-2xl bg-amber-100 border-2 border-black flex items-center justify-center mx-auto text-2xl">
               🛵
             </div>
-            <h4 className="text-base font-black text-black">Aucun livreur configuré</h4>
+            <h4 className="text-base font-black text-black">{t('pro_drivers_empty_title', 'Aucun livreur configuré pour le moment')}</h4>
             <p className="text-xs text-neutral-600 font-medium max-w-sm mx-auto">
-              Ajoutez vos livreurs avec un identifiant et un mot de passe pour qu’ils puissent
-              consulter les livraisons et valider les paiements en espèces.
+              {t('pro_drivers_empty_desc', 'Créez des accès chauffeurs pour permettre à votre équipe de voir et livrer vos commandes avec calcul GPS et encaissement.')}
             </p>
             <button
               type="button"
               onClick={() => setModalOpen(true)}
               className="px-6 py-3 rounded-full bg-black text-white text-xs font-black shadow-[3px_3px_0px_0px_#FFB800]"
             >
-              + Créer mon premier livreur
+              + {t('pro_drivers_add_first_btn', 'Créer mon premier livreur')}
             </button>
           </div>
         ) : (
@@ -303,10 +308,10 @@ export default function ProDriversManagementPage() {
                           ? 'bg-[#00F59B] text-black'
                           : 'bg-neutral-200 text-neutral-600'
                       }`}
-                      title="Cliquer pour changer le statut"
+                      title={driver.is_active ? t('pro_drivers_deactivate', 'Désactiver') : t('pro_drivers_activate', 'Activer')}
                     >
                       <Power className="w-3 h-3" />
-                      <span>{driver.is_active ? 'Actif' : 'Désactivé'}</span>
+                      <span>{driver.is_active ? t('pro_drivers_active', 'Actif') : t('pro_drivers_inactive', 'Inactif')}</span>
                     </button>
                   </div>
 
@@ -320,13 +325,13 @@ export default function ProDriversManagementPage() {
 
                 <div className="pt-3 border-t-2 border-neutral-100 flex items-center justify-between text-xs">
                   <span className="text-[10px] text-neutral-400 font-medium">
-                    Créé le {new Date(driver.created_at).toLocaleDateString()}
+                    {new Date(driver.created_at).toLocaleDateString()}
                   </span>
                   <button
                     type="button"
                     onClick={() => handleDeleteDriver(driver)}
                     className="p-1.5 rounded-lg text-neutral-400 hover:text-red-600 hover:bg-red-50 transition"
-                    title="Supprimer ce livreur"
+                    title={t('delete', 'Supprimer')}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -352,27 +357,27 @@ export default function ProDriversManagementPage() {
                 <div className="w-9 h-9 rounded-xl bg-[#FFB800] border-2 border-black flex items-center justify-center">
                   <Bike className="w-5 h-5 text-black" />
                 </div>
-                <h3 className="text-lg font-black text-black">Nouveau Livreur</h3>
+                <h3 className="text-lg font-black text-black">{t('pro_drivers_modal_title', 'Créer un profil livreur')}</h3>
               </div>
 
               <form onSubmit={handleCreateDriver} className="space-y-3.5">
                 <div>
                   <label className="block text-[11px] font-black uppercase text-neutral-700 mb-1">
-                    Prénom & Nom du Livreur
+                    {t('pro_drivers_name_label', 'Nom & Prénom du livreur *')}
                   </label>
                   <input
                     type="text"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Ex: Karim Benz"
+                    placeholder={t('pro_drivers_name_ph', 'Ex: Karim B.')}
                     className="w-full px-4 py-2.5 rounded-xl border-2 border-black text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#FFB800]"
                   />
                 </div>
 
                 <div>
                   <label className="block text-[11px] font-black uppercase text-neutral-700 mb-1">
-                    Identifiant de Connexion (Unique)
+                    {t('pro_drivers_username_label', 'Identifiant de connexion *')}
                   </label>
                   <input
                     type="text"
@@ -380,37 +385,34 @@ export default function ProDriversManagementPage() {
                     autoCapitalize="none"
                     value={username}
                     onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
-                    placeholder="Ex: livreur-karim"
+                    placeholder={t('pro_drivers_username_ph', 'Ex: karim-livreur')}
                     className="w-full px-4 py-2.5 rounded-xl border-2 border-black text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-[#FFB800]"
                   />
-                  <p className="text-[10px] text-neutral-500 mt-1">
-                    Le livreur tapera cet identifiant sur son téléphone.
-                  </p>
                 </div>
 
                 <div>
                   <label className="block text-[11px] font-black uppercase text-neutral-700 mb-1">
-                    Mot de passe
+                    {t('pro_drivers_pwd_label', 'Mot de passe *')}
                   </label>
                   <input
                     type="text"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Ex: resto2026"
+                    placeholder={t('pro_drivers_pwd_ph', 'Au moins 6 caractères')}
                     className="w-full px-4 py-2.5 rounded-xl border-2 border-black text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-[#FFB800]"
                   />
                 </div>
 
                 <div>
                   <label className="block text-[11px] font-black uppercase text-neutral-700 mb-1">
-                    Téléphone (Optionnel)
+                    {t('pro_drivers_phone_label', 'Numéro de téléphone (optionnel)')}
                   </label>
                   <input
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="Ex: 06 12 34 56 78"
+                    placeholder={t('pro_drivers_phone_ph', '06 12 34 56 78')}
                     className="w-full px-4 py-2.5 rounded-xl border-2 border-black text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#FFB800]"
                   />
                 </div>
@@ -420,7 +422,7 @@ export default function ProDriversManagementPage() {
                   disabled={submitting}
                   className="w-full py-3.5 rounded-full bg-black text-white hover:bg-neutral-800 text-xs font-black shadow-[3px_3px_0px_0px_#FFB800] disabled:opacity-50 mt-4"
                 >
-                  {submitting ? 'Création...' : 'Créer et activer le livreur'}
+                  {submitting ? t('pro_drivers_submitting', 'Création...') : t('pro_drivers_submit', 'Créer l\'accès livreur')}
                 </button>
               </form>
             </div>

@@ -202,7 +202,7 @@ export default function CustomerOrderModal({
           <div className="flex items-center gap-2">
             <ShoppingBag className="w-6 h-6 text-black" />
             <h2 className="text-base sm:text-lg font-black uppercase text-black tracking-tight">
-              {confirmedOrder ? 'Commande Confirmée !' : t('cart_summary', 'Finaliser ma commande')}
+              {confirmedOrder ? t('order_success_title', 'Commande Confirmée !') : t('cart_summary', 'Finaliser ma commande')}
             </h2>
           </div>
           <button
@@ -235,21 +235,21 @@ export default function CustomerOrderModal({
 
               <div className="neo-box p-4 bg-neutral-50 text-left space-y-2 text-xs font-bold">
                 <div className="flex justify-between border-b border-neutral-200 pb-1.5">
-                  <span className="text-neutral-500">Mode :</span>
+                  <span className="text-neutral-500">{t('order_mode_label', 'Mode :')}</span>
                   <span className="font-black">
-                    {confirmedOrder.order_type === 'delivery' ? 'Livraison à domicile' : 'À emporter'}
+                    {confirmedOrder.order_type === 'delivery' ? t('order_mode_delivery', 'Livraison à domicile') : t('order_mode_takeaway', 'À emporter')}
                   </span>
                 </div>
                 <div className="flex justify-between border-b border-neutral-200 pb-1.5">
-                  <span className="text-neutral-500">Règlement :</span>
+                  <span className="text-neutral-500">{t('order_payment_label', 'Règlement :')}</span>
                   <span className="font-black">
                     {confirmedOrder.payment_method === 'cash_on_delivery'
-                      ? '💵 À la porte (Espèces)'
-                      : '💳 Carte Bancaire en ligne'}
+                      ? t('order_cash_door', '💵 À la porte (Espèces)')
+                      : t('order_card_online', '💳 Carte Bancaire en ligne')}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm font-black pt-1">
-                  <span>Total à régler :</span>
+                  <span>{t('order_total', 'Total à régler :')}</span>
                   <span className="font-mono text-base">
                     {formatPrice(confirmedOrder.total_amount, currency, language)}
                   </span>
@@ -262,7 +262,7 @@ export default function CustomerOrderModal({
                   className="w-full neo-pill-btn bg-[#FFB800] hover:bg-amber-400 text-black py-3.5 text-xs font-black flex items-center justify-center gap-2 shadow-[2px_2px_0px_0px_#000]"
                 >
                   <Truck className="w-4 h-4" />
-                  <span>Suivre ma commande en direct 🛵</span>
+                  <span>{t('orders_tracking_title', 'Suivi de Mes Commandes')} 🛵</span>
                 </a>
 
                 <a
@@ -272,7 +272,7 @@ export default function CustomerOrderModal({
                   className="w-full neo-pill-btn bg-[#25D366] hover:bg-emerald-500 text-black py-3.5 text-xs font-black flex items-center justify-center gap-2 shadow-[2px_2px_0px_0px_#000]"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  <span>Envoyer la confirmation sur WhatsApp</span>
+                  <span>{t('order_send_whatsapp', 'Envoyer la confirmation sur WhatsApp')}</span>
                 </a>
 
                 <button
@@ -280,7 +280,7 @@ export default function CustomerOrderModal({
                   onClick={onClose}
                   className="w-full neo-pill-btn-white py-3 text-xs font-black"
                 >
-                  Fermer et retourner au menu
+                  {t('order_close_menu', 'Fermer et retourner au menu')}
                 </button>
               </div>
             </div>
@@ -308,7 +308,7 @@ export default function CustomerOrderModal({
                     className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#25D366] text-black rounded-xl border border-black font-black text-xs shadow-[2px_2px_0px_0px_#000]"
                   >
                     <MessageCircle className="w-4 h-4" />
-                    <span>Transmettre directement la commande sur WhatsApp</span>
+                    <span>{t('order_whatsapp_fallback', 'Transmettre directement la commande sur WhatsApp')}</span>
                   </a>
                 </div>
               )}
@@ -352,12 +352,12 @@ export default function CustomerOrderModal({
                 <div className="p-3.5 rounded-xl border-2 border-black bg-amber-50 text-amber-950 text-xs font-bold space-y-1">
                   <div className="flex items-center gap-1.5 font-black text-amber-900">
                     <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                    <span>Panier minimum non atteint</span>
+                    <span>{t('order_min_not_met_title', 'Panier minimum non atteint')}</span>
                   </div>
                   <p className="text-[11px]">
                     {t('min_basket_not_reached', 'Le montant minimum de commande est de')}{' '}
                     <span className="font-black">{formatPrice(minOrderAmount, currency, language)}</span>. 
-                    Il vous manque encore <span className="font-black">{formatPrice(minOrderAmount - totalCartPrice, currency, language)}</span> pour commander en livraison.
+                    Il vous manque encore <span className="font-black">{formatPrice(minOrderAmount - totalCartPrice, currency, language)}</span> {t('order_min_not_met_suffix', 'pour commander en livraison.')}
                   </p>
                 </div>
               )}
@@ -367,7 +367,7 @@ export default function CustomerOrderModal({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-[11px] font-black uppercase text-black mb-1">
-                      Nom complet *
+                      {t('order_full_name_label', 'Nom complet *')}
                     </label>
                     <div className="relative">
                       <User className="w-4 h-4 text-neutral-400 absolute left-3 top-3" />
@@ -384,7 +384,7 @@ export default function CustomerOrderModal({
 
                   <div>
                     <label className="block text-[11px] font-black uppercase text-black mb-1">
-                      Numéro de téléphone *
+                      {t('order_phone_label', 'Numéro de téléphone *')}
                     </label>
                     <div className="relative">
                       <Phone className="w-4 h-4 text-neutral-400 absolute left-3 top-3" />
@@ -472,7 +472,7 @@ export default function CustomerOrderModal({
                             💵 {t('payment_cash_door', 'Paiement à la porte (Espèces)')}
                           </p>
                           <p className="text-[10px] text-neutral-500 font-bold">
-                            Réglez directement au livreur ou au comptoir
+                            {t('order_payment_cash_desc', 'Réglez directement au livreur ou au comptoir')}
                           </p>
                         </div>
                       </div>
@@ -499,7 +499,7 @@ export default function CustomerOrderModal({
                             💳 {t('payment_card_online', 'Paiement CB en ligne')}
                           </p>
                           <p className="text-[10px] text-neutral-500 font-bold">
-                            Transaction sécurisée par Stripe
+                            {t('order_payment_card_desc', 'Transaction sécurisée par Stripe')}
                           </p>
                         </div>
                       </div>
@@ -521,7 +521,7 @@ export default function CustomerOrderModal({
                   <div className="flex justify-between text-neutral-600">
                     <span>{t('delivery_fee', 'Frais de livraison')}</span>
                     <span className="font-mono font-black text-black">
-                      {deliveryFee > 0 ? formatPrice(deliveryFee, currency, language) : 'Gratuit'}
+                      {deliveryFee > 0 ? formatPrice(deliveryFee, currency, language) : t('order_delivery_free', 'Gratuit')}
                     </span>
                   </div>
                 )}

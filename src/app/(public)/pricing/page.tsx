@@ -9,16 +9,24 @@ import { Check, Sparkles, ShieldCheck, ArrowRight, Zap, Award, QrCode, ShoppingB
 import { useLanguage } from '@/lib/i18n';
 
 export default function PricingPage() {
-  const { t, language } = useLanguage();
+  const { t, language, dir } = useLanguage();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('yearly');
   const [currency, setCurrency] = useState<'EUR' | 'DZD'>('EUR');
+
+  const lifetimePeriodLabel = currency === 'DZD'
+    ? (language === 'ar' ? 'دج دفع لمرة واحدة' : (language === 'en' ? 'DZD one-time payment' : 'DA en paiement unique'))
+    : (language === 'ar' ? '€ دفع لمرة واحدة' : (language === 'en' ? '€ one-time payment' : '€ en paiement unique'));
+
+  const freemiumPeriodLabel = currency === 'DZD'
+    ? (language === 'ar' ? 'دج / مدى الحياة' : (language === 'en' ? 'DZD / lifetime' : 'DA / à vie'))
+    : (language === 'ar' ? '€ / مدى الحياة' : (language === 'en' ? '€ / lifetime' : '€ / à vie'));
 
   // Tarifs dynamiques en fonction de la devise et de la périodicité (Offre spéciale lancement: abonnements 100% gratuits, licence -50%)
   const prices = {
     freemium: {
       monthly: '0',
       yearly: '0',
-      periodLabel: currency === 'DZD' ? 'DA / à vie' : '€ / à vie',
+      periodLabel: freemiumPeriodLabel,
     },
     starter: {
       monthly: '0',
@@ -26,7 +34,7 @@ export default function PricingPage() {
       oldMonthly: currency === 'DZD' ? '1 900 DA' : '19 €',
       oldYearly: currency === 'DZD' ? '19 000 DA' : '190 €',
       unit: currency === 'DZD' ? 'DA' : '€',
-      saveLabel: currency === 'DZD' ? 'Offert pour le lancement (0 DA)' : 'Offert pour le lancement (0 €)',
+      saveLabel: currency === 'DZD' ? `${t('pricing_free_launch_notice', 'Offert pour le lancement')} (0 DA)` : `${t('pricing_free_launch_notice', 'Offert pour le lancement')} (0 €)`,
     },
     pro: {
       monthly: '0',
@@ -34,19 +42,19 @@ export default function PricingPage() {
       oldMonthly: currency === 'DZD' ? '3 900 DA' : '39 €',
       oldYearly: currency === 'DZD' ? '39 000 DA' : '390 €',
       unit: currency === 'DZD' ? 'DA' : '€',
-      saveLabel: currency === 'DZD' ? 'Offert pour le lancement (0 DA)' : 'Offert pour le lancement (0 €)',
+      saveLabel: currency === 'DZD' ? `${t('pricing_free_launch_notice', 'Offert pour le lancement')} (0 DA)` : `${t('pricing_free_launch_notice', 'Offert pour le lancement')} (0 €)`,
     },
     lifetime: {
       amount: currency === 'DZD' ? '24 500' : '245',
       oldAmount: currency === 'DZD' ? '49 000' : '490',
       unit: currency === 'DZD' ? 'DA' : '€',
-      discountBadge: '-50% OFFRE SPÉCIALE',
-      periodLabel: currency === 'DZD' ? 'DA en paiement unique' : '€ en paiement unique',
+      discountBadge: t('pricing_lifetime_discount_badge', '-50% OFFRE SPÉCIALE'),
+      periodLabel: lifetimePeriodLabel,
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-black flex flex-col font-sans selection:bg-[#FFB800] selection:text-black">
+    <div dir={dir} className="min-h-screen bg-[#FAFAFA] text-black flex flex-col font-sans selection:bg-[#FFB800] selection:text-black">
       <Navbar />
 
       <main className="flex-1 py-12 px-4 max-w-6xl mx-auto w-full">
@@ -190,7 +198,7 @@ export default function PricingPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-black text-xl sm:text-2xl text-black">{t('pricing_title_starter', 'Formule STARTER')}</h3>
-                <span className="neo-badge text-[10px] font-black bg-[#00F59B] text-black">OFFERT LANCEMENT</span>
+                <span className="neo-badge text-[10px] font-black bg-[#00F59B] text-black">{t('pricing_launch_badge', 'OFFERT LANCEMENT')}</span>
               </div>
               <p className="text-neutral-600 text-xs font-bold leading-relaxed">
                 {t('pricing_desc_starter', 'Pour les cafés et restaurants qui veulent un menu digital complet, illimité et actualisé 24h/24.')}
@@ -202,7 +210,7 @@ export default function PricingPage() {
                     {billingPeriod === 'yearly' ? prices.starter.oldYearly : prices.starter.oldMonthly}
                   </span>
                   <span className="text-[10px] bg-emerald-100 text-emerald-800 font-black px-2 py-0.5 rounded-full border border-emerald-300">
-                    100% GRATUIT
+                    {t('pricing_100_free', '100% GRATUIT')}
                   </span>
                 </div>
                 <div className="flex items-baseline gap-1.5 mt-0.5">
@@ -259,7 +267,7 @@ export default function PricingPage() {
               <div className="flex items-center justify-between">
                 <h3 className="font-black text-xl sm:text-2xl text-black">{t('pricing_title_pro', 'Formule PRO')}</h3>
                 <span className="bg-black text-[#FFB800] text-[10px] font-black uppercase px-3 py-1 rounded-full border border-black shadow-[2px_2px_0px_0px_#000]">
-                  ⭐ {t('best_value', 'Offert Lancement')}
+                  ⭐ {t('pricing_launch_badge', 'Offert Lancement')}
                 </span>
               </div>
               <p className="text-neutral-900 text-xs font-black leading-relaxed">
@@ -272,7 +280,7 @@ export default function PricingPage() {
                     {billingPeriod === 'yearly' ? prices.pro.oldYearly : prices.pro.oldMonthly}
                   </span>
                   <span className="text-[10px] bg-black text-[#00F59B] font-black px-2 py-0.5 rounded-full border border-black">
-                    ACCÈS LIBRE 0 €
+                    {currency === 'DZD' ? (language === 'ar' ? 'وصول مجاني 0 دج' : (language === 'en' ? 'FREE ACCESS 0 DZD' : 'ACCÈS LIBRE 0 DA')) : t('pricing_free_access', 'ACCÈS LIBRE 0 €')}
                   </span>
                 </div>
                 <div className="flex items-baseline gap-1.5 mt-0.5">

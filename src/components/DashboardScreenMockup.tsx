@@ -19,11 +19,11 @@ import {
 import { useLanguage } from '@/lib/i18n';
 
 export default function DashboardScreenMockup() {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const [activeView, setActiveView] = useState<'client' | 'pro'>('client');
 
   return (
-    <div className="w-full max-w-4xl mx-auto mt-8 relative px-2 sm:px-4">
+    <div dir={dir} className="w-full max-w-4xl mx-auto mt-8 relative px-2 sm:px-4">
       {/* Sélecteur de vue épuré (Switch Minimaliste) */}
       <div className="flex items-center justify-center gap-2 mb-8">
         <div className="inline-flex items-center bg-white border-2 border-black rounded-full p-1 shadow-[3px_3px_0px_0px_#000]">
@@ -75,7 +75,7 @@ export default function DashboardScreenMockup() {
               <div className="bg-[#FFB800] p-4 border-b-2 border-black">
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-[9px] font-black uppercase bg-white px-2 py-0.5 rounded border border-black">
-                    Menu & Fidélité
+                    {t('mockup_menu_loyalty', 'Menu & Fidélité')}
                   </span>
                   <span className="text-[10px] font-bold text-black flex items-center gap-1 bg-white/80 px-2 py-0.5 rounded-full border border-black">
                     <Star className="w-3 h-3 fill-black text-black" /> 4.9
@@ -85,7 +85,7 @@ export default function DashboardScreenMockup() {
                   Burger Gourmet & Co.
                 </p>
                 <p className="text-[10px] font-bold text-neutral-800">
-                  Commandes directes • Fidélité Apple & Google Wallet
+                  {t('mockup_client_subtitle', 'Commandes directes • Fidélité Apple & Google Wallet')}
                 </p>
               </div>
 
@@ -93,10 +93,10 @@ export default function DashboardScreenMockup() {
               <div className="p-3.5 bg-neutral-50 border-b-2 border-black">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] font-black uppercase flex items-center gap-1">
-                    <Award className="w-3 h-3 text-black" /> Carte de Fidélité
+                    <Award className="w-3 h-3 text-black" /> {t('mockup_loyalty_card', 'Carte de Fidélité')}
                   </span>
                   <span className="text-[9px] font-black bg-[#00F59B] border border-black px-1.5 py-0.5 rounded">
-                    4 / 10 Tampons
+                    {t('mockup_stamps_count', '4 / 10 Tampons')}
                   </span>
                 </div>
                 <div className="grid grid-cols-5 gap-1.5">
@@ -128,7 +128,7 @@ export default function DashboardScreenMockup() {
                     type="button"
                     className="px-2.5 py-1 rounded-full bg-black text-white text-[10px] font-black"
                   >
-                    + Ajouter
+                    {t('mockup_add_btn', '+ Ajouter')}
                   </button>
                 </div>
 
@@ -141,7 +141,7 @@ export default function DashboardScreenMockup() {
                     type="button"
                     className="px-2.5 py-1 rounded-full bg-black text-white text-[10px] font-black"
                   >
-                    + Ajouter
+                    {t('mockup_add_btn', '+ Ajouter')}
                   </button>
                 </div>
               </div>
@@ -149,7 +149,7 @@ export default function DashboardScreenMockup() {
               {/* Action Bar Client */}
               <div className="p-3 bg-neutral-100 border-t-2 border-black text-center">
                 <div className="w-full py-2 rounded-full bg-[#00F59B] text-black font-black text-xs border-2 border-black shadow-[2px_2px_0px_0px_#000]">
-                  🛒 Voir mon Panier (21,40 €)
+                  {t('mockup_view_cart', '🛒 Voir mon Panier')} (21,40 €)
                 </div>
               </div>
 
@@ -169,7 +169,7 @@ export default function DashboardScreenMockup() {
                 app.menufid.site/pro/dashboard
               </div>
               <span className="text-[10px] font-black bg-[#00F59B] text-black px-2 py-0.5 rounded border border-black">
-                EN SERVICE
+                {t('mockup_status_service', 'EN SERVICE')}
               </span>
             </div>
 
@@ -178,26 +178,26 @@ export default function DashboardScreenMockup() {
               {/* 3 Métriques clés */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                 <div className="p-3.5 bg-white border-2 border-black rounded-2xl shadow-[3px_3px_0px_0px_#000]">
-                  <div className="text-[11px] font-bold text-neutral-600">Scans QR Aujourd’hui</div>
+                  <div className="text-[11px] font-bold text-neutral-600">{t('mockup_scans_today', 'Scans QR Aujourd’hui')}</div>
                   <div className="text-2xl font-black text-black mt-0.5">148</div>
                   <div className="text-[10px] font-black text-emerald-700 mt-0.5 flex items-center gap-1">
-                    <TrendingUp className="w-3 h-3" /> +24% vs hier
+                    <TrendingUp className="w-3 h-3" /> {t('mockup_vs_yesterday', '+24% vs hier')}
                   </div>
                 </div>
 
                 <div className="p-3.5 bg-[#FFB800] border-2 border-black rounded-2xl shadow-[3px_3px_0px_0px_#000]">
-                  <div className="text-[11px] font-bold text-black">Clients Fidélisés</div>
+                  <div className="text-[11px] font-bold text-black">{t('mockup_loyal_clients', 'Clients Fidélisés')}</div>
                   <div className="text-2xl font-black text-black mt-0.5">842</div>
                   <div className="text-[10px] font-black text-black mt-0.5">
-                    Apple & Google Wallet
+                    {t('mockup_wallet_types', 'Apple & Google Wallet')}
                   </div>
                 </div>
 
                 <div className="p-3.5 bg-white border-2 border-black rounded-2xl shadow-[3px_3px_0px_0px_#000]">
-                  <div className="text-[11px] font-bold text-neutral-600">Commandes Directes</div>
+                  <div className="text-[11px] font-bold text-neutral-600">{t('mockup_direct_orders', 'Commandes Directes')}</div>
                   <div className="text-2xl font-black text-black mt-0.5">38</div>
                   <div className="text-[10px] font-black text-emerald-700 mt-0.5">
-                    0% Commission prélevée
+                    {t('mockup_zero_commission', '0% Commission prélevée')}
                   </div>
                 </div>
               </div>
@@ -212,7 +212,7 @@ export default function DashboardScreenMockup() {
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-black text-black">Commande #CMD-842</span>
                       <span className="text-[9px] bg-amber-100 text-amber-900 border border-amber-300 font-bold px-1.5 py-0.2 rounded">
-                        En cuisine
+                        {t('mockup_order_kitchen', 'En cuisine')}
                       </span>
                     </div>
                     <p className="text-[11px] text-neutral-500 font-medium">
@@ -224,7 +224,7 @@ export default function DashboardScreenMockup() {
                 <div className="flex items-center gap-2 self-end sm:self-auto">
                   <span className="text-sm font-black text-black">36,00 €</span>
                   <span className="text-[10px] bg-[#00F59B] text-black font-black px-2.5 py-1 rounded-full border border-black">
-                    Validée
+                    {t('mockup_order_validated', 'Validée')}
                   </span>
                 </div>
               </div>

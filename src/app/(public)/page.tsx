@@ -25,7 +25,7 @@ export default function HomePage() {
   const isRtl = dir === 'rtl';
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-black flex flex-col font-sans selection:bg-[#FFB800] selection:text-black">
+    <div dir={dir} className="min-h-screen bg-[#FAFAFA] text-black flex flex-col font-sans selection:bg-[#FFB800] selection:text-black">
       <Navbar />
 
       <main className="flex-1">

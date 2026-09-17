@@ -507,7 +507,7 @@ export default function RestaurantCustomerViewPage() {
             }`}
           >
             <Truck className="w-4 h-4 shrink-0" />
-            <span className="truncate">Commandes</span>
+            <span className="truncate">{t('wallet_tab_orders', 'Commandes')}</span>
             {activeOrdersCount > 0 && (
               <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500 text-white animate-pulse">
                 {activeOrdersCount}
@@ -916,10 +916,10 @@ export default function RestaurantCustomerViewPage() {
               <div>
                 <h2 className="text-lg sm:text-xl font-black uppercase tracking-tight flex items-center gap-2">
                   <Truck className="w-5 h-5 text-black" />
-                  <span>Suivi de Mes Commandes</span>
+                  <span>{t('orders_tracking_title', 'Suivi de Mes Commandes')}</span>
                 </h2>
                 <p className="text-xs text-neutral-600 font-bold">
-                  Statut actualisé en direct depuis la cuisine et le livreur
+                  {t('orders_tracking_subtitle', 'Statut actualisé en direct depuis la cuisine et le livreur')}
                 </p>
               </div>
 
@@ -928,7 +928,7 @@ export default function RestaurantCustomerViewPage() {
                 onClick={fetchCustomerOrders}
                 disabled={loadingOrders}
                 className="p-2.5 rounded-xl border-2 border-black bg-white hover:bg-neutral-100 shadow-[2px_2px_0px_0px_#000] active:translate-x-[1px] active:translate-y-[1px] transition"
-                title="Actualiser"
+                title={t('refresh', 'Actualiser')}
               >
                 <RotateCcw className={`w-4 h-4 ${loadingOrders ? 'animate-spin' : ''}`} />
               </button>
@@ -942,10 +942,10 @@ export default function RestaurantCustomerViewPage() {
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black uppercase">
-                    Connectez-vous pour voir vos commandes
+                    {t('orders_auth_prompt_title', 'Connectez-vous pour voir vos commandes')}
                   </h3>
                   <p className="text-xs text-neutral-600 font-bold max-w-sm mx-auto mt-1">
-                    Indiquez votre numéro pour retrouver vos commandes récentes et suivre l'arrivée de votre livreur en direct.
+                    {t('orders_auth_prompt_desc', 'Indiquez votre numéro pour retrouver vos commandes récentes et suivre l\'arrivée de votre livreur en direct.')}
                   </p>
                 </div>
                 <button
@@ -953,21 +953,21 @@ export default function RestaurantCustomerViewPage() {
                   onClick={() => setShowAuthModal(true)}
                   className="neo-pill-btn bg-[#FFB800] hover:bg-amber-400 text-black px-6 py-3 text-xs font-black uppercase shadow-[2px_2px_0px_0px_#000]"
                 >
-                  S'identifier avec mon numéro
+                  {t('orders_auth_btn', 'S\'identifier avec mon numéro')}
                 </button>
               </div>
             ) : loadingOrders ? (
               <div className="py-12 text-center">
                 <Spinner size={32} className="text-black mx-auto" />
-                <p className="text-xs font-bold text-neutral-500 mt-2">Chargement de vos commandes...</p>
+                <p className="text-xs font-bold text-neutral-500 mt-2">{t('orders_loading', 'Chargement de vos commandes...')}</p>
               </div>
             ) : orders.length === 0 ? (
               <div className="neo-box p-8 sm:p-12 bg-white text-center space-y-4 border-dashed border-3 sm:border-4 border-black">
                 <ShoppingBag className="w-10 h-10 text-neutral-400 mx-auto" />
                 <div>
-                  <h3 className="text-base font-black uppercase tracking-tight">Aucune commande enregistrée</h3>
+                  <h3 className="text-base font-black uppercase tracking-tight">{t('orders_empty_title', 'Aucune commande enregistrée')}</h3>
                   <p className="text-xs text-neutral-600 font-bold mt-1">
-                    Vous n'avez pas encore passé de commande avec le numéro <span className="font-mono font-bold">{customerPhone}</span>.
+                    {t('orders_empty_desc', 'Vous n\'avez pas encore passé de commande avec ce numéro.')}
                   </p>
                 </div>
                 <button
@@ -976,7 +976,7 @@ export default function RestaurantCustomerViewPage() {
                   className="neo-pill-btn bg-[#00F59B] hover:bg-emerald-400 text-black px-6 py-3 text-xs font-black uppercase shadow-[2px_2px_0px_0px_#000] inline-flex items-center gap-2"
                 >
                   <Utensils className="w-4 h-4" />
-                  <span>Explorer le menu et commander</span>
+                  <span>{t('orders_explore_menu_btn', 'Explorer le menu et commander')}</span>
                 </button>
               </div>
             ) : (
@@ -1005,7 +1005,7 @@ export default function RestaurantCustomerViewPage() {
                             #{ord.order_number}
                           </span>
                           <span className="text-[11px] font-bold text-neutral-500">
-                            {new Date(ord.created_at).toLocaleDateString('fr-FR', {
+                            {new Date(ord.created_at).toLocaleDateString(language === 'ar' ? 'ar-SA' : language === 'en' ? 'en-US' : 'fr-FR', {
                               day: '2-digit',
                               month: 'short',
                               hour: '2-digit',
@@ -1016,7 +1016,7 @@ export default function RestaurantCustomerViewPage() {
 
                         <div className="flex items-center gap-2">
                           <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-md border border-black bg-white shadow-[1px_1px_0px_0px_#000]">
-                            {ord.order_type === 'delivery' ? '🛵 Livraison' : '🏪 À emporter'}
+                            {ord.order_type === 'delivery' ? `🛵 ${t('order_type_delivery', 'Livraison')}` : `🏪 ${t('order_type_takeaway', 'À emporter')}`}
                           </span>
                           <span className="font-mono font-black text-sm">
                             {formatPrice(ord.total_amount, ord.currency || merchant?.currency, language)}
@@ -1030,12 +1030,18 @@ export default function RestaurantCustomerViewPage() {
                           <div className="flex items-center justify-between text-xs font-black uppercase">
                             <span className="flex items-center gap-1.5 text-black">
                               <Clock className="w-4 h-4 text-black" />
-                              <span>Statut en direct</span>
+                              <span>{t('orders_status_live', 'Statut en direct')}</span>
                             </span>
                             <span className={`px-2 py-0.5 rounded-full text-[10px] font-black border border-black ${
                               isDelivered ? 'bg-[#00F59B]' : isInDelivery ? 'bg-[#FFB800] animate-pulse' : isPreparing ? 'bg-amber-300' : 'bg-neutral-200'
                             }`}>
-                              {isDelivered ? 'Livrée' : isInDelivery ? 'En cours de livraison' : isPreparing ? 'En cuisine' : 'En attente'}
+                              {isDelivered
+                                ? t('orders_status_delivered_label', 'Livrée')
+                                : isInDelivery
+                                ? t('orders_status_in_delivery_label', 'En cours de livraison')
+                                : isPreparing
+                                ? t('orders_status_preparing_label', 'En cuisine')
+                                : t('orders_status_pending_label', 'En attente')}
                             </span>
                           </div>
 
@@ -1046,7 +1052,7 @@ export default function RestaurantCustomerViewPage() {
                               currentStep >= 1 ? 'bg-[#FFB800] text-black font-black' : 'bg-neutral-100 text-neutral-400'
                             }`}>
                               <div className="text-sm">⏱️</div>
-                              <div className="text-[9px] sm:text-[10px] font-black uppercase mt-0.5 truncate">Reçue</div>
+                              <div className="text-[9px] sm:text-[10px] font-black uppercase mt-0.5 truncate">{t('orders_step_received', 'Reçue')}</div>
                             </div>
 
                             {/* Step 2: En cuisine */}
@@ -1054,7 +1060,7 @@ export default function RestaurantCustomerViewPage() {
                               currentStep >= 2 ? 'bg-[#FFB800] text-black font-black' : 'bg-neutral-100 text-neutral-400'
                             }`}>
                               <div className="text-sm">👨‍🍳</div>
-                              <div className="text-[9px] sm:text-[10px] font-black uppercase mt-0.5 truncate">En cuisine</div>
+                              <div className="text-[9px] sm:text-[10px] font-black uppercase mt-0.5 truncate">{t('orders_step_kitchen', 'En cuisine')}</div>
                             </div>
 
                             {/* Step 3: En livraison */}
@@ -1062,7 +1068,7 @@ export default function RestaurantCustomerViewPage() {
                               currentStep >= 3 ? 'bg-[#FFB800] text-black font-black' : 'bg-neutral-100 text-neutral-400'
                             }`}>
                               <div className="text-sm">🛵</div>
-                              <div className="text-[9px] sm:text-[10px] font-black uppercase mt-0.5 truncate">Livraison</div>
+                              <div className="text-[9px] sm:text-[10px] font-black uppercase mt-0.5 truncate">{t('orders_step_on_the_way', 'Sur la route')}</div>
                             </div>
 
                             {/* Step 4: Livrée */}
@@ -1070,7 +1076,7 @@ export default function RestaurantCustomerViewPage() {
                               currentStep >= 4 ? 'bg-[#00F59B] text-black font-black' : 'bg-neutral-100 text-neutral-400'
                             }`}>
                               <div className="text-sm">🎉</div>
-                              <div className="text-[9px] sm:text-[10px] font-black uppercase mt-0.5 truncate">Livrée</div>
+                              <div className="text-[9px] sm:text-[10px] font-black uppercase mt-0.5 truncate">{t('orders_step_delivered', 'Arrivée')}</div>
                             </div>
                           </div>
 
@@ -1083,9 +1089,9 @@ export default function RestaurantCustomerViewPage() {
                                 </div>
                                 <div>
                                   <p className="text-xs font-black uppercase text-black">
-                                    Livreur : {ord.assigned_driver.name}
+                                    {t('orders_driver_assigned', 'Livreur assigné :')} {ord.assigned_driver.name}
                                   </p>
-                                  <p className="text-[10px] text-neutral-500 font-bold">Votre commande est en route vers vous !</p>
+                                  <p className="text-[10px] text-neutral-500 font-bold">{t('orders_step_on_the_way', 'Votre commande est en route vers vous !')}</p>
                                 </div>
                               </div>
 
@@ -1095,7 +1101,7 @@ export default function RestaurantCustomerViewPage() {
                                   className="neo-pill-btn bg-[#00F59B] text-black px-3 py-1.5 text-xs font-black flex items-center gap-1 shadow-[1px_1px_0px_0px_#000]"
                                 >
                                   <Phone className="w-3 h-3" />
-                                  <span>Appeler</span>
+                                  <span>{t('driver_call', 'Appeler')}</span>
                                 </a>
                               )}
                             </div>
@@ -1111,7 +1117,7 @@ export default function RestaurantCustomerViewPage() {
                         </div>
                       ) : (
                         <div className="p-3 bg-red-100 text-red-900 border-b-2 border-black text-xs font-black text-center">
-                          Commande Annulée par le restaurant
+                          {t('orders_cancelled_badge', 'Commande Annulée')}
                         </div>
                       )}
 
@@ -1141,9 +1147,11 @@ export default function RestaurantCustomerViewPage() {
                         {/* Payment & WhatsApp action */}
                         <div className="pt-2 border-t border-neutral-200 flex flex-wrap items-center justify-between gap-2 text-xs font-bold">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-neutral-500">Paiement :</span>
+                            <span className="text-neutral-500">{t('order_payment_label', 'Paiement :')}</span>
                             <span className="font-black text-black">
-                              {ord.payment_method === 'cash_on_delivery' ? '💵 Espèces à la porte' : '💳 Carte Bancaire (Stripe)'}
+                              {ord.payment_method === 'cash_on_delivery'
+                                ? t('order_cash_door', '💵 Espèces à la porte')
+                                : t('order_card_online', '💳 Carte Bancaire (Stripe)')}
                             </span>
                           </div>
 
@@ -1155,7 +1163,7 @@ export default function RestaurantCustomerViewPage() {
                               className="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-900 text-[11px] font-black underline"
                             >
                               <MessageCircle className="w-3.5 h-3.5" />
-                              <span>Contacter le restaurant</span>
+                              <span>{t('contact_restaurant', 'Contacter le restaurant')}</span>
                             </a>
                           )}
                         </div>
