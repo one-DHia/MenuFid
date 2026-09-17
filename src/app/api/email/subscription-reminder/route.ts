@@ -29,13 +29,13 @@ export async function POST(req: Request) {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #334155;">
         <h2 style="color: #78350f;">Bonjour ${businessName || ''} 👋</h2>
         <p>Vous avez créé votre compte sur <strong>MenuFid</strong>, mais vous n'avez pas encore choisi votre formule d'abonnement pour activer votre menu QR et votre carte de fidélité.</p>
-        <p>Pour commencer à recevoir vos premiers clients et booster vos revenus dès aujourd'hui, choisissez votre formule à partir de seulement <strong>19 €/mois</strong> :</p>
+        <p>Pour commencer à recevoir vos premiers clients et booster vos revenus dès aujourd'hui, choisissez votre formule avec <strong>3 mois offerts</strong> :</p>
         <div style="text-align: center; margin: 30px 0;">
           <a href="${finishUrl}" style="background-color: #b45309; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 16px; display: inline-block;">
-            Finaliser mon Abonnement (Dès 19 €/mois) &rarr;
+            Finaliser mon Abonnement (3 Mois Offerts) &rarr;
           </a>
         </div>
-        <p style="font-size: 12px; color: #64748b;">Abonnement sans engagement. Support client dédié 7j/7.</p>
+        <p style="font-size: 12px; color: #64748b;">Support client dédié 7j/7.</p>
       </div>
     `;
 

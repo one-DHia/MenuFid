@@ -28,11 +28,11 @@ export interface PlanConfig {
 
 export const MENUFID_PLANS: Record<'starter' | 'pro', PlanConfig> = {
   starter: {
-    name: 'Menufid Formule STARTER',
+    name: 'Menufid Formule ESSENTIEL',
     planTier: 'basic',
-    amountMonthly: 1900, // 19.00 €
-    amountYearly: 19000, // 190.00 € (2 mois offerts)
-    description: 'Menu Digital QR Code HD Illimité sans engagement',
+    amountMonthly: 399, // 3.99 €
+    amountYearly: 3990, // 39.90 €
+    description: 'Menu Digital QR Code jusqu\'à 100 plats',
   },
   pro: {
     name: 'Menufid Formule PRO & Fidélité',

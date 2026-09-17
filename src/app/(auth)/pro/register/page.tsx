@@ -365,7 +365,7 @@ function RegisterContent() {
                 </a>
 
                 <a 
-                  href={`mailto:contact@menufid.site?subject=Souscription ${selectedPlan.toUpperCase()} sans carte bancaire`} 
+                  href={`mailto:contact@menufid.site?subject=Souscription ${selectedPlan.toUpperCase()}`} 
                   className="w-full neo-pill-btn-white text-xs sm:text-sm py-4 justify-center gap-2 flex items-center"
                 >
                   <Mail className="w-5 h-5" />
