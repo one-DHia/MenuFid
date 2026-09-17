@@ -33,8 +33,8 @@ function RegisterContent() {
   // Mode de paiement : 'online' (CB Stripe) ou 'offline' (Pas de carte / Contact)
   const [paymentMode, setPaymentMode] = useState<'online' | 'offline'>('online');
 
-  // Formulaire Section 1 (Infos restaurant)
-  const [selectedPlan, setSelectedPlan] = useState<'starter' | 'pro'>(planParam === 'starter' ? 'starter' : 'pro');
+  const isEssential = planParam === 'essential' || planParam === 'starter';
+  const [selectedPlan, setSelectedPlan] = useState<'starter' | 'pro'>(isEssential ? 'starter' : 'pro');
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>(billingParam === 'yearly' ? 'yearly' : 'monthly');
   const [businessName, setBusinessName] = useState('');
   const [email, setEmail] = useState('');
@@ -45,20 +45,20 @@ function RegisterContent() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (planParam === 'starter') setSelectedPlan('starter');
+    if (isEssential) setSelectedPlan('starter');
     if (billingParam === 'yearly') setBillingPeriod('yearly');
-  }, [planParam, billingParam]);
+  }, [planParam, billingParam, isEssential]);
 
   const priceSuffix = billingPeriod === 'yearly' 
     ? (language === 'ar' ? '/ سنوياً' : (language === 'en' ? '/ yr' : '/ an'))
     : (language === 'ar' ? '/ شهرياً' : (language === 'en' ? '/ mo' : '/ mois'));
 
   const planPrice = selectedPlan === 'starter' 
-    ? (billingPeriod === 'yearly' ? `190 € ${priceSuffix}` : `19 € ${priceSuffix}`) 
+    ? (billingPeriod === 'yearly' ? `39,90 € ${priceSuffix}` : `3,99 € ${priceSuffix}`) 
     : (billingPeriod === 'yearly' ? `390 € ${priceSuffix}` : `39 € ${priceSuffix}`);
 
   const planTitle = selectedPlan === 'starter' 
-    ? t('plan_starter_title', 'Formule STARTER') 
+    ? t('plan_essential_title', 'Formule ESSENTIEL') 
     : t('plan_pro_title', 'Formule PRO & Fidélité');
 
   const handleOnlineCheckout = async (e: React.FormEvent) => {

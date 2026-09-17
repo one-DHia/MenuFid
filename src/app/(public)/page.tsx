@@ -81,7 +81,7 @@ export default function HomePage() {
         {/* ── 4. CTA BANNER MINIMALISTE ── */}
         <section className="py-16 px-4 max-w-4xl mx-auto">
           <div className="neo-box p-8 sm:p-12 text-center bg-white space-y-6">
-            <span className="neo-badge-yellow text-xs">{t('no_commitment', 'Sans Engagement • Sans CB')}</span>
+            <span className="neo-badge-yellow text-xs">{t('start_free_promo', '3 Mois Offerts pour Démarrer')}</span>
             <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-black max-w-xl mx-auto">
               {t('cta_title', 'Prêt à booster votre restaurant ?')}
             </h2>
