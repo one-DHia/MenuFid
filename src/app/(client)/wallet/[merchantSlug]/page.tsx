@@ -1147,9 +1147,9 @@ export default function RestaurantCustomerViewPage() {
                             </span>
                           </div>
 
-                          {merchant.contact_phone && (
+                          {(merchant as any)?.contact_phone && (
                             <a
-                              href={`https://wa.me/${merchant.contact_phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Bonjour, j'ai une question concernant ma commande #${ord.order_number}`)}`}
+                              href={`https://wa.me/${String((merchant as any).contact_phone).replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Bonjour, j'ai une question concernant ma commande #${ord.order_number}`)}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-900 text-[11px] font-black underline"

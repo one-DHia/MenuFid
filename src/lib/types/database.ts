@@ -104,6 +104,7 @@ export interface Merchant {
   google_maps_url?: string | null;
   instagram_url?: string | null;
   contact_email?: string | null;
+  contact_phone?: string | null;
   email?: string;
   scan_count?: number;
   demo_start?: string | null;
