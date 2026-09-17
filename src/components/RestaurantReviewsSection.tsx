@@ -17,40 +17,11 @@ interface Review {
   created_at: string;
 }
 
-const DEFAULT_REVIEWS: Review[] = [
-  {
-    id: 'r1',
-    restaurant_name: 'Bistrot Parisien',
-    owner_name: 'Marc L.',
-    city: 'Paris',
-    rating: 5,
-    comment: 'Nos clients adorent scanner le QR code directement à table. La carte de fidélité dans Apple Wallet a augmenté notre taux de retour de plus de 40% en deux mois.',
-    created_at: '2026-08-15T10:00:00Z',
-  },
-  {
-    id: 'r2',
-    restaurant_name: 'Casa Della Pasta',
-    owner_name: 'Sofia B.',
-    city: 'Marseille',
-    rating: 5,
-    comment: 'La commande en direct sans commission nous fait économiser des centaines d’euros chaque semaine par rapport aux plateformes tierces. Interface rapide et claire.',
-    created_at: '2026-08-20T14:30:00Z',
-  },
-  {
-    id: 'r3',
-    restaurant_name: 'Le Comptoir Burger',
-    owner_name: 'Karim D.',
-    city: 'Lyon',
-    rating: 5,
-    comment: 'Modifier les prix et les disponibilités en un clic depuis mon téléphone en plein rush du midi, c’est un vrai soulagement au quotidien.',
-    created_at: '2026-09-02T18:00:00Z',
-  },
-];
-
 export default function RestaurantReviewsSection() {
   const { t, dir } = useLanguage();
   const { showToast } = useToast();
-  const [reviews, setReviews] = useState<Review[]>(DEFAULT_REVIEWS);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
@@ -63,11 +34,15 @@ export default function RestaurantReviewsSection() {
       try {
         const res = await fetch('/api/reviews');
         const json = await res.json();
-        if (json.success && json.reviews && json.reviews.length > 0) {
+        if (json.success && Array.isArray(json.reviews)) {
           setReviews(json.reviews);
+        } else {
+          setReviews([]);
         }
       } catch {
-        // Fallback to DEFAULT_REVIEWS
+        setReviews([]);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -158,49 +133,89 @@ export default function RestaurantReviewsSection() {
         </button>
       </div>
 
-      {/* Grille d'avis épurée et responsive */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {reviews.map((rev) => (
-          <div
-            key={rev.id}
-            className="p-6 rounded-3xl bg-white border-3 border-black shadow-[4px_4px_0px_0px_#000] flex flex-col justify-between hover:translate-y-[-2px] transition-transform duration-200"
-          >
-            <div className="space-y-3">
-              {/* Étoiles */}
-              <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    className={`w-4 h-4 ${
-                      star <= rev.rating
-                        ? 'fill-[#FFB800] text-[#FFB800]'
-                        : 'text-neutral-200'
-                    }`}
-                  />
-                ))}
+      {/* Grille d'avis épurée et responsive - 100% Données Réelles */}
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="p-6 rounded-3xl bg-white border-2 border-black/10 animate-pulse h-48 flex flex-col justify-between"
+            >
+              <div className="space-y-3">
+                <div className="h-4 w-24 bg-neutral-200 rounded" />
+                <div className="h-3 w-full bg-neutral-200 rounded" />
+                <div className="h-3 w-3/4 bg-neutral-200 rounded" />
               </div>
-
-              {/* Commentaire */}
-              <p className="text-xs sm:text-sm text-neutral-800 font-medium leading-relaxed italic">
-                « {rev.comment} »
-              </p>
+              <div className="h-4 w-32 bg-neutral-200 rounded" />
             </div>
-
-            {/* Auteur & Restaurant */}
-            <div className="pt-4 mt-4 border-t-2 border-neutral-100 flex items-center justify-between">
-              <div>
-                <p className="font-black text-xs sm:text-sm text-black">
-                  {rev.restaurant_name}
-                </p>
-                <p className="text-[11px] font-bold text-neutral-500">
-                  {rev.owner_name ? `${rev.owner_name} • ` : ''}{rev.city || 'France'}
-                </p>
-              </div>
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            </div>
+          ))}
+        </div>
+      ) : reviews.length === 0 ? (
+        <div className="p-8 sm:p-12 rounded-3xl bg-white border-3 border-black shadow-[4px_4px_0px_0px_#000] text-center max-w-xl mx-auto space-y-4">
+          <div className="w-12 h-12 rounded-2xl bg-[#FFB800] border-2 border-black flex items-center justify-center mx-auto shadow-[2px_2px_0px_0px_#000]">
+            <MessageSquareQuote className="w-6 h-6 text-black" />
           </div>
-        ))}
-      </div>
+          <div className="space-y-1">
+            <h3 className="text-base sm:text-lg font-black text-black">
+              {t('no_reviews_title', 'Soyez le premier restaurateur à témoigner')}
+            </h3>
+            <p className="text-xs sm:text-sm text-neutral-600 font-medium">
+              {t('no_reviews_desc', 'Vous utilisez MenuFid dans votre établissement ? Partagez votre retour d’expérience et inspirez vos confrères.')}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setModalOpen(true)}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-black text-white hover:bg-neutral-800 text-xs font-black shadow-[3px_3px_0px_0px_#FFB800] transition-all"
+          >
+            <Plus className="w-4 h-4 text-[#FFB800]" />
+            <span>{t('write_first_review_btn', 'Partager mon avis vérifié')}</span>
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {reviews.map((rev) => (
+            <div
+              key={rev.id}
+              className="p-6 rounded-3xl bg-white border-3 border-black shadow-[4px_4px_0px_0px_#000] flex flex-col justify-between hover:translate-y-[-2px] transition-transform duration-200"
+            >
+              <div className="space-y-3">
+                {/* Étoiles */}
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`w-4 h-4 ${
+                        star <= rev.rating
+                          ? 'fill-[#FFB800] text-[#FFB800]'
+                          : 'text-neutral-200'
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                {/* Commentaire */}
+                <p className="text-xs sm:text-sm text-neutral-800 font-medium leading-relaxed italic">
+                  « {rev.comment} »
+                </p>
+              </div>
+
+              {/* Auteur & Restaurant */}
+              <div className="pt-4 mt-4 border-t-2 border-neutral-100 flex items-center justify-between">
+                <div>
+                  <p className="font-black text-xs sm:text-sm text-black">
+                    {rev.restaurant_name}
+                  </p>
+                  <p className="text-[11px] font-bold text-neutral-500">
+                    {rev.owner_name ? `${rev.owner_name} • ` : ''}{rev.city || 'France'}
+                  </p>
+                </div>
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Modal Soumission d'Avis */}
       {modalOpen && (

@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
     const { data: merchant, error: merchantError } = await supabaseAdmin
       .from('merchants')
       .select('id, business_name, city')
-      .eq('user_id', user.id)
+      .eq('id', user.id)
       .single();
 
     if (merchantError || !merchant) {
