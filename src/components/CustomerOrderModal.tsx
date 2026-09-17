@@ -90,6 +90,22 @@ export default function CustomerOrderModal({
     }
   }
 
+  const getWhatsAppMessage = (orderNum?: string) => {
+    const num = orderNum || (confirmedOrder ? confirmedOrder.order_number : `ORD-${Math.floor(1000 + Math.random() * 9000)}`);
+    const itemsText = cart.map((ci) => `• ${ci.quantity}x ${ci.item.name} (${formatPrice(ci.item.price * ci.quantity, currency, language)})`).join('\n');
+    const msg = `*NOUVELLE COMMANDE #${num}*\n` +
+      `🍽️ Restaurant : ${merchant?.business_name || 'MenuFid'}\n` +
+      `👤 Client : ${customerName.trim() || 'Client'}\n` +
+      `📞 Tél : ${customerPhone.trim() || 'Non spécifié'}\n` +
+      (orderType === 'delivery' ? `📍 Adresse livraison : ${customerAddress.trim() || 'Non spécifiée'}\n` : `🏪 Mode : À emporter / Retrait comptoir\n`) +
+      (deliveryNotes.trim() ? `📝 Note : ${deliveryNotes.trim()}\n` : '') +
+      `💳 Règlement : ${paymentMethod === 'cash_on_delivery' ? 'À la livraison (Espèces)' : 'En ligne'}\n\n` +
+      `*Détails du panier :*\n${itemsText}\n\n` +
+      (deliveryFee > 0 ? `🛵 Livraison : ${formatPrice(deliveryFee, currency, language)}\n` : '') +
+      `💰 *TOTAL À RÉGLER : ${formatPrice(finalTotal, currency, language)}*`;
+    return encodeURIComponent(msg);
+  };
+
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
@@ -216,11 +232,21 @@ export default function CustomerOrderModal({
                 </div>
               </div>
 
-              <div className="pt-2 flex flex-col gap-2">
+              <div className="pt-2 flex flex-col gap-2.5">
+                <a
+                  href={`https://wa.me/?text=${getWhatsAppMessage(confirmedOrder.order_number)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full neo-pill-btn bg-[#25D366] hover:bg-emerald-500 text-black py-3.5 text-xs font-black flex items-center justify-center gap-2 shadow-[2px_2px_0px_0px_#000]"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span>Envoyer la confirmation sur WhatsApp</span>
+                </a>
+
                 <button
                   type="button"
                   onClick={onClose}
-                  className="w-full neo-pill-btn py-3.5 text-xs font-black"
+                  className="w-full neo-pill-btn-white py-3 text-xs font-black"
                 >
                   Fermer et retourner au menu
                 </button>
@@ -239,10 +265,19 @@ export default function CustomerOrderModal({
                 </div>
               )}
 
-              {/* Erreur API */}
+              {/* Erreur API avec secours WhatsApp */}
               {errorMsg && (
-                <div className="p-3.5 rounded-xl border-2 border-black bg-rose-100 text-rose-900 text-xs font-black">
-                  ⚠️ {errorMsg}
+                <div className="p-3.5 rounded-xl border-2 border-black bg-rose-100 text-rose-900 text-xs font-bold space-y-2">
+                  <p className="font-black">⚠️ {errorMsg}</p>
+                  <a
+                    href={`https://wa.me/?text=${getWhatsAppMessage()}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#25D366] text-black rounded-xl border border-black font-black text-xs shadow-[2px_2px_0px_0px_#000]"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>Transmettre directement la commande sur WhatsApp</span>
+                  </a>
                 </div>
               )}
 

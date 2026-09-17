@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
+export const dynamic = 'force-dynamic';
+
 const VALID_PLAN_TIERS: Record<string, 'freemium' | 'basic' | 'loyalty' | 'delivery' | 'premium'> = {
   'freemium': 'freemium',
   'free': 'freemium',
@@ -98,7 +100,26 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: queryError.message }, { status: 500 });
     }
 
-    return NextResponse.json({ merchants: merchants || [] });
+    const sanitizedMerchants = (merchants || []).map((m: any) => {
+      const cur = m.currency || (m.country === 'Algérie' || m.country === 'DZ' ? 'DZD' : 'EUR');
+      let price = m.monthly_price;
+      if (price === null || price === undefined) {
+        if (m.license_type === 'lifetime' || m.plan_tier === 'freemium') {
+          price = 0;
+        } else if (cur === 'DZD') {
+          price = m.plan_tier === 'basic' ? 1900 : (m.plan_tier === 'delivery' ? 4900 : 3900);
+        } else {
+          price = m.plan_tier === 'basic' ? 19 : (m.plan_tier === 'delivery' ? 49 : 39);
+        }
+      }
+      return {
+        ...m,
+        currency: cur,
+        monthly_price: price,
+      };
+    });
+
+    return NextResponse.json({ merchants: sanitizedMerchants });
   } catch (error: any) {
     console.error('Merchant GET API Error:', error);
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
@@ -210,25 +231,52 @@ export async function POST(req: Request) {
       const mappedCurrency = currency === 'DZD' ? 'DZD' : 'EUR';
       const mappedPaymentMode = VALID_PAYMENT_MODES[deliveryPaymentMode] || (mappedCurrency === 'DZD' ? 'cash_on_delivery' : 'both');
 
+      // Calcul dynamique du tarif mensuel
+      let computedMonthlyPrice = 0;
+      if (mappedLicenseType !== 'lifetime' && mappedPlanTier !== 'freemium') {
+        if (mappedCurrency === 'DZD') {
+          computedMonthlyPrice = mappedPlanTier === 'basic' ? 1900 : (mappedPlanTier === 'delivery' ? 4900 : 3900);
+        } else {
+          computedMonthlyPrice = mappedPlanTier === 'basic' ? 19 : (mappedPlanTier === 'delivery' ? 49 : 39);
+        }
+      }
+
       // 2. Create merchant profile
-      const { data: merchantData, error: merchantError } = await supabaseAdmin
+      const merchantInsertPayload: any = {
+        id: authData.user.id,
+        distributor_id: assignedDistributorId,
+        business_name: businessName.trim(),
+        slug: slug.trim().toLowerCase(),
+        short_code: shortCode,
+        contact_email: email.trim().toLowerCase(),
+        plan_tier: mappedPlanTier,
+        plan_status: mappedPlanStatus,
+        license_type: mappedLicenseType,
+        currency: mappedCurrency,
+        monthly_price: computedMonthlyPrice,
+        delivery_payment_mode: mappedPaymentMode,
+        primary_color: '#FFB800'
+      };
+
+      let { data: merchantData, error: merchantError } = await supabaseAdmin
         .from('merchants')
-        .insert({
-          id: authData.user.id,
-          distributor_id: assignedDistributorId,
-          business_name: businessName.trim(),
-          slug: slug.trim().toLowerCase(),
-          short_code: shortCode,
-          contact_email: email.trim().toLowerCase(),
-          plan_tier: mappedPlanTier,
-          plan_status: mappedPlanStatus,
-          license_type: mappedLicenseType,
-          currency: mappedCurrency,
-          delivery_payment_mode: mappedPaymentMode,
-          primary_color: '#FFB800'
-        })
+        .insert(merchantInsertPayload)
         .select()
         .single();
+
+      // Graceful fallback si la colonne currency n'existe pas encore dans PostgreSQL
+      if (merchantError && (merchantError.message?.includes("'currency'") || (merchantError as any).code === 'PGRST204')) {
+        console.warn('[AdminCreateMerchant] Fallback: currency column missing from schema cache, retrying without it');
+        const fallbackPayload = { ...merchantInsertPayload };
+        delete fallbackPayload.currency;
+        const retryRes = await supabaseAdmin
+          .from('merchants')
+          .insert(fallbackPayload)
+          .select()
+          .single();
+        merchantData = retryRes.data ? { ...retryRes.data, currency: mappedCurrency } : null;
+        merchantError = retryRes.error;
+      }
 
       if (merchantError) {
         // Rollback: delete auth user if merchant creation fails
@@ -242,14 +290,16 @@ export async function POST(req: Request) {
     else if (action === 'update') {
       if (!merchantId) return NextResponse.json({ error: 'Missing merchantId' }, { status: 400 });
 
+      // Récupérer le marchand actuel pour vérification et calcul
+      const { data: existingMerchant } = await supabaseAdmin
+        .from('merchants')
+        .select('id, distributor_id, plan_tier, license_type, monthly_price')
+        .eq('id', merchantId)
+        .single();
+
       // 🔒 IDOR Defense: If distributor, verify the merchant strictly belongs to them
       if (!isSuperAdmin) {
-        const { data: verifyMerchant } = await supabaseAdmin
-          .from('merchants')
-          .select('distributor_id')
-          .eq('id', merchantId)
-          .single();
-        if (!verifyMerchant || verifyMerchant.distributor_id !== authDistributorId) {
+        if (!existingMerchant || existingMerchant.distributor_id !== authDistributorId) {
           return NextResponse.json({ error: 'Accès refusé pour ce restaurant' }, { status: 403 });
         }
       }
@@ -274,12 +324,42 @@ export async function POST(req: Request) {
       if (demoEnd !== undefined) updates.demo_end = demoEnd;
       if (typeof isSuspended !== 'undefined') updates.is_suspended = isSuspended;
 
-      const { data, error } = await supabaseAdmin
+      // Calcul dynamique et synchronisation du monthly_price
+      const targetPlanTier = updates.plan_tier || existingMerchant?.plan_tier || 'loyalty';
+      const targetLicenseType = updates.license_type || existingMerchant?.license_type || 'recurring';
+      const targetCurrency = updates.currency || 'EUR';
+
+      if (targetLicenseType === 'lifetime' || targetPlanTier === 'freemium') {
+        updates.monthly_price = 0;
+      } else if (targetCurrency === 'DZD') {
+        updates.monthly_price = targetPlanTier === 'basic' ? 1900 : (targetPlanTier === 'delivery' ? 4900 : 3900);
+      } else {
+        updates.monthly_price = targetPlanTier === 'basic' ? 19 : (targetPlanTier === 'delivery' ? 49 : 39);
+      }
+
+      let { data, error } = await supabaseAdmin
         .from('merchants')
         .update(updates)
         .eq('id', merchantId)
         .select()
         .single();
+
+      // Graceful Fallback si la colonne 'currency' n'est pas encore présente dans la table PostgreSQL
+      if (error && (error.message?.includes("'currency'") || (error as any).code === 'PGRST204')) {
+        console.warn('[AdminUpdateMerchant] Fallback: currency column missing from schema cache, retrying without currency column');
+        const fallbackUpdates = { ...updates };
+        delete fallbackUpdates.currency;
+        
+        const fallbackRes = await supabaseAdmin
+          .from('merchants')
+          .update(fallbackUpdates)
+          .eq('id', merchantId)
+          .select()
+          .single();
+
+        data = fallbackRes.data ? { ...fallbackRes.data, currency: updates.currency || 'EUR' } : null;
+        error = fallbackRes.error;
+      }
 
       if (error) {
         console.error('[AdminUpdateMerchant Error]:', error);

@@ -425,6 +425,33 @@ export default function CustomerMenu({ slug, hostname }: CustomerMenuProps) {
           <Share2 className="w-4 h-4" />
           <span className="hidden sm:inline text-xs font-bold">{t('share', 'Partager')}</span>
         </button>
+        <button
+          onClick={() => setIsCartOpen(true)}
+          className={isMinimalist
+            ? "inline-flex items-center gap-1.5 bg-[#8C6D3F] text-white p-2 sm:px-3 sm:py-2 rounded-full hover:bg-[#725730] transition shadow-sm"
+            : isDark
+            ? "inline-flex items-center gap-1.5 bg-[#FFB800] text-black p-2 sm:px-3 sm:py-2 rounded-xl border border-black hover:bg-amber-400 transition shadow-sm"
+            : isLuxury
+            ? "inline-flex items-center gap-1.5 bg-[#FFE600] text-black p-2 sm:px-3 sm:py-2 rounded-xl border border-black hover:bg-amber-300 transition shadow-sm"
+            : isCyberpunk
+            ? "inline-flex items-center gap-1.5 bg-[#CCFF00] text-black p-2 sm:px-3 sm:py-2 rounded-xl border border-black hover:bg-lime-400 transition shadow-sm font-mono"
+            : isRetro
+            ? "inline-flex items-center gap-1.5 bg-[#C84B31] text-white p-2 rounded-xl border-4 border-black hover:bg-[#b03f29] transition shadow-[2px_2px_0px_0px_#000] font-serif"
+            : "neo-pill-btn bg-[#FFB800] text-black border-2 border-black p-2 sm:px-3 sm:py-2 rounded-xl flex items-center gap-1.5 hover:bg-amber-400 transition shadow-[2px_2px_0px_0px_#000]"}
+          title={t('my_cart', 'Mon Panier')}
+        >
+          <div className="relative">
+            <ShoppingBag className="w-4 h-4 text-black" />
+            {totalCartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-600 text-white font-mono text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+                {totalCartCount}
+              </span>
+            )}
+          </div>
+          <span className="hidden sm:inline text-xs font-black uppercase">
+            {t('cart', 'Panier')} {totalCartCount > 0 ? `(${totalCartCount})` : ''}
+          </span>
+        </button>
         <LanguageSelector />
       </div>
 
@@ -510,7 +537,71 @@ export default function CustomerMenu({ slug, hostname }: CustomerMenuProps) {
       {isRetro && <div style={checkerboardStyle} className="border-y-2 border-black relative z-10 shrink-0" />}
 
       <main className="flex-1 max-w-3xl w-full mx-auto px-4 py-8">
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
+          {/* ── Banner Commande en Ligne & Livraison ── */}
+          <div className={
+            isMinimalist
+              ? "bg-[#FAF6F0] border border-[#E3DEC3] p-4 sm:p-5 rounded-2xl shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 font-serif"
+              : isDark
+              ? "bg-[#202020] border border-[#333] p-4 sm:p-5 rounded-2xl shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 text-white"
+              : isLuxury
+              ? "bg-[#181818] border border-[#FFE600]/30 p-4 sm:p-5 rounded-2xl shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 text-[#FFE600] font-serif"
+              : isCyberpunk
+              ? "bg-[#141414] border-2 border-[#CCFF00] p-4 sm:p-5 rounded-xl shadow-[0_0_15px_rgba(204,255,0,0.15)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 text-[#CCFF00] font-mono"
+              : isRetro
+              ? "bg-white border-4 border-[#C84B31] p-4 sm:p-5 rounded-3xl shadow-[4px_4px_0px_0px_rgba(200,75,49,0.3)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 text-[#C84B31] font-serif"
+              : "neo-box p-4 sm:p-5 bg-white border-3 sm:border-4 border-black rounded-2xl sm:rounded-3xl shadow-[4px_4px_0px_0px_#000] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4"
+          }>
+            <div className="space-y-1.5 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className={`text-[10px] sm:text-xs font-black uppercase px-2.5 py-0.5 rounded-full border border-black flex items-center gap-1 shadow-[1px_1px_0px_0px_#000] ${
+                  merchant.orders_paused 
+                    ? 'bg-red-500 text-white' 
+                    : 'bg-[#00F59B] text-black'
+                }`}>
+                  {merchant.orders_paused ? '⏸️ Commandes suspendues' : '🛵 Commandes & Livraison'}
+                </span>
+
+                {Number(merchant.min_order_amount) > 0 && (
+                  <span className="text-[10px] sm:text-xs font-black text-neutral-800 bg-neutral-100 px-2 py-0.5 rounded-md border border-neutral-300">
+                    {t('min_order_short', 'Panier min')} : {formatPrice(Number(merchant.min_order_amount), merchant?.currency, language)}
+                  </span>
+                )}
+
+                {Number(merchant.delivery_fee) > 0 ? (
+                  <span className="text-[10px] sm:text-xs font-black text-neutral-800 bg-neutral-100 px-2 py-0.5 rounded-md border border-neutral-300">
+                    {t('delivery_fee_short', 'Livraison')} : {formatPrice(Number(merchant.delivery_fee), merchant?.currency, language)}
+                  </span>
+                ) : (
+                  <span className="text-[10px] sm:text-xs font-black text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-300">
+                    {t('free_delivery', 'Livraison Gratuite')}
+                  </span>
+                )}
+              </div>
+
+              <p className="text-xs font-bold opacity-80 leading-relaxed">
+                {merchant.orders_paused 
+                  ? t('orders_paused_hint', 'Le restaurant ne prend pas de commandes pour le moment.')
+                  : t('order_online_hint', 'Composez votre panier et commandez en livraison ou à emporter en quelques clics.')}
+              </p>
+            </div>
+
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className={
+                isMinimalist ? "w-full sm:w-auto bg-[#2C2520] text-white px-4 py-2.5 rounded-xl text-xs font-bold shrink-0" :
+                isDark ? "w-full sm:w-auto bg-[#FFB800] text-black px-4 py-2.5 rounded-xl text-xs font-bold shrink-0" :
+                isLuxury ? "w-full sm:w-auto bg-[#FFE600] text-black px-4 py-2.5 rounded-xl text-xs font-bold shrink-0 font-sans" :
+                isCyberpunk ? "w-full sm:w-auto bg-[#CCFF00] text-black px-4 py-2.5 rounded-xl text-xs font-black shrink-0 font-mono" :
+                isRetro ? "w-full sm:w-auto bg-[#C84B31] text-white px-4 py-2.5 rounded-2xl border-2 border-black text-xs font-black uppercase shadow-[2px_2px_0px_0px_#000] shrink-0" :
+                "w-full sm:w-auto neo-pill-btn bg-[#FFB800] hover:bg-amber-400 text-black px-4 py-2.5 text-xs font-black flex items-center justify-center gap-2 shadow-[2px_2px_0px_0px_#000] shrink-0"
+              }
+            >
+              <ShoppingBag className="w-4 h-4" />
+              <span>{totalCartCount > 0 ? `${t('checkout_btn', 'Voir Panier')} (${totalCartCount})` : t('open_cart', 'Voir Mon Panier')}</span>
+            </button>
+          </div>
+
           {/* Search Bar */}
           <div className="relative">
             <Search className={`w-5 h-5 absolute left-4 top-4 ${
@@ -1483,6 +1574,21 @@ export default function CustomerMenu({ slug, hostname }: CustomerMenuProps) {
         </div>
       )}
 
+      {/* ── Floating Fast-Access Order Button (quand le panier est vide) ── */}
+      {totalCartCount === 0 && !isCartOpen && (
+        <div className={`fixed right-4 z-40 transition-all duration-300 ${
+          merchant?.plan_tier !== 'basic' ? 'bottom-24' : 'bottom-6'
+        }`}>
+          <button
+            onClick={() => setIsCartOpen(true)}
+            className="neo-pill-btn bg-[#FFB800] hover:bg-amber-400 text-black px-4 py-3 text-xs font-black flex items-center gap-2 shadow-[4px_4px_0px_0px_#000] border-3 border-black active:translate-x-[2px] active:translate-y-[2px]"
+          >
+            <ShoppingBag className="w-4 h-4" />
+            <span>{t('order_online', 'Commander')}</span>
+          </button>
+        </div>
+      )}
+
       {/* ── Floating Sticky Cart Bar (Actif quand le panier n'est pas vide) ── */}
       {totalCartCount > 0 && (
         <div className={`fixed left-4 right-4 z-40 max-w-xl mx-auto transition-all duration-300 animate-bounce-short ${
@@ -1600,6 +1706,16 @@ export default function CustomerMenu({ slug, hostname }: CustomerMenuProps) {
                   <p className="text-base font-bold text-neutral-500">
                     {t('cart_empty', 'Votre panier est vide')}
                   </p>
+                  <p className="text-xs text-neutral-400 font-bold max-w-xs mx-auto">
+                    {t('cart_empty_hint', 'Sélectionnez des plats sur le menu pour commencer à composer votre commande.')}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setIsCartOpen(false)}
+                    className="mt-3 neo-pill-btn bg-[#FFB800] hover:bg-amber-400 text-black px-5 py-2.5 text-xs font-black shadow-[2px_2px_0px_0px_#000]"
+                  >
+                    {t('browse_menu', 'Parcourir les plats')}
+                  </button>
                 </div>
               ) : (
                 cart.map(({ item, quantity }) => {

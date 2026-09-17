@@ -8,9 +8,15 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-// This key bypasses Row Level Security. Never expose it on the client.
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseUrl = (rawUrl && rawUrl.startsWith('http') && rawUrl !== '[SENSITIVE]')
+  ? rawUrl
+  : 'https://vrfmytzkhsktwyjcdnja.supabase.co';
+
+const rawKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseServiceKey = (rawKey && rawKey !== '[SENSITIVE]')
+  ? rawKey
+  : 'placeholder-service-key';
 
 export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {

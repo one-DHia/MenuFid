@@ -4,180 +4,290 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Check, Sparkles, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Check, Sparkles, ShieldCheck, ArrowRight, Zap, Award, QrCode, ShoppingBag, Bell, Globe } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 
 export default function PricingPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('yearly');
+  const [currency, setCurrency] = useState<'EUR' | 'DZD'>('EUR');
+
+  // Tarifs dynamiques en fonction de la devise et de la périodicité
+  const prices = {
+    freemium: {
+      monthly: currency === 'DZD' ? '0 DA' : '0 €',
+      yearly: currency === 'DZD' ? '0 DA' : '0 €',
+      periodLabel: currency === 'DZD' ? 'DA / à vie' : '€ / à vie',
+    },
+    starter: {
+      monthly: currency === 'DZD' ? '1 900' : '19',
+      yearly: currency === 'DZD' ? '19 000' : '190',
+      unit: currency === 'DZD' ? 'DA' : '€',
+      saveLabel: currency === 'DZD' ? 'Économisez 3 800 DA (2 mois offerts)' : 'Économisez 38 € (2 mois offerts)',
+    },
+    pro: {
+      monthly: currency === 'DZD' ? '3 900' : '39',
+      yearly: currency === 'DZD' ? '39 000' : '390',
+      unit: currency === 'DZD' ? 'DA' : '€',
+      saveLabel: currency === 'DZD' ? 'Économisez 7 800 DA (2 mois offerts)' : 'Économisez 78 € (2 mois offerts)',
+    },
+    lifetime: {
+      amount: currency === 'DZD' ? '49 000' : '490',
+      unit: currency === 'DZD' ? 'DA' : '€',
+      periodLabel: currency === 'DZD' ? 'DA en paiement unique' : '€ en paiement unique',
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-black flex flex-col font-sans selection:bg-[#FFB800] selection:text-black">
       <Navbar />
 
-      <main className="flex-1 py-12 px-4 max-w-5xl mx-auto w-full">
+      <main className="flex-1 py-12 px-4 max-w-6xl mx-auto w-full">
         {/* Header Title */}
-        <div className="text-center max-w-xl mx-auto mb-8">
-          <span className="neo-badge-yellow mb-3 inline-flex items-center gap-1.5 shadow-[2px_2px_0px_0px_#000]">
+        <div className="text-center max-w-2xl mx-auto mb-10 space-y-3">
+          <span className="neo-badge-yellow inline-flex items-center gap-1.5 shadow-[2px_2px_0px_0px_#000]">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>{t('no_commitment_prices', 'Tarifs Sans Engagement')}</span>
+            <span>{t('no_commitment_prices', 'Tarifs Clairs & Sans Surprise')}</span>
           </span>
-          <h1 className="text-3xl sm:text-5xl font-black text-black tracking-tight mt-2 mb-3">
-            {t('simple_transparent', 'Simple & Transparent.')}
+          <h1 className="text-3xl sm:text-5xl font-black text-black tracking-tight">
+            {t('simple_transparent', 'Simple, Transparent & Adapté.')}
           </h1>
-          <p className="text-neutral-600 text-xs sm:text-sm font-bold">
-            {t('choose_ideal_offer', "Activez votre menu digital ou votre carte de fidélité dès aujourd'hui.")}
+          <p className="text-neutral-600 text-xs sm:text-sm font-bold max-w-xl mx-auto">
+            {t('choose_ideal_offer', 'Choisissez la formule idéale pour digitaliser votre carte, encaisser vos commandes en ligne et fidéliser votre clientèle.')}
           </p>
 
-          {/* Billing Period Toggle (Mensuel / Annuel) */}
-          <div className="inline-flex items-center gap-2 p-1.5 mt-6 bg-white border-3 border-black rounded-full shadow-[4px_4px_0px_0px_#000]">
-            <button
-              type="button"
-              onClick={() => setBillingPeriod('monthly')}
-              className={`px-5 py-2 rounded-full text-xs font-black transition-all ${
-                billingPeriod === 'monthly'
-                  ? 'bg-black text-white shadow-[2px_2px_0px_0px_#000]'
-                  : 'text-neutral-700 hover:text-black'
-              }`}
-            >
-              {t('billing_monthly_tab', 'Facturation Mensuelle')}
-            </button>
-            <button
-              type="button"
-              onClick={() => setBillingPeriod('yearly')}
-              className={`px-5 py-2 rounded-full text-xs font-black transition-all flex items-center gap-1.5 ${
-                billingPeriod === 'yearly'
-                  ? 'bg-[#FFB800] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000]'
-                  : 'text-neutral-700 hover:text-black'
-              }`}
-            >
-              <span>{t('billing_yearly_tab', 'Facturation Annuelle')}</span>
-              <span className="bg-black text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
-                {t('two_months_free', '2 Mois Offerts')}
-              </span>
-            </button>
+          {/* Controls Bar: Sélecteur de Devise + Période de Facturation */}
+          <div className="pt-4 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+            
+            {/* Currency Selector (EUR / DZD) */}
+            <div className="inline-flex items-center bg-white border-3 border-black rounded-full p-1 shadow-[4px_4px_0px_0px_#000]">
+              <button
+                type="button"
+                onClick={() => setCurrency('EUR')}
+                className={`px-4 py-1.5 rounded-full text-xs font-black transition-all flex items-center gap-1.5 ${
+                  currency === 'EUR'
+                    ? 'bg-black text-white shadow-[2px_2px_0px_0px_#000]'
+                    : 'text-neutral-600 hover:text-black'
+                }`}
+              >
+                <span>🇪🇺 EUR (€)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setCurrency('DZD')}
+                className={`px-4 py-1.5 rounded-full text-xs font-black transition-all flex items-center gap-1.5 ${
+                  currency === 'DZD'
+                    ? 'bg-[#FFB800] text-black border border-black shadow-[2px_2px_0px_0px_#000]'
+                    : 'text-neutral-600 hover:text-black'
+                }`}
+              >
+                <span>🇩🇿 DZD (DA)</span>
+              </button>
+            </div>
+
+            {/* Billing Period Toggle (Mensuel / Annuel) */}
+            <div className="inline-flex items-center bg-white border-3 border-black rounded-full p-1 shadow-[4px_4px_0px_0px_#000]">
+              <button
+                type="button"
+                onClick={() => setBillingPeriod('monthly')}
+                className={`px-4 py-1.5 rounded-full text-xs font-black transition-all ${
+                  billingPeriod === 'monthly'
+                    ? 'bg-black text-white shadow-[2px_2px_0px_0px_#000]'
+                    : 'text-neutral-600 hover:text-black'
+                }`}
+              >
+                {t('billing_monthly_tab', 'Mensuel')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setBillingPeriod('yearly')}
+                className={`px-4 py-1.5 rounded-full text-xs font-black transition-all flex items-center gap-1.5 ${
+                  billingPeriod === 'yearly'
+                    ? 'bg-[#00F59B] text-black border border-black shadow-[2px_2px_0px_0px_#000]'
+                    : 'text-neutral-600 hover:text-black'
+                }`}
+              >
+                <span>{t('billing_yearly_tab', 'Annuel')}</span>
+                <span className="bg-black text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase">
+                  {t('two_months_free', '2 Mois Offerts')}
+                </span>
+              </button>
+            </div>
+
           </div>
         </div>
 
-        {/* ── PRICING BENTO CARDS (2 FORMULES PAYANTES) ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch max-w-4xl mx-auto">
+        {/* ── PRICING BENTO GRID ── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch max-w-6xl mx-auto">
           
-          {/* 1. FORMULE STARTER (MENU QR ONLY) */}
-          <div className="neo-box p-6 sm:p-8 flex flex-col justify-between bg-white border-4 border-black shadow-[6px_6px_0px_0px_#000] rounded-3xl">
+          {/* 1. FORMULE DÉCOUVERTE / FREEMIUM (0 € / 0 DA) */}
+          <div className="neo-box p-6 flex flex-col justify-between bg-white border-4 border-black shadow-[6px_6px_0px_0px_#000] rounded-3xl">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="font-black text-2xl text-black">{t('pricing_title_starter', 'Formule STARTER')}</h3>
-                <span className="neo-badge text-[10px] font-black">Menu QR</span>
+                <h3 className="font-black text-xl sm:text-2xl text-black">{t('plan_freemium_title', 'Freemium')}</h3>
+                <span className="neo-badge text-[10px] font-black bg-neutral-100">{t('free', 'Gratuit')}</span>
               </div>
-              <p className="text-neutral-600 text-xs font-bold">
-                {t('pricing_desc_starter', 'Pour les cafés et restaurants qui veulent simplement remplacer leur menu papier par un menu digital HD propre.')}
+              <p className="text-neutral-600 text-xs font-bold leading-relaxed">
+                {t('plan_freemium_desc', 'Pour tester MenuFid avec une carte digitale en ligne propre sans engagement financier.')}
               </p>
               
               <div className="pt-2">
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-4xl sm:text-5xl font-black text-black" dir="ltr">
-                    {billingPeriod === 'yearly' ? '190' : '19'}
+                  <span className="text-4xl font-black text-black" dir="ltr">
+                    0
                   </span>
                   <span className="text-neutral-600 text-xs font-black">
-                    {billingPeriod === 'yearly' ? t('dzd_per_year', '€ / an') : t('dzd_per_month', '€ / mois')}
+                    {currency === 'DZD' ? 'DA / à vie' : '€ / à vie'}
                   </span>
                 </div>
                 <p className="text-[11px] font-bold text-neutral-500 mt-1">
-                  {billingPeriod === 'yearly' ? t('save_4000_dzd', 'Économisez 38 € par rapport au mensuel') : t('no_price_increase', 'Sans engagement de durée')}
+                  {t('freemium_no_card', 'Sans carte bancaire requise')}
                 </p>
               </div>
 
-              <ul className="space-y-3 text-xs text-black font-extrabold pt-4 border-t-2 border-black">
+              <ul className="space-y-3 text-xs text-black font-bold pt-4 border-t-2 border-black">
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-600 stroke-[3]" />
-                  <span>{t('pricing_feature_starter_1', 'Menu Digital QR Code HD Illimité')}</span>
+                  <Check className="w-4 h-4 text-emerald-600 stroke-[3] shrink-0" />
+                  <span>{t('feature_digital_menu', 'Menu Digital QR Code en ligne')}</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-600 stroke-[3]" />
-                  <span>{t('pricing_feature_starter_2', 'Photos des plats, prix & allergènes')}</span>
+                  <Check className="w-4 h-4 text-emerald-600 stroke-[3] shrink-0" />
+                  <span>{t('feature_up_to_dishes', 'Jusqu\'à 20 plats avec photos')}</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-600 stroke-[3]" />
-                  <span>{t('pricing_feature_starter_3', 'Mises à jour du menu 24h/24 en direct')}</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-600 stroke-[3]" />
-                  <span>{t('pricing_feature_starter_4', 'Modèle de QR Code standard à imprimer')}</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-600 stroke-[3]" />
-                  <span>{t('pricing_feature_starter_5', 'Support client par email')}</span>
+                  <Check className="w-4 h-4 text-emerald-600 stroke-[3] shrink-0" />
+                  <span>{t('feature_qr_standard', 'QR Code de base à imprimer')}</span>
                 </li>
                 <li className="flex items-center gap-2 text-neutral-400 line-through">
-                  <span>{t('pricing_feature_starter_6', 'Pas de Carte de Fidélité')}</span>
+                  <span>{t('feature_no_orders', 'Pas de Commande directe')}</span>
                 </li>
                 <li className="flex items-center gap-2 text-neutral-400 line-through">
-                  <span>{t('pricing_feature_starter_7', 'Pas de Notifications clients')}</span>
+                  <span>{t('feature_no_loyalty', 'Pas de Carte de Fidélité')}</span>
                 </li>
               </ul>
             </div>
 
             <div className="pt-6 mt-6 border-t-2 border-black">
               <Link 
-                href={`/pro/register?plan=starter&billing=${billingPeriod}`} 
-                className="w-full neo-pill-btn-white text-xs py-4 flex items-center justify-center gap-2 text-center shadow-[2px_2px_0px_0px_#000]"
+                href={`/pro/register?plan=freemium&currency=${currency}`} 
+                className="w-full neo-pill-btn-white text-xs py-3.5 flex items-center justify-center gap-2 text-center shadow-[2px_2px_0px_0px_#000]"
               >
-                <span>{t('pricing_btn_starter', "Activer l'offre Starter")}</span>
+                <span>{t('btn_activate_freemium', 'Commencer Gratuitement')}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
 
-          {/* 2. FORMULE PRO / FIDÉLITÉ (STAR PLAN) */}
-          <div className="neo-box-yellow p-6 sm:p-8 flex flex-col justify-between relative border-4 border-black shadow-[10px_10px_0px_0px_#000] rounded-3xl">
+          {/* 2. FORMULE STARTER (MENU QR HD ILLIMITÉ) */}
+          <div className="neo-box p-6 flex flex-col justify-between bg-white border-4 border-black shadow-[6px_6px_0px_0px_#000] rounded-3xl">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="font-black text-2xl text-black">{t('pricing_title_pro', 'Formule PRO')}</h3>
-                <span className="bg-black text-white text-[10px] font-black uppercase px-3 py-1 rounded-full border border-black shadow-[2px_2px_0px_0px_#000]">
-                  ⭐ {t('best_value', 'Recommandé')}
-                </span>
+                <h3 className="font-black text-xl sm:text-2xl text-black">{t('pricing_title_starter', 'Formule STARTER')}</h3>
+                <span className="neo-badge text-[10px] font-black bg-[#FFB800]">Menu HD</span>
               </div>
-              <p className="text-neutral-900 text-xs font-black">
-                {t('pricing_desc_pro', 'Pour les établissements qui veulent faire revenir les clients, booster leur chiffre d\'affaires et utiliser nos outils de fidélité.')}
+              <p className="text-neutral-600 text-xs font-bold leading-relaxed">
+                {t('pricing_desc_starter', 'Pour les cafés et restaurants qui veulent un menu digital complet, illimité et actualisé 24h/24.')}
               </p>
               
               <div className="pt-2">
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-4xl sm:text-5xl font-black text-black" dir="ltr">
-                    {billingPeriod === 'yearly' ? '390' : '39'}
+                    {billingPeriod === 'yearly' ? prices.starter.yearly : prices.starter.monthly}
                   </span>
-                  <span className="text-black text-xs font-black">
-                    {billingPeriod === 'yearly' ? t('dzd_per_year', '€ / an') : t('dzd_per_month', '€ / mois')}
+                  <span className="text-neutral-600 text-xs font-black">
+                    {prices.starter.unit} {billingPeriod === 'yearly' ? (language === 'ar' ? '/ سنوياً' : '/ an') : (language === 'ar' ? '/ شهرياً' : '/ mois')}
                   </span>
                 </div>
-                <p className="text-[11px] font-bold text-neutral-800 mt-1">
-                  {billingPeriod === 'yearly' ? t('save_8000_dzd_free', 'Économisez 78 € par rapport au mensuel (2 mois offerts)') : t('no_price_increase', 'Sans engagement de durée')}
+                <p className="text-[11px] font-bold text-neutral-600 mt-1">
+                  {billingPeriod === 'yearly' ? prices.starter.saveLabel : t('no_price_increase', 'Sans engagement de durée')}
+                </p>
+              </div>
+
+              <ul className="space-y-3 text-xs text-black font-extrabold pt-4 border-t-2 border-black">
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 stroke-[3] shrink-0" />
+                  <span>{t('pricing_feature_starter_1', 'Menu Digital QR Code HD Illimité')}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 stroke-[3] shrink-0" />
+                  <span>{t('pricing_feature_starter_2', 'Photos HD, catégories & allergènes')}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 stroke-[3] shrink-0" />
+                  <span>{t('pricing_feature_starter_3', 'Mises à jour des prix 24h/24 en direct')}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 stroke-[3] shrink-0" />
+                  <span>{t('pricing_feature_starter_4', 'Générateur de QR code de table HD')}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 stroke-[3] shrink-0" />
+                  <span>{t('pricing_feature_starter_5', 'Support technique par email')}</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="pt-6 mt-6 border-t-2 border-black">
+              <Link 
+                href={`/pro/register?plan=starter&currency=${currency}&billing=${billingPeriod}`} 
+                className="w-full neo-pill-btn-white text-xs py-3.5 flex items-center justify-center gap-2 text-center shadow-[2px_2px_0px_0px_#000]"
+              >
+                <span>{t('pricing_btn_starter', "Choisir l'offre Starter")}</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+
+          {/* 3. FORMULE PRO & FIDÉLITÉ (STAR PLAN - RECOMMANDÉ) */}
+          <div className="neo-box-yellow p-6 sm:p-7 flex flex-col justify-between relative border-4 border-black shadow-[10px_10px_0px_0px_#000] rounded-3xl">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-black text-xl sm:text-2xl text-black">{t('pricing_title_pro', 'Formule PRO')}</h3>
+                <span className="bg-black text-white text-[10px] font-black uppercase px-3 py-1 rounded-full border border-black shadow-[2px_2px_0px_0px_#000]">
+                  ⭐ {t('best_value', 'Recommandé')}
+                </span>
+              </div>
+              <p className="text-neutral-900 text-xs font-black leading-relaxed">
+                {t('pricing_desc_pro', 'La solution complète : Commandes en direct sans commission, Carte de fidélité et notifications push.')}
+              </p>
+              
+              <div className="pt-2">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-4xl sm:text-5xl font-black text-black" dir="ltr">
+                    {billingPeriod === 'yearly' ? prices.pro.yearly : prices.pro.monthly}
+                  </span>
+                  <span className="text-black text-xs font-black">
+                    {prices.pro.unit} {billingPeriod === 'yearly' ? (language === 'ar' ? '/ سنوياً' : '/ an') : (language === 'ar' ? '/ شهرياً' : '/ mois')}
+                  </span>
+                </div>
+                <p className="text-[11px] font-black text-neutral-900 mt-1">
+                  {billingPeriod === 'yearly' ? prices.pro.saveLabel : t('no_price_increase', 'Sans engagement de durée')}
                 </p>
               </div>
 
               <ul className="space-y-3 text-xs text-black font-black pt-4 border-t-2 border-black">
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-black stroke-[3]" />
-                  <span><strong>{t('pricing_feature_pro_1', 'Tout ce qui est inclus dans la formule Starter')}</strong></span>
+                  <Check className="w-4 h-4 text-black stroke-[3] shrink-0" />
+                  <span><strong>{t('feature_pro_everything_starter', 'Tout ce qui est inclus dans Starter')}</strong></span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-black stroke-[3]" />
+                  <ShoppingBag className="w-4 h-4 text-black stroke-[2.5] shrink-0" />
+                  <span><strong>{t('feature_online_orders', 'Commandes en ligne & Livraison (0% com)')}</strong></span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Award className="w-4 h-4 text-black stroke-[2.5] shrink-0" />
                   <span><strong>{t('pricing_feature_pro_2', 'Carte de Fidélité client interactive')}</strong></span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-black stroke-[3]" />
-                  <span><strong>{t('pricing_feature_pro_3', 'Système de Notifications Web Push')}</strong></span>
+                  <Bell className="w-4 h-4 text-black stroke-[2.5] shrink-0" />
+                  <span><strong>{t('pricing_feature_pro_3', 'Notifications Web Push')}</strong></span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-black stroke-[3]" />
-                  <span>{t('pricing_feature_pro_4', 'Générateur de QR chevalets de table & posters HD')}</span>
+                  <Globe className="w-4 h-4 text-black stroke-[2.5] shrink-0" />
+                  <span>{t('pricing_feature_pro_5', 'Traduction automatique (FR, AR, EN)')}</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-black stroke-[3]" />
-                  <span>{t('pricing_feature_pro_5', 'Traduction automatique en direct (AR, FR, EN)')}</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-black stroke-[3]" />
+                  <Zap className="w-4 h-4 text-black stroke-[2.5] shrink-0" />
                   <span><strong>{t('pricing_feature_pro_6', 'Support prioritaire WhatsApp 7j/7')}</strong></span>
                 </li>
               </ul>
@@ -185,10 +295,10 @@ export default function PricingPage() {
 
             <div className="pt-6 mt-6 border-t-2 border-black">
               <Link 
-                href={`/pro/register?plan=pro&billing=${billingPeriod}`} 
+                href={`/pro/register?plan=pro&currency=${currency}&billing=${billingPeriod}`} 
                 className="w-full neo-pill-btn bg-white hover:bg-neutral-100 text-black text-xs py-4 flex items-center justify-center gap-2 text-center shadow-[4px_4px_0px_0px_#000]"
               >
-                <span>{t('pricing_btn_pro', "Activer l'offre Pro & Fidélité")}</span>
+                <span>{t('pricing_btn_pro', "Activer l'offre PRO")}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -196,14 +306,50 @@ export default function PricingPage() {
 
         </div>
 
+        {/* ── 4. FORMULE SPÉCIALE : LICENCE À VIE (ONE-SHOT) ── */}
+        <div className="mt-10 max-w-4xl mx-auto neo-box p-6 sm:p-8 bg-gradient-to-r from-amber-50 to-orange-50 border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_#000]">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+            <div className="space-y-2 max-w-xl">
+              <div className="inline-flex items-center gap-2 bg-[#FFB800] text-black px-3 py-1 rounded-full border-2 border-black text-xs font-black uppercase shadow-[2px_2px_0px_0px_#000]">
+                <span>⭐ {t('lifetime_badge', 'Formule Partenaire & Distributeur')}</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-black">
+                {t('lifetime_title', 'Licence Complète à Vie (One-Shot)')}
+              </h2>
+              <p className="text-xs sm:text-sm font-bold text-neutral-700 leading-relaxed">
+                {t('lifetime_desc', 'Un paiement unique, aucun prélèvement mensuel ou annuel. Accédez à l\'ensemble des fonctionnalités PRO (Menu HD, Commandes, Livraison, Fidélité) avec mises à jour à vie et accompagnement distributeur.')}
+              </p>
+            </div>
+
+            <div className="flex flex-col items-start lg:items-end gap-3 shrink-0">
+              <div className="text-left lg:text-right">
+                <span className="text-3xl sm:text-4xl font-black text-black" dir="ltr">
+                  {prices.lifetime.amount} {prices.lifetime.unit}
+                </span>
+                <p className="text-[11px] font-black text-neutral-600">
+                  {t('one_time_payment', 'Paiement unique • Sans abonnement')}
+                </p>
+              </div>
+
+              <Link
+                href={`/pro/register?plan=lifetime&currency=${currency}&billing=lifetime`}
+                className="neo-pill-btn bg-black hover:bg-neutral-800 text-white px-6 py-3.5 text-xs font-black flex items-center gap-2 shadow-[4px_4px_0px_0px_#FFB800]"
+              >
+                <span>{t('btn_get_lifetime', 'Obtenir la Licence à Vie')}</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+
         {/* Bottom Reassurance Banner */}
         <div className="mt-12 neo-box bg-white p-6 text-center max-w-2xl mx-auto space-y-2 border-4 border-black shadow-[4px_4px_0px_0px_#000] rounded-2xl">
           <div className="flex items-center justify-center gap-2 text-sm font-black text-black">
             <ShieldCheck className="w-5 h-5 text-emerald-600" />
-            <span>{t('pricing_reassurance_title', 'Activation Immédiate par votre Distributeur')}</span>
+            <span>{t('pricing_reassurance_title', 'Accompagnement & Déploiement Local')}</span>
           </div>
           <p className="text-xs text-neutral-600 font-bold">
-            {t('pricing_reassurance_desc', 'Votre compte sera activé et votre menu configuré immédiatement par notre partenaire distributeur local.')}
+            {t('pricing_reassurance_desc', 'Nos distributeurs partenaires régionaux vous accompagnent pour la saisie de votre carte, l\'impression de vos QR codes de table et la configuration de votre compte.')}
           </p>
         </div>
 

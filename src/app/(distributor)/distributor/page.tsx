@@ -209,6 +209,37 @@ export default function AdminDistributorPage() {
 
   const handleUpdate = async (id: string, updates: any) => {
     setUpdatingId(id);
+
+    // Mise à jour optimiste immédiate (0ms) pour fluidité absolue
+    setMerchants((prev) =>
+      prev.map((m) => {
+        if (m.id === id) {
+          const nextPlan = updates.planTier || m.plan_tier;
+          const nextCurrency = updates.currency || m.currency || 'EUR';
+          const nextLicense = updates.licenseType || m.license_type || 'recurring';
+          let nextPrice = m.monthly_price;
+
+          if (nextLicense === 'lifetime' || nextPlan === 'freemium') {
+            nextPrice = 0;
+          } else if (nextCurrency === 'DZD') {
+            nextPrice = nextPlan === 'basic' ? 1900 : (nextPlan === 'delivery' ? 4900 : 3900);
+          } else {
+            nextPrice = nextPlan === 'basic' ? 19 : (nextPlan === 'delivery' ? 49 : 39);
+          }
+
+          return {
+            ...m,
+            ...updates,
+            plan_tier: nextPlan,
+            currency: nextCurrency,
+            license_type: nextLicense,
+            monthly_price: nextPrice,
+          };
+        }
+        return m;
+      })
+    );
+
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
@@ -228,9 +259,11 @@ export default function AdminDistributorPage() {
         if (distributorId) await fetchMerchants(distributorId);
       } else {
         showToast(data.error || t('error_update', 'Erreur lors de la mise à jour'), 'error');
+        if (distributorId) await fetchMerchants(distributorId);
       }
     } catch (e: any) {
       showToast(e.message || 'Erreur', 'error');
+      if (distributorId) await fetchMerchants(distributorId);
     } finally {
       setUpdatingId(null);
     }
@@ -387,12 +420,25 @@ export default function AdminDistributorPage() {
   const proCount = merchants.filter((m) => (m.plan_tier === 'loyalty' || m.plan_tier === 'premium') && !m.is_suspended).length;
   const totalScans = merchants.reduce((acc, m) => acc + (m.scan_count || 0), 0);
 
-  // Estimations financières basées sur Starter (19 €), Pro Mensuel (39 €), Pro Annuel (390 € / 12)
-  const monthlyVolume = merchants.reduce((acc, m) => {
+  // Estimations financières basées sur les tarifs réels de chaque restaurant (EUR & DZD)
+  const monthlyVolumeEUR = merchants.reduce((acc, m) => {
     if (m.is_suspended || m.plan_status !== 'active') return acc;
-    if (m.plan_tier === 'premium') return acc + Math.round(390 / 12);
-    if (m.plan_tier === 'loyalty') return acc + 39;
-    return acc + 19; // basic (Starter)
+    if (m.license_type === 'lifetime' || m.plan_tier === 'freemium') return acc;
+    if (m.currency === 'DZD') return acc;
+    const price = m.monthly_price !== undefined && m.monthly_price !== null 
+      ? Number(m.monthly_price) 
+      : (m.plan_tier === 'basic' ? 19 : 39);
+    return acc + price;
+  }, 0);
+
+  const monthlyVolumeDZD = merchants.reduce((acc, m) => {
+    if (m.is_suspended || m.plan_status !== 'active') return acc;
+    if (m.license_type === 'lifetime' || m.plan_tier === 'freemium') return acc;
+    if (m.currency !== 'DZD') return acc;
+    const price = m.monthly_price !== undefined && m.monthly_price !== null 
+      ? Number(m.monthly_price) 
+      : (m.plan_tier === 'basic' ? 1900 : 3900);
+    return acc + price;
   }, 0);
 
   if (loading) {
@@ -507,9 +553,14 @@ export default function AdminDistributorPage() {
               <span className="uppercase truncate">{t('distributor_monthly_volume', 'Volume Mensuel')}</span>
               <CheckCircle2 className="w-4 h-4 text-black shrink-0" />
             </div>
-            <div className="text-xl sm:text-3xl font-black text-black truncate">{monthlyVolume.toLocaleString()} €</div>
+            <div className="text-base sm:text-xl font-black text-black truncate flex flex-wrap items-baseline gap-1.5">
+              {monthlyVolumeEUR > 0 && <span>{monthlyVolumeEUR.toLocaleString()} €</span>}
+              {monthlyVolumeEUR > 0 && monthlyVolumeDZD > 0 && <span className="text-xs text-neutral-600 font-bold">•</span>}
+              {monthlyVolumeDZD > 0 && <span>{monthlyVolumeDZD.toLocaleString()} DA</span>}
+              {monthlyVolumeEUR === 0 && monthlyVolumeDZD === 0 && <span>0 €</span>}
+            </div>
             <div className="text-[10px] sm:text-[11px] font-black text-black truncate">
-              {t('distributor_active_mrr', 'Restaurants actifs')}
+              {t('distributor_active_mrr', 'Portefeuille actif')}
             </div>
           </div>
 
@@ -834,6 +885,18 @@ export default function AdminDistributorPage() {
                               CODE: {m.short_code}
                             </span>
                           )}
+                          <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                            <span className="font-mono font-black text-[11px] bg-neutral-100 px-2 py-0.5 rounded-md border border-black text-black">
+                              {m.license_type === 'lifetime'
+                                ? '⭐ Licence à Vie'
+                                : m.plan_tier === 'freemium'
+                                ? `0 ${m.currency === 'DZD' ? 'DA' : '€'} (Gratuit)`
+                                : `${m.monthly_price !== undefined && m.monthly_price !== null ? m.monthly_price : (m.currency === 'DZD' ? (m.plan_tier === 'basic' ? 1900 : 3900) : (m.plan_tier === 'basic' ? 19 : 39))} ${m.currency === 'DZD' ? 'DA' : '€'}/mois`}
+                            </span>
+                            <span className="text-[9px] font-black text-neutral-600 uppercase bg-neutral-100 px-1.5 py-0.5 rounded border border-neutral-300">
+                              {m.currency === 'DZD' ? '🇩🇿 DZD' : '🇪🇺 EUR'}
+                            </span>
+                          </div>
                         </div>
                       </div>
 

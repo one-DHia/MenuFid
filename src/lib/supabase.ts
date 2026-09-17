@@ -8,8 +8,15 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://your-supabase-project.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'your-supabase-anon-key-here';
+const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseUrl = (rawUrl && rawUrl.startsWith('http') && rawUrl !== '[SENSITIVE]')
+  ? rawUrl
+  : 'https://vrfmytzkhsktwyjcdnja.supabase.co';
+
+const rawAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseAnonKey = (rawAnonKey && rawAnonKey !== '[SENSITIVE]')
+  ? rawAnonKey
+  : 'placeholder-anon-key';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
