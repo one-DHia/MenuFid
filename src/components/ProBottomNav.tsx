@@ -51,25 +51,34 @@ export default function ProBottomNav() {
 
     fetchPendingCount();
 
-    // Listen for realtime orders updates
-    const channel = supabase
-      .channel(`pro-bottom-nav-orders-${merchant.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'orders',
-          filter: `merchant_id=eq.${merchant.id}`,
-        },
-        () => {
-          fetchPendingCount();
-        }
-      )
-      .subscribe();
+    let channel: any = null;
+    try {
+      const channelName = `pro-bottom-nav-orders-${merchant.id}-${Math.random().toString(36).substring(2, 9)}`;
+      channel = supabase
+        .channel(channelName)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'orders',
+            filter: `merchant_id=eq.${merchant.id}`,
+          },
+          () => {
+            fetchPendingCount();
+          }
+        )
+        .subscribe();
+    } catch (err) {
+      console.error('[ProBottomNav] Realtime subscription error:', err);
+    }
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) {
+        try {
+          supabase.removeChannel(channel);
+        } catch {}
+      }
     };
   }, [merchant?.id]);
 

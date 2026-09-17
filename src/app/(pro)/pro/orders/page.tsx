@@ -66,39 +66,49 @@ export default function ProOrdersPage() {
     fetchOrders();
 
     // Supabase Realtime Subscription
-    const channel = supabase
-      .channel(`merchant-orders-${merchant.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'orders',
-          filter: `merchant_id=eq.${merchant.id}`,
-        },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            const newOrder = payload.new as Order;
-            setOrders((prev) => [newOrder, ...prev]);
-            if (newOrder.order_status === 'pending') {
-              playAlarm();
-              showToast(`Nouvelle commande reçue ! (#${newOrder.order_number})`, 'success');
+    let channel: any = null;
+    try {
+      const channelName = `merchant-orders-${merchant.id}-${Math.random().toString(36).substring(2, 9)}`;
+      channel = supabase
+        .channel(channelName)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'orders',
+            filter: `merchant_id=eq.${merchant.id}`,
+          },
+          (payload) => {
+            if (payload.eventType === 'INSERT') {
+              const newOrder = payload.new as Order;
+              setOrders((prev) => [newOrder, ...prev]);
+              if (newOrder.order_status === 'pending') {
+                playAlarm();
+                showToast(`Nouvelle commande reçue ! (#${newOrder.order_number})`, 'success');
+              }
+            } else if (payload.eventType === 'UPDATE') {
+              const updated = payload.new as Order;
+              setOrders((prev) =>
+                prev.map((o) => (o.id === updated.id ? updated : o))
+              );
+            } else if (payload.eventType === 'DELETE') {
+              setOrders((prev) => prev.filter((o) => o.id === payload.old.id));
             }
-          } else if (payload.eventType === 'UPDATE') {
-            const updated = payload.new as Order;
-            setOrders((prev) =>
-              prev.map((o) => (o.id === updated.id ? updated : o))
-            );
-          } else if (payload.eventType === 'DELETE') {
-            setOrders((prev) => prev.filter((o) => o.id === payload.old.id));
           }
-        }
-      )
-      .subscribe();
+        )
+        .subscribe();
+    } catch (err) {
+      console.error('[ProOrdersPage] Realtime subscription error:', err);
+    }
 
     return () => {
       stopAlarm();
-      supabase.removeChannel(channel);
+      if (channel) {
+        try {
+          supabase.removeChannel(channel);
+        } catch {}
+      }
     };
   }, [merchant?.id]);
 

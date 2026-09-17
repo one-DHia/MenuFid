@@ -180,41 +180,51 @@ export function useAuth(): UseAuthReturn {
   useEffect(() => {
     if (!merchant?.id) return;
 
-    const channel = supabase
-      .channel(`merchant-status-${merchant.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'merchants',
-          filter: `id=eq.${merchant.id}`
-        },
-        (payload) => {
-          if (payload.eventType === 'DELETE') {
-            if (typeof window !== 'undefined') {
-              localStorage.removeItem('menufid_merchant_profile');
-              localStorage.removeItem('menufid_merchant_id');
-              localStorage.removeItem('menufid_merchant_name');
-              localStorage.removeItem('menufid_merchant_slug');
-              localStorage.removeItem('menufid_plan_tier');
-              document.cookie = 'menufid_merchant_id=; path=/; max-age=0';
-              router.replace('/pro/deleted');
-            }
-            setMerchant(null);
-          } else if (payload.new) {
-            const updated = payload.new as Merchant;
-            setMerchant(updated);
-            if (typeof window !== 'undefined') {
-              localStorage.setItem('menufid_merchant_profile', JSON.stringify(updated));
+    let channel: any = null;
+    try {
+      const channelName = `merchant-status-${merchant.id}-${Math.random().toString(36).substring(2, 9)}`;
+      channel = supabase
+        .channel(channelName)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'merchants',
+            filter: `id=eq.${merchant.id}`
+          },
+          (payload) => {
+            if (payload.eventType === 'DELETE') {
+              if (typeof window !== 'undefined') {
+                localStorage.removeItem('menufid_merchant_profile');
+                localStorage.removeItem('menufid_merchant_id');
+                localStorage.removeItem('menufid_merchant_name');
+                localStorage.removeItem('menufid_merchant_slug');
+                localStorage.removeItem('menufid_plan_tier');
+                document.cookie = 'menufid_merchant_id=; path=/; max-age=0';
+                router.replace('/pro/deleted');
+              }
+              setMerchant(null);
+            } else if (payload.new) {
+              const updated = payload.new as Merchant;
+              setMerchant(updated);
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('menufid_merchant_profile', JSON.stringify(updated));
+              }
             }
           }
-        }
-      )
-      .subscribe();
+        )
+        .subscribe();
+    } catch (err) {
+      console.error('[useAuth] Realtime status sync error:', err);
+    }
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) {
+        try {
+          supabase.removeChannel(channel);
+        } catch {}
+      }
     };
   }, [merchant?.id, router]);
 
