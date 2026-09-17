@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { checkRateLimit } from '@/lib/rateLimit';
 import { sanitizeInputText } from '@/lib/security';
+import { stripe } from '@/lib/stripe';
 
 export const dynamic = 'force-dynamic';
 
@@ -226,6 +227,66 @@ export async function POST(req: Request) {
       .select()
       .single();
 
+    const orderRecord = newOrder || null;
+    let checkoutUrl: string | null = null;
+
+    if (paymentMethod === 'card_online' && process.env.STRIPE_SECRET_KEY) {
+      try {
+        const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'https://www.menufid.site';
+        const lineItems = verifiedOrderItems.map((it: any) => ({
+          price_data: {
+            currency: (merchant.currency || 'eur').toLowerCase(),
+            product_data: {
+              name: it.name,
+            },
+            unit_amount: Math.round(it.price * 100),
+          },
+          quantity: it.quantity,
+        }));
+
+        if (deliveryFee > 0) {
+          lineItems.push({
+            price_data: {
+              currency: (merchant.currency || 'eur').toLowerCase(),
+              product_data: {
+                name: 'Frais de livraison',
+              },
+              unit_amount: Math.round(deliveryFee * 100),
+            },
+            quantity: 1,
+          });
+        }
+
+        const stripeSessionParams: any = {
+          payment_method_types: ['card'],
+          line_items: lineItems,
+          mode: 'payment',
+          success_url: `${origin}/wallet/${merchant.slug}?tab=orders&order_success=${orderRecord?.order_number || orderNumber}`,
+          cancel_url: `${origin}/wallet/${merchant.slug}?tab=orders&order_cancelled=true`,
+          client_reference_id: orderRecord?.id || orderNumber,
+          metadata: {
+            type: 'customer_order',
+            order_id: orderRecord?.id || orderNumber,
+            merchant_id: merchant.id,
+            customer_phone: cleanPhone,
+          },
+        };
+
+        if (merchant.stripe_connect_account_id) {
+          stripeSessionParams.payment_intent_data = {
+            transfer_data: {
+              destination: merchant.stripe_connect_account_id,
+            },
+          };
+        }
+
+        const stripeSession = await stripe.checkout.sessions.create(stripeSessionParams);
+        checkoutUrl = stripeSession.url;
+      } catch (stripeErr) {
+        console.error('Stripe order checkout error:', stripeErr);
+      }
+    }
+
     if (insertErr) {
       console.error('Order creation insert error:', insertErr);
       // Fallback résilient en cas de permission Supabase non encore accordée :
@@ -255,6 +316,7 @@ export async function POST(req: Request) {
       return NextResponse.json({
         success: true,
         order: fallbackOrder,
+        checkoutUrl,
         isFallback: true,
         message: 'Commande validée avec succès !',
       });
@@ -263,6 +325,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       order: newOrder,
+      checkoutUrl,
       message: 'Commande enregistrée avec succès !',
     });
   } catch (error: any) {

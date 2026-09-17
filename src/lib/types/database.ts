@@ -40,9 +40,35 @@ export interface Order {
   payment_method: 'cash_on_delivery' | 'stripe' | 'card_online';
   payment_status: PaymentStatus;
   order_status: OrderStatus;
+  assigned_driver_id?: string | null;
+  points_awarded?: boolean;
+  driver_cash_collected?: boolean;
+  tracking_token?: string;
   stripe_payment_intent_id?: string | null;
   created_at: string;
   updated_at?: string;
+}
+
+export interface DeliveryDriver {
+  id: string;
+  merchant_id: string;
+  name: string;
+  username: string;
+  phone?: string | null;
+  is_active: boolean;
+  created_at?: string;
+}
+
+export interface RestaurantReview {
+  id: string;
+  merchant_id?: string | null;
+  restaurant_name: string;
+  owner_name?: string | null;
+  city?: string | null;
+  rating: number;
+  comment: string;
+  is_approved: boolean;
+  created_at: string;
 }
 
 export interface Distributor {

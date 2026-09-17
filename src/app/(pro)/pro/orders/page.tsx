@@ -26,7 +26,8 @@ import {
   VolumeX,
   MessageCircle,
   ArrowLeft,
-  DollarSign
+  DollarSign,
+  Bike
 } from 'lucide-react';
 import { Spinner } from '@/components/ui/Spinner';
 import ProBottomNav from '@/components/ProBottomNav';
@@ -40,6 +41,7 @@ export default function ProOrdersPage() {
   const { showToast } = useToast();
 
   const [orders, setOrders] = useState<Order[]>([]);
+  const [drivers, setDrivers] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'preparing' | 'in_delivery' | 'delivered'>('all');
   const [isAlarmPlaying, setIsAlarmPlaying] = useState(false);
@@ -175,10 +177,45 @@ export default function ProOrdersPage() {
       if (hasPending) {
         playAlarm();
       }
+
+      // Charger aussi la liste des livreurs actifs de ce restaurant
+      if (merchant?.id) {
+        const { data: driversData } = await supabase
+          .from('delivery_drivers')
+          .select('id, name')
+          .eq('merchant_id', merchant.id)
+          .eq('is_active', true);
+        if (driversData) {
+          setDrivers(driversData);
+        }
+      }
     } catch (err: any) {
       console.error('Error fetching orders:', err);
     } finally {
       setLoading(false);
+    }
+  }
+
+  // Assigner un livreur à une commande
+  async function assignDriver(orderId: string, driverId: string | null) {
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({
+          assigned_driver_id: driverId || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', orderId)
+        .eq('merchant_id', merchant?.id);
+
+      if (error) throw error;
+
+      setOrders((prev) =>
+        prev.map((o) => (o.id === orderId ? { ...o, assigned_driver_id: driverId || null } : o))
+      );
+      showToast('Livreur assigné !', 'success');
+    } catch (err: any) {
+      showToast('Erreur lors de l’assignation du livreur.', 'error');
     }
   }
 
@@ -595,6 +632,25 @@ export default function ProOrdersPage() {
                         {Number(order.total_amount).toFixed(2)} {order.currency}
                       </div>
                     </div>
+
+                    {/* Sélecteur de livreur assigné */}
+                    {(isPreparing || isInDelivery || order.order_status === 'accepted') && (
+                      <div className="p-2 rounded-xl bg-neutral-100 border-2 border-black flex items-center gap-2">
+                        <Bike className="w-4 h-4 text-purple-600 shrink-0" />
+                        <select
+                          value={order.assigned_driver_id || ''}
+                          onChange={(e) => assignDriver(order.id, e.target.value || null)}
+                          className="flex-1 text-[11px] font-bold py-1 px-2 rounded-lg border border-black bg-white focus:outline-none"
+                        >
+                          <option value="">🛵 Assigner un livreur...</option>
+                          {drivers.map((d) => (
+                            <option key={d.id} value={d.id}>
+                              {d.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
 
                     {/* Dynamic Action Buttons according to state */}
                     <div className="space-y-2">

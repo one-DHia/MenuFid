@@ -27,10 +27,121 @@ export async function POST(req: Request) {
       }
     }
 
-    // 1. Session de Checkout terminée avec succès (Inscription & Paiement)
+    // 1. Session de Checkout terminée avec succès
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
-      if (session.payment_status === 'paid' && session.metadata) {
+
+      // ── CAS A : Commande Client payée en ligne via Stripe ──
+      if (session.payment_status === 'paid' && session.metadata?.type === 'customer_order') {
+        const orderId = session.metadata.order_id;
+        const customerPhone = session.metadata.customer_phone;
+        const merchantId = session.metadata.merchant_id;
+
+        if (orderId) {
+          try {
+            const { data: order } = await supabaseAdmin
+              .from('orders')
+              .select('id, merchant_id, customer_phone, points_awarded')
+              .or(`id.eq.${orderId},order_number.eq.${orderId}`)
+              .maybeSingle();
+
+            if (order && !order.points_awarded) {
+              const cleanPhone = (order.customer_phone || customerPhone)?.replace(/[^0-9]/g, '');
+              const targetMerchantId = order.merchant_id || merchantId;
+
+              // Trouver ou créer le profil client
+              let customerId: string | null = null;
+              if (cleanPhone) {
+                const { data: customer } = await supabaseAdmin
+                  .from('customers')
+                  .select('id')
+                  .eq('phone', cleanPhone)
+                  .maybeSingle();
+
+                if (customer) {
+                  customerId = customer.id;
+                } else {
+                  const { data: newCust } = await supabaseAdmin
+                    .from('customers')
+                    .insert({
+                      phone: cleanPhone,
+                      loyalty_code: cleanPhone.slice(-6),
+                    })
+                    .select('id')
+                    .single();
+                  if (newCust) customerId = newCust.id;
+                }
+              }
+
+              // Créditer automatiquement +1 tampon fidélité
+              if (customerId && targetMerchantId) {
+                const { data: card } = await supabaseAdmin
+                  .from('loyalty_cards')
+                  .select('id, stamps_count, total_visits')
+                  .eq('customer_id', customerId)
+                  .eq('merchant_id', targetMerchantId)
+                  .maybeSingle();
+
+                if (card) {
+                  await supabaseAdmin
+                    .from('loyalty_cards')
+                    .update({
+                      stamps_count: (card.stamps_count || 0) + 1,
+                      total_visits: (card.total_visits || 0) + 1,
+                      last_visit_at: new Date().toISOString(),
+                      updated_at: new Date().toISOString(),
+                    })
+                    .eq('id', card.id);
+
+                  await supabaseAdmin.from('stamp_transactions').insert({
+                    card_id: card.id,
+                    type: 'stamp',
+                    amount: 1,
+                    reason: `Commande payée en ligne via Stripe`,
+                  });
+                } else {
+                  const { data: newCard } = await supabaseAdmin
+                    .from('loyalty_cards')
+                    .insert({
+                      customer_id: customerId,
+                      merchant_id: targetMerchantId,
+                      stamps_count: 1,
+                      total_visits: 1,
+                      last_visit_at: new Date().toISOString(),
+                    })
+                    .select('id')
+                    .single();
+
+                  if (newCard) {
+                    await supabaseAdmin.from('stamp_transactions').insert({
+                      card_id: newCard.id,
+                      type: 'stamp',
+                      amount: 1,
+                      reason: `Première commande payée en ligne via Stripe`,
+                    });
+                  }
+                }
+              }
+
+              // Mettre à jour la commande : payée, en cuisine et tampon crédité
+              await supabaseAdmin
+                .from('orders')
+                .update({
+                  payment_status: 'paid',
+                  order_status: 'preparing',
+                  points_awarded: true,
+                  updated_at: new Date().toISOString(),
+                })
+                .eq('id', order.id);
+            }
+          } catch (orderErr) {
+            console.error('Error fulfilling online order webhook:', orderErr);
+          }
+        }
+      }
+
+      // ── CAS B : Inscription & Abonnement Marchand ──
+      if (session.payment_status === 'paid' && session.metadata && session.metadata.type !== 'customer_order') {
         const metadata = session.metadata;
         const email = metadata.email?.toLowerCase();
         const businessName = metadata.business_name;

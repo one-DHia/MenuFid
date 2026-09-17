@@ -23,7 +23,8 @@ import {
   Bell,
   ArrowRight,
   Lock,
-  ShoppingBag
+  ShoppingBag,
+  Bike
 } from 'lucide-react';
 import { Spinner } from '@/components/ui/Spinner';
 import { useToast } from '@/components/ui/Toast';
@@ -453,6 +454,22 @@ export default function ProDashboardPage() {
             </div>
             <div className="flex items-center gap-1 text-xs font-black text-black pt-2">
               <span>{t('manage_orders', 'Ouvrir le flux')}</span>
+              <ChevronRight className="w-4 h-4" />
+            </div>
+          </Link>
+
+          <Link href="/pro/drivers" className="neo-box neo-box-hover p-6 flex flex-col justify-between space-y-4 bg-amber-50/70 border-3 border-black">
+            <div className="space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-[#FFB800] border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000]">
+                <Bike className="w-6 h-6 text-black" />
+              </div>
+              <h3 className="font-black text-xl text-black">Mes Livreurs</h3>
+              <p className="text-neutral-600 text-xs font-bold">
+                Identifiants personnalisés, portail mobile dédié et validation des encaissements en espèces.
+              </p>
+            </div>
+            <div className="flex items-center gap-1 text-xs font-black text-black pt-2">
+              <span>Gérer les livreurs</span>
               <ChevronRight className="w-4 h-4" />
             </div>
           </Link>

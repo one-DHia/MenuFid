@@ -1574,11 +1574,9 @@ export default function CustomerMenu({ slug, hostname }: CustomerMenuProps) {
         </div>
       )}
 
-      {/* ── Floating Fast-Access Order Button (quand le panier est vide) ── */}
-      {totalCartCount === 0 && !isCartOpen && (
-        <div className={`fixed right-4 z-40 transition-all duration-300 ${
-          merchant?.plan_tier !== 'basic' ? 'bottom-24' : 'bottom-6'
-        }`}>
+      {/* ── Floating Fast-Access Order Button (quand le panier est vide et pas de footer fidélité) ── */}
+      {totalCartCount === 0 && !isCartOpen && merchant?.plan_tier === 'basic' && (
+        <div className="fixed right-4 z-40 transition-all duration-300 bottom-[max(1.25rem,calc(env(safe-area-inset-bottom)+0.75rem))]">
           <button
             onClick={() => setIsCartOpen(true)}
             className="neo-pill-btn bg-[#FFB800] hover:bg-amber-400 text-black px-4 py-3 text-xs font-black flex items-center gap-2 shadow-[4px_4px_0px_0px_#000] border-3 border-black active:translate-x-[2px] active:translate-y-[2px]"
@@ -1589,11 +1587,9 @@ export default function CustomerMenu({ slug, hostname }: CustomerMenuProps) {
         </div>
       )}
 
-      {/* ── Floating Sticky Cart Bar (Actif quand le panier n'est pas vide) ── */}
+      {/* ── Floating Sticky Cart Bar (Actif quand le panier n'est pas vide - remplace le footer) ── */}
       {totalCartCount > 0 && (
-        <div className={`fixed left-4 right-4 z-40 max-w-xl mx-auto transition-all duration-300 animate-bounce-short ${
-          merchant?.plan_tier !== 'basic' ? 'bottom-24' : 'bottom-6'
-        }`}>
+        <div className="fixed left-3 right-3 sm:left-4 sm:right-4 z-40 max-w-xl mx-auto transition-all duration-300 animate-bounce-short bottom-[max(1rem,calc(env(safe-area-inset-bottom)+0.5rem))]">
           <div
             onClick={() => setIsCartOpen(true)}
             className={
@@ -1794,7 +1790,7 @@ export default function CustomerMenu({ slug, hostname }: CustomerMenuProps) {
 
             {/* Cart Footer */}
             {cart.length > 0 && (
-              <div className={`p-6 border-t ${
+              <div className={`p-5 sm:p-6 border-t pb-[max(1.5rem,calc(env(safe-area-inset-bottom)+1rem))] shrink-0 ${
                 isMinimalist ? 'border-[#E3DEC3] bg-[#FAF6F0]' :
                 isDark ? 'border-[#2D2D2D] bg-[#1A1A1A]' :
                 isRetro ? 'border-t-4 border-[#C84B31] bg-[#F4F1EA]' :
@@ -1843,9 +1839,9 @@ export default function CustomerMenu({ slug, hostname }: CustomerMenuProps) {
         />
       )}
 
-      {/* ── Footer Sticky Club Fidélité (Désactivé pour la formule Starter/basic) ── */}
-      {merchant?.plan_tier !== 'basic' && (
-        <footer className={`fixed bottom-0 left-0 right-0 z-40 p-4 ${
+      {/* ── Footer Sticky Navigation (Unifié & Sans superposition, masqué si le panier contient des articles) ── */}
+      {merchant?.plan_tier !== 'basic' && totalCartCount === 0 && (
+        <footer className={`fixed bottom-0 left-0 right-0 z-40 p-3 sm:p-4 pb-[max(0.85rem,calc(env(safe-area-inset-bottom)+0.65rem))] ${
           isMinimalist
             ? "bg-[#FAF6F0]/95 backdrop-blur-xl border-t border-[#E3DEC3] text-[#2C2520] shadow-sm"
             : isDark
@@ -1860,9 +1856,9 @@ export default function CustomerMenu({ slug, hostname }: CustomerMenuProps) {
             ? "bg-[#131313]/95 backdrop-blur-xl border-t border-white/10 shadow-[0_-4px_20px_rgba(0,0,0,0.8)] text-[#FFE600]"
             : "bg-white border-t-4 border-black shadow-[0_-4px_0_0_rgba(0,0,0,1)]"
         }`}>
-          <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className={`p-3 rounded-xl ${
+          <div className="max-w-3xl mx-auto flex items-center justify-between gap-3 sm:gap-4">
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              <div className={`p-2 sm:p-3 rounded-xl ${
                 isMinimalist
                   ? "bg-white border border-[#E3DEC3] text-[#8C6D3F] rounded-full"
                   : isDark
@@ -1875,12 +1871,12 @@ export default function CustomerMenu({ slug, hostname }: CustomerMenuProps) {
                   ? "bg-neutral-900 border border-[#CCFF00]/40 text-[#CCFF00] shadow-[0_0_10px_rgba(204,255,0,0.2)] rounded-xl"
                   : isLuxury
                   ? "bg-neutral-900 border border-[#FFE600]/40 text-[#FFE600] shadow-[0_0_12px_rgba(255,230,0,0.2)] rounded-xl"
-                  : "bg-[#FFB800] border-4 border-black shadow-[4px_4px_0px_0px_#000] text-black"
+                  : "bg-[#FFB800] border-3 sm:border-4 border-black shadow-[3px_3px_0px_0px_#000] text-black"
               }`}>
-                <Award className="h-6 w-6 sm:h-7 sm:w-7" />
+                <Award className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
               <div>
-                <p className={`text-sm sm:text-base font-black uppercase tracking-tight ${
+                <p className={`text-xs sm:text-sm font-black uppercase tracking-tight ${
                   isMinimalist ? "text-[#2C2520] font-serif" :
                   isDark ? "text-white" :
                   isRetro ? "text-[#C84B31] font-serif" :
@@ -1902,27 +1898,38 @@ export default function CustomerMenu({ slug, hostname }: CustomerMenuProps) {
               </div>
             </div>
 
-            <Link
-              href={`/wallet/${merchant?.slug || 'demo'}?scan=true`}
-              className={`flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-black uppercase tracking-wider transition-all whitespace-nowrap text-xs sm:text-base ${
-                isMinimalist
-                  ? "bg-[#2C2520] text-white font-serif rounded-full hover:bg-black border border-[#2C2520]"
-                  : isDark
-                  ? "bg-[#FFB800] text-black rounded-xl hover:bg-yellow-400 border border-[#FFB800]"
-                  : isRetro 
-                  ? "bg-white text-[#C84B31] font-serif border-2 border-black shadow-[3px_3px_0px_0px_rgba(200,75,49,0.3)] hover:bg-neutral-50 active:translate-x-[2px] active:translate-y-[2px]" 
-                  : isNature
-                  ? "bg-[#5F8D58] text-white rounded-full hover:bg-[#4C7546] border border-[#4C7546]"
-                  : isCyberpunk
-                  ? "bg-[#CCFF00] text-black font-mono font-bold border border-[#CCFF00] rounded-xl hover:bg-[#b0dc00] shadow-[0_0_15px_rgba(204,255,0,0.3)]"
-                  : isLuxury
-                  ? "bg-[#FFE600] text-black font-sans font-bold border border-[#FFE600] rounded-full hover:bg-yellow-400 shadow-[0_0_15px_rgba(255,230,0,0.3)]"
-                  : "bg-[#00F59B] text-black border-4 border-black shadow-[4px_4px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#000] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
-              }`}
-            >
-              <span>{t('join_now', 'Rejoindre')}</span>
-              <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
-            </Link>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsCartOpen(true)}
+                className="flex items-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl border-2 border-black bg-[#FFB800] text-black font-black text-xs uppercase shadow-[2px_2px_0px_0px_#000] active:translate-x-[1px] active:translate-y-[1px] transition"
+              >
+                <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span>{t('order_online', 'Commander')}</span>
+              </button>
+
+              <Link
+                href={`/wallet/${merchant?.slug || 'demo'}?scan=true`}
+                className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-black uppercase tracking-wider transition-all whitespace-nowrap text-xs ${
+                  isMinimalist
+                    ? "bg-[#2C2520] text-white font-serif rounded-full hover:bg-black border border-[#2C2520]"
+                    : isDark
+                    ? "bg-[#FFB800] text-black rounded-xl hover:bg-yellow-400 border border-[#FFB800]"
+                    : isRetro 
+                    ? "bg-white text-[#C84B31] font-serif border-2 border-black shadow-[2px_2px_0px_0px_rgba(200,75,49,0.3)] hover:bg-neutral-50 active:translate-x-[2px] active:translate-y-[2px]" 
+                    : isNature
+                    ? "bg-[#5F8D58] text-white rounded-full hover:bg-[#4C7546] border border-[#4C7546]"
+                    : isCyberpunk
+                    ? "bg-[#CCFF00] text-black font-mono font-bold border border-[#CCFF00] rounded-xl hover:bg-[#b0dc00] shadow-[0_0_15px_rgba(204,255,0,0.3)]"
+                    : isLuxury
+                    ? "bg-[#FFE600] text-black font-sans font-bold border border-[#FFE600] rounded-full hover:bg-yellow-400 shadow-[0_0_15px_rgba(255,230,0,0.3)]"
+                    : "bg-[#00F59B] text-black border-2 sm:border-3 border-black shadow-[3px_3px_0px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] active:shadow-none"
+                }`}
+              >
+                <span>{t('join_now', 'Rejoindre')}</span>
+                <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              </Link>
+            </div>
           </div>
         </footer>
       )}

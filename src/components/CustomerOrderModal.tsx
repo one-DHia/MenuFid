@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/lib/i18n';
 import { formatPrice } from '@/lib/currency';
 import type { MenuItem } from '@/types';
@@ -106,6 +106,17 @@ export default function CustomerOrderModal({
     return encodeURIComponent(msg);
   };
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedPhone = localStorage.getItem('menufid_customer_phone');
+      const savedName = localStorage.getItem('menufid_customer_name');
+      const savedAddress = localStorage.getItem('menufid_customer_address');
+      if (savedPhone) setCustomerPhone(savedPhone);
+      if (savedName) setCustomerName(savedName);
+      if (savedAddress) setCustomerAddress(savedAddress);
+    }
+  }, []);
+
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
@@ -155,6 +166,19 @@ export default function CustomerOrderModal({
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || 'Erreur lors de la prise de commande.');
+      }
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('menufid_customer_phone', customerPhone.trim());
+        localStorage.setItem('menufid_customer_name', customerName.trim());
+        if (customerAddress.trim()) {
+          localStorage.setItem('menufid_customer_address', customerAddress.trim());
+        }
+      }
+
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+        return;
       }
 
       setConfirmedOrder(data.order);
@@ -234,6 +258,14 @@ export default function CustomerOrderModal({
 
               <div className="pt-2 flex flex-col gap-2.5">
                 <a
+                  href={`/wallet/${merchant?.slug || ''}?tab=orders`}
+                  className="w-full neo-pill-btn bg-[#FFB800] hover:bg-amber-400 text-black py-3.5 text-xs font-black flex items-center justify-center gap-2 shadow-[2px_2px_0px_0px_#000]"
+                >
+                  <Truck className="w-4 h-4" />
+                  <span>Suivre ma commande en direct 🛵</span>
+                </a>
+
+                <a
                   href={`https://wa.me/?text=${getWhatsAppMessage(confirmedOrder.order_number)}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -254,7 +286,7 @@ export default function CustomerOrderModal({
             </div>
           ) : (
             /* ── ORDER FORM ── */
-            <form onSubmit={handleSubmitOrder} className="space-y-5">
+            <form id="customer-order-form" onSubmit={handleSubmitOrder} className="space-y-5">
               {/* Alerte Pause active */}
               {isOrdersPaused && (
                 <div className="p-3.5 rounded-xl border-2 border-black bg-red-100 flex items-start gap-2.5">
@@ -500,27 +532,32 @@ export default function CustomerOrderModal({
                   </span>
                 </div>
               </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={loading || isOrdersPaused || isBelowMinOrder}
-                className="w-full neo-pill-btn bg-[#00F59B] hover:bg-emerald-400 text-black py-4 text-xs font-black flex items-center justify-center gap-2 shadow-[4px_4px_0px_0px_#000] disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? (
-                  <Spinner size={20} className="text-black" />
-                ) : (
-                  <>
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>
-                      {t('order_now', 'Commander maintenant')} • {formatPrice(finalTotal, currency, language)}
-                    </span>
-                  </>
-                )}
-              </button>
             </form>
           )}
         </div>
+
+        {/* Modal Sticky Footer (Always visible & accessible across all mobile devices & foldables) */}
+        {!confirmedOrder && (
+          <div className="shrink-0 p-3.5 sm:p-4 border-t-2 border-black bg-white pb-[max(1rem,calc(env(safe-area-inset-bottom)+0.5rem))]">
+            <button
+              type="submit"
+              form="customer-order-form"
+              disabled={loading || isOrdersPaused || isBelowMinOrder}
+              className="w-full neo-pill-btn bg-[#00F59B] hover:bg-emerald-400 text-black py-3.5 sm:py-4 text-xs sm:text-sm font-black flex items-center justify-center gap-2 shadow-[4px_4px_0px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            >
+              {loading ? (
+                <Spinner size={20} className="text-black" />
+              ) : (
+                <>
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>
+                    {t('order_now', 'Commander maintenant')} • {formatPrice(finalTotal, currency, language)}
+                  </span>
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

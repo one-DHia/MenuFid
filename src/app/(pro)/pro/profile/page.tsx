@@ -75,6 +75,8 @@ export default function ProProfilePage() {
   const [orderOpeningTime, setOrderOpeningTime] = useState<string>('11:30');
   const [orderClosingTime, setOrderClosingTime] = useState<string>('23:00');
   const [ordersPaused, setOrdersPaused] = useState<boolean>(false);
+  const [deliveryPaymentMode, setDeliveryPaymentMode] = useState<'both' | 'cash_on_delivery' | 'online_only'>('both');
+  const [stripeConnectAccountId, setStripeConnectAccountId] = useState<string>('');
   const [savingDeliverySettings, setSavingDeliverySettings] = useState<boolean>(false);
 
   // Sécurité
@@ -145,6 +147,8 @@ export default function ProProfilePage() {
       if (merchant.min_order_amount !== undefined) setMinOrderAmount(merchant.min_order_amount || 0);
       if (merchant.delivery_fee !== undefined) setDeliveryFee(merchant.delivery_fee || 0);
       if (merchant.orders_paused !== undefined) setOrdersPaused(!!merchant.orders_paused);
+      if (merchant.delivery_payment_mode) setDeliveryPaymentMode(merchant.delivery_payment_mode as any);
+      if (merchant.stripe_connect_account_id) setStripeConnectAccountId(merchant.stripe_connect_account_id);
       if (merchant.delivery_hours) {
         try {
           const parsed = typeof merchant.delivery_hours === 'string' ? JSON.parse(merchant.delivery_hours) : merchant.delivery_hours;
@@ -357,6 +361,8 @@ export default function ProProfilePage() {
           delivery_fee: Number(deliveryFee) || 0,
           delivery_hours: deliveryHoursJson,
           orders_paused: ordersPaused,
+          delivery_payment_mode: deliveryPaymentMode,
+          stripe_connect_account_id: stripeConnectAccountId.trim() || null,
         })
         .eq('id', merchant.id);
 
@@ -366,6 +372,8 @@ export default function ProProfilePage() {
       merchant.delivery_fee = Number(deliveryFee) || 0;
       merchant.delivery_hours = deliveryHoursJson;
       merchant.orders_paused = ordersPaused;
+      merchant.delivery_payment_mode = deliveryPaymentMode;
+      merchant.stripe_connect_account_id = stripeConnectAccountId.trim() || null;
 
       showToast(t('update_merchant_success', 'Paramètres de l\'établissement mis à jour avec succès !'), 'success');
     } catch (err: any) {
@@ -827,6 +835,51 @@ export default function ProProfilePage() {
                   />
                   <p className="text-[10px] text-neutral-500 font-bold mt-1">
                     {t('delivery_fee_help', 'Ajoutés automatiquement aux livraisons.')}
+                  </p>
+                </div>
+              </div>
+
+              {/* Mode d'encaissement accepté & Coordonnées Stripe */}
+              <div className="p-4 rounded-2xl bg-neutral-50 border-2 border-black space-y-4">
+                <div>
+                  <label className="block text-xs font-black uppercase text-black mb-1">
+                    Mode d’encaissement accepté pour les livraisons
+                  </label>
+                  <select
+                    value={deliveryPaymentMode}
+                    onChange={(e) => setDeliveryPaymentMode(e.target.value as any)}
+                    className="w-full neo-input text-xs font-bold bg-white"
+                  >
+                    <option value="both">💳 Carte Bancaire (Stripe) + 💵 Espèces à la livraison (Recommandé)</option>
+                    <option value="cash_on_delivery">💵 Espèces à la livraison uniquement (0% commission)</option>
+                    <option value="online_only">💳 Carte Bancaire en ligne uniquement (Stripe Connect)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-black uppercase text-black">
+                      Coordonnées Bancaires / Compte Stripe Connect (Paiements Directs)
+                    </label>
+                    {stripeConnectAccountId ? (
+                      <span className="text-[10px] bg-[#00F59B] text-black font-black px-2 py-0.5 rounded-full border border-black">
+                        ✓ Stripe Connect Connecté
+                      </span>
+                    ) : (
+                      <span className="text-[10px] bg-amber-100 text-amber-900 font-black px-2 py-0.5 rounded-full border border-amber-300">
+                        À configurer
+                      </span>
+                    )}
+                  </div>
+                  <input
+                    type="text"
+                    value={stripeConnectAccountId}
+                    onChange={(e) => setStripeConnectAccountId(e.target.value)}
+                    placeholder="Ex: acct_1NxXXXXXXXXXXXXX ou votre IBAN pro"
+                    className="w-full neo-input text-xs font-mono font-bold bg-white"
+                  />
+                  <p className="text-[10px] text-neutral-500 font-bold mt-1">
+                    Renseignez votre identifiant Stripe Connect ou vos coordonnées bancaires pour recevoir les paiements par carte de vos clients directement sur votre compte.
                   </p>
                 </div>
               </div>

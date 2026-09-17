@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import RestaurantReviewsSection from '@/components/RestaurantReviewsSection';
 import { Check, Sparkles, ShieldCheck, ArrowRight, Zap, Award, QrCode, ShoppingBag, Bell, Globe } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 
@@ -12,28 +13,34 @@ export default function PricingPage() {
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('yearly');
   const [currency, setCurrency] = useState<'EUR' | 'DZD'>('EUR');
 
-  // Tarifs dynamiques en fonction de la devise et de la périodicité
+  // Tarifs dynamiques en fonction de la devise et de la périodicité (Offre spéciale lancement: abonnements 100% gratuits, licence -50%)
   const prices = {
     freemium: {
-      monthly: currency === 'DZD' ? '0 DA' : '0 €',
-      yearly: currency === 'DZD' ? '0 DA' : '0 €',
+      monthly: '0',
+      yearly: '0',
       periodLabel: currency === 'DZD' ? 'DA / à vie' : '€ / à vie',
     },
     starter: {
-      monthly: currency === 'DZD' ? '1 900' : '19',
-      yearly: currency === 'DZD' ? '19 000' : '190',
+      monthly: '0',
+      yearly: '0',
+      oldMonthly: currency === 'DZD' ? '1 900 DA' : '19 €',
+      oldYearly: currency === 'DZD' ? '19 000 DA' : '190 €',
       unit: currency === 'DZD' ? 'DA' : '€',
-      saveLabel: currency === 'DZD' ? 'Économisez 3 800 DA (2 mois offerts)' : 'Économisez 38 € (2 mois offerts)',
+      saveLabel: currency === 'DZD' ? 'Offert pour le lancement (0 DA)' : 'Offert pour le lancement (0 €)',
     },
     pro: {
-      monthly: currency === 'DZD' ? '3 900' : '39',
-      yearly: currency === 'DZD' ? '39 000' : '390',
+      monthly: '0',
+      yearly: '0',
+      oldMonthly: currency === 'DZD' ? '3 900 DA' : '39 €',
+      oldYearly: currency === 'DZD' ? '39 000 DA' : '390 €',
       unit: currency === 'DZD' ? 'DA' : '€',
-      saveLabel: currency === 'DZD' ? 'Économisez 7 800 DA (2 mois offerts)' : 'Économisez 78 € (2 mois offerts)',
+      saveLabel: currency === 'DZD' ? 'Offert pour le lancement (0 DA)' : 'Offert pour le lancement (0 €)',
     },
     lifetime: {
-      amount: currency === 'DZD' ? '49 000' : '490',
+      amount: currency === 'DZD' ? '24 500' : '245',
+      oldAmount: currency === 'DZD' ? '49 000' : '490',
       unit: currency === 'DZD' ? 'DA' : '€',
+      discountBadge: '-50% OFFRE SPÉCIALE',
       periodLabel: currency === 'DZD' ? 'DA en paiement unique' : '€ en paiement unique',
     }
   };
@@ -183,23 +190,31 @@ export default function PricingPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-black text-xl sm:text-2xl text-black">{t('pricing_title_starter', 'Formule STARTER')}</h3>
-                <span className="neo-badge text-[10px] font-black bg-[#FFB800]">Menu HD</span>
+                <span className="neo-badge text-[10px] font-black bg-[#00F59B] text-black">OFFERT LANCEMENT</span>
               </div>
               <p className="text-neutral-600 text-xs font-bold leading-relaxed">
                 {t('pricing_desc_starter', 'Pour les cafés et restaurants qui veulent un menu digital complet, illimité et actualisé 24h/24.')}
               </p>
               
               <div className="pt-2">
-                <div className="flex items-baseline gap-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-neutral-400 line-through">
+                    {billingPeriod === 'yearly' ? prices.starter.oldYearly : prices.starter.oldMonthly}
+                  </span>
+                  <span className="text-[10px] bg-emerald-100 text-emerald-800 font-black px-2 py-0.5 rounded-full border border-emerald-300">
+                    100% GRATUIT
+                  </span>
+                </div>
+                <div className="flex items-baseline gap-1.5 mt-0.5">
                   <span className="text-4xl sm:text-5xl font-black text-black" dir="ltr">
-                    {billingPeriod === 'yearly' ? prices.starter.yearly : prices.starter.monthly}
+                    0
                   </span>
                   <span className="text-neutral-600 text-xs font-black">
                     {prices.starter.unit} {billingPeriod === 'yearly' ? (language === 'ar' ? '/ سنوياً' : '/ an') : (language === 'ar' ? '/ شهرياً' : '/ mois')}
                   </span>
                 </div>
-                <p className="text-[11px] font-bold text-neutral-600 mt-1">
-                  {billingPeriod === 'yearly' ? prices.starter.saveLabel : t('no_price_increase', 'Sans engagement de durée')}
+                <p className="text-[11px] font-bold text-emerald-700 mt-1">
+                  ✓ {prices.starter.saveLabel}
                 </p>
               </div>
 
@@ -232,7 +247,7 @@ export default function PricingPage() {
                 href={`/pro/register?plan=starter&currency=${currency}&billing=${billingPeriod}`} 
                 className="w-full neo-pill-btn-white text-xs py-3.5 flex items-center justify-center gap-2 text-center shadow-[2px_2px_0px_0px_#000]"
               >
-                <span>{t('pricing_btn_starter', "Choisir l'offre Starter")}</span>
+                <span>{t('pricing_btn_starter_free', "Activer l'offre Starter (Gratuit)")}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -243,8 +258,8 @@ export default function PricingPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-black text-xl sm:text-2xl text-black">{t('pricing_title_pro', 'Formule PRO')}</h3>
-                <span className="bg-black text-white text-[10px] font-black uppercase px-3 py-1 rounded-full border border-black shadow-[2px_2px_0px_0px_#000]">
-                  ⭐ {t('best_value', 'Recommandé')}
+                <span className="bg-black text-[#FFB800] text-[10px] font-black uppercase px-3 py-1 rounded-full border border-black shadow-[2px_2px_0px_0px_#000]">
+                  ⭐ {t('best_value', 'Offert Lancement')}
                 </span>
               </div>
               <p className="text-neutral-900 text-xs font-black leading-relaxed">
@@ -252,16 +267,24 @@ export default function PricingPage() {
               </p>
               
               <div className="pt-2">
-                <div className="flex items-baseline gap-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-neutral-600 line-through">
+                    {billingPeriod === 'yearly' ? prices.pro.oldYearly : prices.pro.oldMonthly}
+                  </span>
+                  <span className="text-[10px] bg-black text-[#00F59B] font-black px-2 py-0.5 rounded-full border border-black">
+                    ACCÈS LIBRE 0 €
+                  </span>
+                </div>
+                <div className="flex items-baseline gap-1.5 mt-0.5">
                   <span className="text-4xl sm:text-5xl font-black text-black" dir="ltr">
-                    {billingPeriod === 'yearly' ? prices.pro.yearly : prices.pro.monthly}
+                    0
                   </span>
                   <span className="text-black text-xs font-black">
                     {prices.pro.unit} {billingPeriod === 'yearly' ? (language === 'ar' ? '/ سنوياً' : '/ an') : (language === 'ar' ? '/ شهرياً' : '/ mois')}
                   </span>
                 </div>
                 <p className="text-[11px] font-black text-neutral-900 mt-1">
-                  {billingPeriod === 'yearly' ? prices.pro.saveLabel : t('no_price_increase', 'Sans engagement de durée')}
+                  ✓ {t('pro_free_launch', 'Toutes les fonctionnalités PRO offertes sans carte bancaire')}
                 </p>
               </div>
 
@@ -296,9 +319,9 @@ export default function PricingPage() {
             <div className="pt-6 mt-6 border-t-2 border-black">
               <Link 
                 href={`/pro/register?plan=pro&currency=${currency}&billing=${billingPeriod}`} 
-                className="w-full neo-pill-btn bg-white hover:bg-neutral-100 text-black text-xs py-4 flex items-center justify-center gap-2 text-center shadow-[4px_4px_0px_0px_#000]"
+                className="w-full neo-pill-btn bg-black hover:bg-neutral-800 text-white text-xs py-4 flex items-center justify-center gap-2 text-center shadow-[4px_4px_0px_0px_#000]"
               >
-                <span>{t('pricing_btn_pro', "Activer l'offre PRO")}</span>
+                <span>{t('pricing_btn_pro_free', "Activer l'offre PRO & Fidélité (Gratuit)")}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -306,12 +329,12 @@ export default function PricingPage() {
 
         </div>
 
-        {/* ── 4. FORMULE SPÉCIALE : LICENCE À VIE (ONE-SHOT) ── */}
+        {/* ── 4. FORMULE SPÉCIALE : LICENCE À VIE (ONE-SHOT -50%) ── */}
         <div className="mt-10 max-w-4xl mx-auto neo-box p-6 sm:p-8 bg-gradient-to-r from-amber-50 to-orange-50 border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_#000]">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
             <div className="space-y-2 max-w-xl">
-              <div className="inline-flex items-center gap-2 bg-[#FFB800] text-black px-3 py-1 rounded-full border-2 border-black text-xs font-black uppercase shadow-[2px_2px_0px_0px_#000]">
-                <span>⭐ {t('lifetime_badge', 'Formule Partenaire & Distributeur')}</span>
+              <div className="inline-flex items-center gap-2 bg-[#FF4747] text-white px-3 py-1 rounded-full border-2 border-black text-xs font-black uppercase shadow-[2px_2px_0px_0px_#000]">
+                <span>🔥 {prices.lifetime.discountBadge}</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-black text-black">
                 {t('lifetime_title', 'Licence Complète à Vie (One-Shot)')}
@@ -323,7 +346,15 @@ export default function PricingPage() {
 
             <div className="flex flex-col items-start lg:items-end gap-3 shrink-0">
               <div className="text-left lg:text-right">
-                <span className="text-3xl sm:text-4xl font-black text-black" dir="ltr">
+                <div className="flex items-center gap-2 lg:justify-end">
+                  <span className="text-base font-bold text-neutral-400 line-through">
+                    {prices.lifetime.oldAmount} {prices.lifetime.unit}
+                  </span>
+                  <span className="text-xs bg-[#FF4747] text-white font-black px-2 py-0.5 rounded border border-black">
+                    -50%
+                  </span>
+                </div>
+                <span className="text-3xl sm:text-4xl font-black text-black block mt-0.5" dir="ltr">
                   {prices.lifetime.amount} {prices.lifetime.unit}
                 </span>
                 <p className="text-[11px] font-black text-neutral-600">
@@ -335,12 +366,15 @@ export default function PricingPage() {
                 href={`/pro/register?plan=lifetime&currency=${currency}&billing=lifetime`}
                 className="neo-pill-btn bg-black hover:bg-neutral-800 text-white px-6 py-3.5 text-xs font-black flex items-center gap-2 shadow-[4px_4px_0px_0px_#FFB800]"
               >
-                <span>{t('btn_get_lifetime', 'Obtenir la Licence à Vie')}</span>
+                <span>{t('btn_get_lifetime_discount', 'Obtenir la Licence à Vie (-50%)')}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
         </div>
+
+        {/* ── 5. SECTION AVIS & TÉMOIGNAGES RESTAURATEURS ── */}
+        <RestaurantReviewsSection />
 
         {/* Bottom Reassurance Banner */}
         <div className="mt-12 neo-box bg-white p-6 text-center max-w-2xl mx-auto space-y-2 border-4 border-black shadow-[4px_4px_0px_0px_#000] rounded-2xl">

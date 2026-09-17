@@ -1,6 +1,7 @@
 -- ========================================================
--- MIGRATION : Système de Commande Directe, Livraison, Licences & Devises
--- Tables: public.merchants, public.orders
+-- MIGRATION : Système de Commande Directe, Livraison, 
+-- Portail Livreur, Avis Restaurateurs, Licences & Devises
+-- Tables: public.merchants, public.orders, public.delivery_drivers, public.restaurant_reviews
 -- ========================================================
 
 -- 1. Extension de la table merchants (Devise, Licences, Livraison)
@@ -22,7 +23,23 @@ COMMENT ON COLUMN public.merchants.delivery_fee IS 'Frais ajoutés automatiqueme
 COMMENT ON COLUMN public.merchants.delivery_hours IS 'Plages horaires d ouverture à la commande au format JSON';
 COMMENT ON COLUMN public.merchants.orders_paused IS 'Bouton d urgence rush/pause pour suspendre les commandes';
 
--- 2. Création de la table orders
+-- 2. Création de la table delivery_drivers (Portail Livreur Mobile)
+CREATE TABLE IF NOT EXISTS public.delivery_drivers (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    merchant_id uuid NOT NULL REFERENCES public.merchants(id) ON DELETE CASCADE,
+    name text NOT NULL,
+    username text NOT NULL,
+    password_hash text NOT NULL,
+    phone text,
+    is_active boolean DEFAULT true,
+    created_at timestamp with time zone DEFAULT now(),
+    CONSTRAINT unique_driver_username_per_merchant UNIQUE (merchant_id, username)
+);
+
+CREATE INDEX IF NOT EXISTS idx_delivery_drivers_merchant 
+ON public.delivery_drivers (merchant_id, is_active);
+
+-- 3. Création de la table orders
 CREATE TABLE IF NOT EXISTS public.orders (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     merchant_id uuid NOT NULL REFERENCES public.merchants(id) ON DELETE CASCADE,
@@ -41,26 +58,65 @@ CREATE TABLE IF NOT EXISTS public.orders (
     payment_method text NOT NULL DEFAULT 'cash_on_delivery',
     payment_status text NOT NULL DEFAULT 'pending',
     order_status text NOT NULL DEFAULT 'pending',
+    assigned_driver_id uuid REFERENCES public.delivery_drivers(id) ON DELETE SET NULL,
+    points_awarded boolean DEFAULT false,
+    driver_cash_collected boolean DEFAULT false,
+    tracking_token uuid DEFAULT gen_random_uuid(),
     stripe_payment_intent_id text,
     created_at timestamp with time zone DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now()
 );
 
--- Index pour requêtes rapides du tableau de bord
+-- Extensions si la table existait déjà
+ALTER TABLE public.orders 
+ADD COLUMN IF NOT EXISTS assigned_driver_id uuid REFERENCES public.delivery_drivers(id) ON DELETE SET NULL,
+ADD COLUMN IF NOT EXISTS points_awarded boolean DEFAULT false,
+ADD COLUMN IF NOT EXISTS driver_cash_collected boolean DEFAULT false,
+ADD COLUMN IF NOT EXISTS tracking_token uuid DEFAULT gen_random_uuid();
+
+-- Index pour requêtes rapides du tableau de bord et du portail livreur
 CREATE INDEX IF NOT EXISTS idx_orders_merchant_status 
 ON public.orders (merchant_id, order_status, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_orders_driver 
+ON public.orders (assigned_driver_id, order_status);
+
+CREATE INDEX IF NOT EXISTS idx_orders_tracking 
+ON public.orders (tracking_token);
 
 CREATE INDEX IF NOT EXISTS idx_orders_created_at 
 ON public.orders (created_at DESC);
 
--- 3. Permissions globales (Résolution de l'erreur "permission denied for table orders")
+-- 4. Création de la table restaurant_reviews (Avis & Commentaires Restaurateurs)
+CREATE TABLE IF NOT EXISTS public.restaurant_reviews (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    merchant_id uuid REFERENCES public.merchants(id) ON DELETE CASCADE,
+    restaurant_name text NOT NULL,
+    owner_name text,
+    city text,
+    rating integer NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    comment text NOT NULL,
+    is_approved boolean DEFAULT true,
+    created_at timestamp with time zone DEFAULT now(),
+    CONSTRAINT unique_merchant_review UNIQUE (merchant_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_restaurant_reviews_approved 
+ON public.restaurant_reviews (is_approved, created_at DESC);
+
+-- 5. Permissions globales
 GRANT ALL ON TABLE public.merchants TO postgres, anon, authenticated, service_role;
+GRANT ALL ON TABLE public.delivery_drivers TO postgres, anon, authenticated, service_role;
 GRANT ALL ON TABLE public.orders TO postgres, anon, authenticated, service_role;
+GRANT ALL ON TABLE public.restaurant_reviews TO postgres, anon, authenticated, service_role;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO postgres, anon, authenticated, service_role;
 
--- 4. Sécurité Row Level Security (RLS)
+-- 6. Sécurité Row Level Security (RLS)
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.delivery_drivers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.restaurant_reviews ENABLE ROW LEVEL SECURITY;
 
+-- Politiques RLS Orders
 DROP POLICY IF EXISTS "Merchants can read own orders" ON public.orders;
 CREATE POLICY "Merchants can read own orders"
 ON public.orders FOR SELECT
@@ -76,7 +132,24 @@ CREATE POLICY "Service role and customers can insert orders"
 ON public.orders FOR INSERT
 WITH CHECK (true);
 
--- 5. Publication Realtime pour notification sonore en direct
+-- Politiques RLS Delivery Drivers
+DROP POLICY IF EXISTS "Merchants can manage own drivers" ON public.delivery_drivers;
+CREATE POLICY "Merchants can manage own drivers"
+ON public.delivery_drivers FOR ALL
+USING (auth.uid() = merchant_id OR auth.role() = 'service_role');
+
+-- Politiques RLS Reviews
+DROP POLICY IF EXISTS "Public can view approved reviews" ON public.restaurant_reviews;
+CREATE POLICY "Public can view approved reviews"
+ON public.restaurant_reviews FOR SELECT
+USING (is_approved = true OR auth.role() = 'service_role');
+
+DROP POLICY IF EXISTS "Merchants can manage own review" ON public.restaurant_reviews;
+CREATE POLICY "Merchants can manage own review"
+ON public.restaurant_reviews FOR ALL
+USING (auth.uid() = merchant_id OR auth.role() = 'service_role');
+
+-- 7. Publication Realtime
 DO $$
 BEGIN
     IF NOT EXISTS (
@@ -89,4 +162,3 @@ END $$;
 
 -- Forcer le rafraîchissement du cache de schéma PostgREST
 NOTIFY pgrst, 'reload schema';
-
