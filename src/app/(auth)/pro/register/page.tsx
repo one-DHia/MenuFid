@@ -200,8 +200,16 @@ function RegisterContent() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <span className="text-lg sm:text-xl font-black text-black">{planPrice}</span>
-                  <Link href="/pricing" className="block text-[10px] font-black text-[#B45309] hover:underline">
+                  <span className="text-[10px] bg-[#00F59B] text-black font-black px-2 py-0.5 rounded-full border border-black inline-block mb-1">
+                    {t('pricing_3_months_free', '🎁 3 MOIS OFFERTS')}
+                  </span>
+                  <div className="text-lg sm:text-xl font-black text-black">
+                    0 € <span className="text-xs font-bold text-neutral-500">{language === 'ar' ? 'اليوم' : (language === 'en' ? 'today' : 'aujourd\'hui')}</span>
+                  </div>
+                  <p className="text-[11px] font-bold text-neutral-600">
+                    {language === 'ar' ? 'ثم' : (language === 'en' ? 'then' : 'puis')} {planPrice}
+                  </p>
+                  <Link href="/pricing" className="block text-[10px] font-black text-[#B45309] hover:underline mt-0.5">
                     {t('reg_change_plan', "Changer d'offre")}
                   </Link>
                 </div>
@@ -284,13 +292,13 @@ function RegisterContent() {
                     </h4>
                   </div>
 
-                  <div className="p-3.5 bg-neutral-50 border-2 border-dashed border-neutral-300 rounded-xl space-y-2 text-xs font-bold text-neutral-600">
+                  <div className="p-3.5 bg-emerald-50 border-2 border-emerald-500 rounded-xl space-y-1.5 text-xs font-bold text-emerald-950">
                     <div className="flex items-center gap-2 text-black font-black">
                       <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>{t('reg_sec2_encrypted', 'Paiement chiffré 256-bit géré par Stripe')}</span>
+                      <span>{t('reg_sec2_encrypted', 'Validation sécurisée 0 € gérée par Stripe')}</span>
                     </div>
                     <p className="text-[11px] leading-relaxed">
-                      ⚠️ <strong>{t('reg_sec2_rule_title', 'Règle de sécurité :')}</strong> {t('reg_sec2_rule_desc', "Si vous ne validez pas le paiement sur la page suivante, aucun compte n'est créé et aucune donnée n'est conservée.")}
+                      🎁 <strong>{t('reg_sec2_rule_title', '3 Mois 100% Offerts :')}</strong> {t('reg_sec2_rule_desc', "Votre carte est validée par Stripe mais 0,00 € sont débités aujourd'hui. Votre premier prélèvement aura lieu uniquement dans 3 mois.")}
                     </p>
                   </div>
 
@@ -306,7 +314,7 @@ function RegisterContent() {
                       </>
                     ) : (
                       <>
-                        <span>{t('reg_btn_pay_on_stripe', 'Valider & Payer sur Stripe')} ({planPrice})</span>
+                        <span>{t('reg_btn_pay_on_stripe', 'Activer mes 3 Mois Offerts sur Stripe (0 €)')}</span>
                         <ArrowRight className="w-4 h-4" />
                       </>
                     )}

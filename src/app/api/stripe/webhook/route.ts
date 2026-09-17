@@ -140,8 +140,12 @@ export async function POST(req: Request) {
         }
       }
 
-      // ── CAS B : Inscription & Abonnement Marchand ──
-      if (session.payment_status === 'paid' && session.metadata && session.metadata.type !== 'customer_order') {
+      // ── CAS B : Inscription & Abonnement Marchand (Paiement validé ou Début d'Essai 0 €) ──
+      const isRegistrationValid = (session.payment_status === 'paid' || session.payment_status === 'no_payment_required' || session.status === 'complete') 
+        && session.metadata 
+        && session.metadata.type !== 'customer_order';
+
+      if (isRegistrationValid) {
         const metadata = session.metadata;
         const email = metadata.email?.toLowerCase();
         const businessName = metadata.business_name;
@@ -173,10 +177,11 @@ export async function POST(req: Request) {
               });
 
               if (!authError && authData.user) {
-                const expiresAt = calculateExpirationDate(billingPeriod);
+                // 3 mois offerts (90 jours) pour le premier cycle
+                const expiresAt = calculateExpirationDate(billingPeriod, 92);
                 const monthlyPrice = billingPeriod === 'yearly' 
-                  ? (planTier === 'basic' ? 190 : 390) 
-                  : (planTier === 'basic' ? 19 : 39);
+                  ? (planTier === 'basic' ? 39.90 : 390) 
+                  : (planTier === 'basic' ? 3.99 : 39);
 
                 await supabaseAdmin.from('merchants').insert({
                   id: authData.user.id,
@@ -210,8 +215,11 @@ export async function POST(req: Request) {
       const customerId = typeof invoice.customer === 'string' ? invoice.customer : null;
       
       if (customerId) {
-        const nextPeriodEnd = new Date();
-        nextPeriodEnd.setMonth(nextPeriodEnd.getMonth() + 1);
+        const periodEndTs = invoice.lines?.data?.[0]?.period?.end;
+        const nextPeriodEnd = periodEndTs ? new Date(periodEndTs * 1000) : new Date();
+        if (!periodEndTs) {
+          nextPeriodEnd.setMonth(nextPeriodEnd.getMonth() + 1);
+        }
 
         await supabaseAdmin
           .from('merchants')

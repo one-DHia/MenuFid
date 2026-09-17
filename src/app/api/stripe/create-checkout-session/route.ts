@@ -67,18 +67,27 @@ export async function POST(req: Request) {
 
     const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'https://menufid.site';
 
-    // 4. Créer la session Stripe Checkout
+    // 4. Créer la session Stripe Checkout avec 3 mois d'essai offerts (90 jours)
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'subscription',
       customer_email: cleanEmail,
+      subscription_data: {
+        trial_period_days: 90,
+        metadata: {
+          business_name: businessName.trim(),
+          email: cleanEmail,
+          plan_tier: selectedPlan.planTier,
+          billing_period: isYearly ? 'yearly' : 'monthly',
+        },
+      },
       line_items: [
         {
           price_data: {
             currency: 'eur',
             product_data: {
-              name: selectedPlan.name,
-              description: selectedPlan.description,
+              name: `${selectedPlan.name} (3 mois offerts)`,
+              description: `${selectedPlan.description} • 0 € aujourd'hui puis prélèvement automatique`,
             },
             unit_amount: unitAmount,
             recurring: {

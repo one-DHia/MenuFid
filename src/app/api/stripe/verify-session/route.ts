@@ -13,9 +13,15 @@ export async function POST(req: Request) {
     // 1. Récupérer la session auprès de Stripe
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
-    if (!session || session.payment_status !== 'paid') {
+    const isAuthorized = session && (
+      session.payment_status === 'paid' || 
+      session.payment_status === 'no_payment_required' || 
+      session.status === 'complete'
+    );
+
+    if (!isAuthorized) {
       return NextResponse.json(
-        { error: 'Paiement non validé ou session expirée' },
+        { error: 'Paiement ou essai non validé ou session expirée' },
         { status: 400 }
       );
     }
@@ -80,10 +86,11 @@ export async function POST(req: Request) {
     }
 
     const userId = authData.user.id;
-    const expiresAt = calculateExpirationDate(billingPeriod);
+    // 3 mois offerts (90 jours) pour le premier cycle
+    const expiresAt = calculateExpirationDate(billingPeriod, 92);
     const monthlyPrice = billingPeriod === 'yearly' 
-      ? (planTier === 'basic' ? 190 : 390) 
-      : (planTier === 'basic' ? 19 : 39);
+      ? (planTier === 'basic' ? 39.90 : 390) 
+      : (planTier === 'basic' ? 3.99 : 39);
 
     // 4. Insérer le marchand dans la table public.merchants
     const { data: newMerchant, error: insertError } = await supabaseAdmin

@@ -44,11 +44,13 @@ export const MENUFID_PLANS: Record<'starter' | 'pro', PlanConfig> = {
 };
 
 /**
- * Calcule la date d'expiration en fonction de la période de facturation
+ * Calcule la date d'expiration en fonction de la période de facturation et d'une éventuelle période d'essai (trialDays)
  */
-export function calculateExpirationDate(billingPeriod: 'monthly' | 'yearly'): Date {
+export function calculateExpirationDate(billingPeriod: 'monthly' | 'yearly', trialDays = 0): Date {
   const expiresAt = new Date();
-  if (billingPeriod === 'yearly') {
+  if (trialDays > 0) {
+    expiresAt.setDate(expiresAt.getDate() + trialDays);
+  } else if (billingPeriod === 'yearly') {
     expiresAt.setFullYear(expiresAt.getFullYear() + 1);
   } else {
     expiresAt.setMonth(expiresAt.getMonth() + 1);
