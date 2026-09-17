@@ -146,7 +146,7 @@ export async function POST(req: Request) {
         && session.metadata.type !== 'customer_order';
 
       if (isRegistrationValid) {
-        const metadata = session.metadata;
+        const metadata = session.metadata || {};
         const email = metadata.email?.toLowerCase();
         const businessName = metadata.business_name;
         const planTier = (metadata.plan_tier as 'basic' | 'loyalty') || 'loyalty';
