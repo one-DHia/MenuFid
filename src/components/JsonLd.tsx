@@ -18,7 +18,7 @@ export function JsonLd() {
             priceCurrency: 'EUR',
             priceValidUntil: '2028-12-31',
             availability: 'https://schema.org/InStock',
-            description: 'Menu digital interactif QR code jusqu\'à 100 plats, 3 mois offerts puis 3,99 €/mois (ou 500 DA/mois).',
+            description: 'Menu digital interactif QR code jusqu\'à 100 plats, 3 mois offerts puis 3,99 €/mois (ou 1 000 DA/mois).',
           },
           {
             '@type': 'Offer',
@@ -116,7 +116,7 @@ export function JsonLd() {
             name: 'Combien coûte l\'abonnement MenuFid ?',
             acceptedAnswer: {
               '@type': 'Answer',
-              text: 'La formule Essentiel démarre avec 3 mois offerts puis 3,99 € / mois (ou 500 DA / mois). La formule PRO est à 39 € / mois (ou 3 900 DA / mois) avec 3 mois offerts. Une Licence Complète à Vie est également disponible à 490 € (ou 49 000 DA) en paiement unique.',
+              text: 'La formule Essentiel démarre avec 3 mois offerts puis 3,99 € / mois (ou 1 000 DA / mois). La formule PRO est à 39 € / mois (ou 3 900 DA / mois) avec 3 mois offerts. Une Licence Complète à Vie est également disponible à 490 € (ou 49 000 DA) en paiement unique.',
             },
           },
         ],

@@ -20,11 +20,11 @@ export default function PricingPage() {
   // Tarifs dynamiques (Offre spéciale : 3 mois offerts sur Essentiel et Pro, Licence à vie 490 € / 49 000 DA)
   const prices = {
     essential: {
-      monthly: currency === 'DZD' ? '500 DA' : '3,99 €',
-      yearly: currency === 'DZD' ? '5 000 DA' : '39,90 €',
+      monthly: currency === 'DZD' ? '1 000 DA' : '3,99 €',
+      yearly: currency === 'DZD' ? '10 000 DA' : '39,90 €',
       unit: currency === 'DZD' ? 'DA' : '€',
       afterPromoNote: currency === 'DZD'
-        ? t('pricing_after_promo_note_essential_dzd', '0 DA pendant 3 mois, puis 500 DA/mois')
+        ? t('pricing_after_promo_note_essential_dzd', '0 DA pendant 3 mois, puis 1 000 DA/mois')
         : t('pricing_after_promo_note_essential_eur', '0 € pendant 3 mois, puis 3,99 €/mois'),
     },
     pro: {
